@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spectrum", "spectrum\spectrum.vcxproj", "{AAD95487-2238-4C6D-BE3A-41CA8E9424F4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spectrum", "src\spectrum.vcxproj", "{AAD95487-2238-4C6D-BE3A-41CA8E9424F4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EightBit", "libraries\EightBit\src\EightBit.vcxproj", "{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Z80", "libraries\EightBit\Z80\src\Z80.vcxproj", "{01974F81-2750-45AF-B845-2C903A54A334}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,22 @@ Global
 		{AAD95487-2238-4C6D-BE3A-41CA8E9424F4}.Release|x64.Build.0 = Release|x64
 		{AAD95487-2238-4C6D-BE3A-41CA8E9424F4}.Release|x86.ActiveCfg = Release|Win32
 		{AAD95487-2238-4C6D-BE3A-41CA8E9424F4}.Release|x86.Build.0 = Release|Win32
+		{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}.Debug|x64.ActiveCfg = Debug|x64
+		{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}.Debug|x64.Build.0 = Debug|x64
+		{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}.Debug|x86.ActiveCfg = Debug|Win32
+		{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}.Debug|x86.Build.0 = Debug|Win32
+		{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}.Release|x64.ActiveCfg = Release|x64
+		{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}.Release|x64.Build.0 = Release|x64
+		{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}.Release|x86.ActiveCfg = Release|Win32
+		{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}.Release|x86.Build.0 = Release|Win32
+		{01974F81-2750-45AF-B845-2C903A54A334}.Debug|x64.ActiveCfg = Debug|x64
+		{01974F81-2750-45AF-B845-2C903A54A334}.Debug|x64.Build.0 = Debug|x64
+		{01974F81-2750-45AF-B845-2C903A54A334}.Debug|x86.ActiveCfg = Debug|Win32
+		{01974F81-2750-45AF-B845-2C903A54A334}.Debug|x86.Build.0 = Debug|Win32
+		{01974F81-2750-45AF-B845-2C903A54A334}.Release|x64.ActiveCfg = Release|x64
+		{01974F81-2750-45AF-B845-2C903A54A334}.Release|x64.Build.0 = Release|x64
+		{01974F81-2750-45AF-B845-2C903A54A334}.Release|x86.ActiveCfg = Release|Win32
+		{01974F81-2750-45AF-B845-2C903A54A334}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
