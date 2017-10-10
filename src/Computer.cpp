@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "Computer.h"
+#include "Configuration.h"
 
 Computer::Computer(const Configuration& configuration)
 : m_configuration(configuration),
-  m_board(configuration),
+  m_board(m_colours, configuration),
   m_window(nullptr),
   m_renderer(nullptr),
   m_bitmapTexture(nullptr),
@@ -22,7 +23,7 @@ void Computer::initialise() {
 	m_board.initialise();
 
 	m_window = ::SDL_CreateWindow(
-		"GameBoy",
+		"Spectrum",
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		ScreenWidth, ScreenHeight,
 		SDL_WINDOW_SHOWN);

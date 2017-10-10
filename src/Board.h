@@ -9,13 +9,14 @@
 #include <Profiler.h>
 #include <Disassembler.h>
 
-#include "Configuration.h"
 #include "Ula.h"
-#include "ColourPalette.h"
+
+class Configuration;
+class ColourPalette;
 
 class Board : public EightBit::Bus {
 public:
-	Board(const Configuration& configuration);
+	Board(const ColourPalette& palette, const Configuration& configuration);
 
 	EightBit::Z80& CPU() { return m_cpu; }
 	Ula &ULA() { return m_ula; }
@@ -29,9 +30,9 @@ protected:
 
 private:
 	const Configuration& m_configuration;
+	const ColourPalette& m_palette;
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu;
-	ColourPalette m_palette;
 	Ula m_ula;
 
 	EightBit::Rom m_basicRom;		//0000h - 3FFFh  ROM(BASIC)

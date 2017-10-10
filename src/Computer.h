@@ -38,8 +38,8 @@ private:
 	};
 
 	const Configuration& m_configuration;
-	mutable Board m_board;
 	ColourPalette m_colours;
+	mutable Board m_board;
 
 	SDL_Window* m_window;
 	SDL_Renderer* m_renderer;

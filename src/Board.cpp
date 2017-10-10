@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "Board.h"
+#include "Configuration.h"
 
 #include <iostream>
 
-Board::Board(const Configuration& configuration)
+Board::Board(const ColourPalette& palette, const Configuration& configuration)
 : m_configuration(configuration),
+  m_palette(palette),
   m_cpu(*this, m_ports),
   m_ula(m_palette, *this),
   m_contendedRam(0x4000),
@@ -57,14 +59,19 @@ uint8_t& Board::reference(uint16_t address, bool& rom) {
 }
 
 int Board::runRasterLines() {
+
+	int count = 0;
+
 	m_scanLine = -1;
-	return runRasterLines(Ula::UpperBorder * Ula::HorizontalCyclesTotal, Ula::UpperBorder);
+	count += runRasterLines(Ula::UpperBorder * Ula::HorizontalCyclesTotal, Ula::UpperBorder);
 
 	m_scanLine = 0;
-	return runRasterLines(Ula::RasterHeight * Ula::HorizontalCyclesTotal, Ula::RasterHeight);
+	count += runRasterLines(Ula::RasterHeight * Ula::HorizontalCyclesTotal, Ula::RasterHeight);
 
 	m_scanLine = -1;
-	return runRasterLines(Ula::LowerBorder * Ula::HorizontalCyclesTotal, Ula::LowerBorder);
+	count += runRasterLines(Ula::LowerBorder * Ula::HorizontalCyclesTotal, Ula::LowerBorder);
+
+	return count;
 }
 
 int Board::runRasterLines(int limit, int lines) {

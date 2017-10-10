@@ -22,12 +22,15 @@ public:
 		HorizontalDrawCycles = 128,
 		HorizontalBlankCycles = 96,
 		HorizontalCyclesTotal = HorizontalDrawCycles + HorizontalBlankCycles,
+
+		BitmapAddress = 0x4000,
+		AttributeAddress = 0x5800
 	};
 
 	Ula(const ColourPalette& palette, Board& bus);
 
 	void initialise();
-	void render(int scanLine);
+	void render(int y);
 
 	const std::vector<uint32_t>& pixels() const;
 
