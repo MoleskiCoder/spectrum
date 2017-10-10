@@ -40,15 +40,19 @@ void Ula::render(int y) {
 
 	for (int byte = 0; byte < bytesPerLine; ++byte) {
 
-		auto address = addressY + byte;
-		auto row = m_bus.peek(address);
+		auto bitmapAddress = addressY + byte;
+		auto row = m_bus.peek(bitmapAddress);
 
-		auto bright = false;
-		auto pen = ColourPalette::Black;
-		auto paper = ColourPalette::Cyan;
+		auto attributeAddress = AttributeAddress + byte + y % 24;
+		auto attribute = m_bus.peek(attributeAddress);
+
+		auto ink = attribute & EightBit::Processor::Mask3;
+		auto paper = (attribute >> 3) & EightBit::Processor::Mask3;
+		auto bright = !!(attribute & EightBit::Processor::Bit6);
+		auto flash = !!(attribute & EightBit::Processor::Bit7);
 
 		auto background = m_palette.getColour(paper, bright);
-		auto foreground = m_palette.getColour(pen, bright);
+		auto foreground = m_palette.getColour(ink, bright);
 
 		for (int bit = 0; bit < 8; ++bit) {
 
