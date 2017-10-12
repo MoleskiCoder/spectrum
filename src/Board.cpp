@@ -62,14 +62,11 @@ int Board::runRasterLines() {
 
 	int count = 0;
 
-	m_scanLine = -1;
-	count += runRasterLines(Ula::UpperBorder * Ula::HorizontalCyclesTotal, Ula::UpperBorder);
-
 	m_scanLine = 0;
-	count += runRasterLines(Ula::RasterHeight * Ula::HorizontalCyclesTotal, Ula::RasterHeight);
 
-	m_scanLine = -1;
-	count += runRasterLines(Ula::LowerBorder * Ula::HorizontalCyclesTotal, Ula::LowerBorder);
+	count += runBlankLines(Ula::UpperRasterBorder * Ula::HorizontalCyclesTotal, Ula::UpperRasterBorder);
+	count += runRasterLines(Ula::ActiveRasterHeight * Ula::HorizontalCyclesTotal, Ula::ActiveRasterHeight);
+	count += runBlankLines(Ula::LowerRasterBorder * Ula::HorizontalCyclesTotal, Ula::LowerRasterBorder);
 
 	return count;
 }
@@ -90,11 +87,24 @@ int Board::runRasterLine(int limit) {
 	int count = 0;
 
 	count += m_cpu.run(Ula::HorizontalDrawCycles);
-
-	if (m_scanLine > -1)
-		m_ula.render(m_scanLine++);
-
-	count += m_cpu.run(Ula::HorizontalBlankCycles);
+	m_ula.render(m_scanLine++);
+	count += m_cpu.run(limit - Ula::HorizontalDrawCycles);
 
 	return count;
+}
+
+int Board::runBlankLines(int limit, int lines) {
+	int count = 0;
+	int allowed = Ula::HorizontalCyclesTotal;
+	for (int line = 0; line < lines; ++line) {
+		auto executed = runBlankLine(allowed);
+		count += executed;
+		allowed = Ula::HorizontalCyclesTotal - (executed - Ula::HorizontalCyclesTotal);
+	}
+	return count;
+}
+
+int Board::runBlankLine(int limit) {
+	m_ula.renderBlank(m_scanLine++);
+	return m_cpu.run(limit);
 }

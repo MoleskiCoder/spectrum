@@ -20,6 +20,7 @@ public:
 
 	EightBit::Z80& CPU() { return m_cpu; }
 	Ula &ULA() { return m_ula; }
+	EightBit::InputOutput &ports() { return m_ports; }
 
 	void initialise();
 
@@ -49,4 +50,7 @@ private:
 
 	int runRasterLines(int limit, int lines);
 	int runRasterLine(int limit);
+
+	int runBlankLines(int limit, int lines);
+	int runBlankLine(int limit);
 };

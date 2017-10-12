@@ -9,11 +9,16 @@ class ColourPalette;
 class Ula {
 public:
 	enum {
-		UpperBorder = 64,
-		LowerBorder = 56,
-		RasterWidth = 256,
-		RasterHeight = 192,
-		TotalLineCount = UpperBorder + RasterHeight + LowerBorder,
+		UpperRasterBorder = 64,
+		ActiveRasterHeight = 192,
+		LowerRasterBorder = 56,
+
+		LeftRasterBorder = 64,
+		ActiveRasterWidth = 256,
+		RightRasterBorder = 64,
+
+		RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder,
+		RasterHeight = UpperRasterBorder + ActiveRasterHeight + LowerRasterBorder,
 
 		CyclesPerSecond = 3500000,	// 3.5Mhz
 		FramesPerSecond = 50,
@@ -30,7 +35,8 @@ public:
 	Ula(const ColourPalette& palette, Board& bus);
 
 	void initialise();
-	void render(int y);
+	void renderBlank(int y);
+	void render(int absoluteY);
 
 	const std::vector<uint32_t>& pixels() const;
 
@@ -38,4 +44,12 @@ private:
 	std::vector<uint32_t> m_pixels;
 	const ColourPalette& m_palette;
 	Board& m_bus;
+	uint32_t m_borderColour;
+
+	void renderLeftHorizontalBorder(int y);
+	void renderRightHorizontalBorder(int y);
+
+	void renderActive(int absoluteY);
+
+	void Board_WrittenPort(const EightBit::PortEventArgs& event);
 };
