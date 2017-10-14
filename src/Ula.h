@@ -17,6 +17,8 @@ public:
 		ActiveRasterWidth = 256,
 		RightRasterBorder = 64,
 
+		BytesPerLine = ActiveRasterWidth / 8,
+
 		RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder,
 		RasterHeight = UpperRasterBorder + ActiveRasterHeight + LowerRasterBorder,
 

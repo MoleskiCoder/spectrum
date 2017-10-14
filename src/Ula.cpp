@@ -21,84 +21,91 @@ void Ula::initialise() {
 	m_bus.ports().WrittenPort.connect(std::bind(&Ula::Board_WrittenPort, this, std::placeholders::_1));
 }
 
-void Ula::renderBlank(int y) {
-	std::fill_n(m_pixels.begin() + y * RasterWidth, (int)RasterWidth, m_borderColour);
+void Ula::renderBlank(const int y) {
+	std::fill_n(
+		m_pixels.begin() + y * RasterWidth,
+		(int)RasterWidth,
+		m_borderColour);
 }
 
-void Ula::renderLeftHorizontalBorder(int y) {
+void Ula::renderLeftHorizontalBorder(const int y) {
 	std::fill_n(
 		m_pixels.begin() + y * RasterWidth,
 		(int)LeftRasterBorder,
 		m_borderColour);
 }
 
-void Ula::renderRightHorizontalBorder(int y) {
+void Ula::renderRightHorizontalBorder(const int y) {
 	std::fill_n(
 		m_pixels.begin() + y * RasterWidth + LeftRasterBorder + ActiveRasterWidth,
-		(int)LeftRasterBorder,
+		(int)RightRasterBorder,
 		m_borderColour);
 }
 
-void Ula::renderActive(int absoluteY) {
+void Ula::renderActive(const int absoluteY) {
 
-	auto y = absoluteY - UpperRasterBorder;
+	assert(absoluteY < RasterHeight);
 
-	auto verticalBlock = y / 64;
-	assert((verticalBlock < 3) && (verticalBlock >= 0));
+	const auto y = absoluteY - UpperRasterBorder;
+	assert((y < 192) && (y >= 0));
 
-	auto verticalCharacterLine = y % 64 / 8;
-	assert((verticalCharacterLine < 8) && (verticalCharacterLine >= 0));
+	const auto high = y >> 6;
+	assert((high < 3) && (high >= 0));
 
-	auto verticalScanLine = y % 64 % 8;
-	assert((verticalScanLine < 8) && (verticalScanLine >= 0));
+	auto medium = (y >> 3) & EightBit::Processor::Mask3;
+	assert((medium < 8) && (medium >= 0));
 
-	const auto bytesPerLine = ActiveRasterWidth / 8;
+	const auto low = y & EightBit::Processor::Mask3;
+	assert((low < 8) && (low >= 0));
 
-	const auto addressY =
+	const auto bitmapAddressY =
 		BitmapAddress
-		| verticalBlock << 11
-		| verticalScanLine << 8
-		| verticalCharacterLine << 5;
+		| (high << 11)
+		| (low << 8)
+		| (medium << 5);
 
-	for (int byte = 0; byte < bytesPerLine; ++byte) {
+	const auto attributeAddressY = AttributeAddress + (y % 32);
 
-		auto bitmapAddress = addressY + byte;
-		auto row = m_bus.peek(bitmapAddress);
+	const auto pixelBase = LeftRasterBorder + absoluteY * RasterWidth;
 
-		auto attributeAddress = AttributeAddress + byte + y % 24;
-		auto attribute = m_bus.peek(attributeAddress);
+	for (int byte = 0; byte < BytesPerLine; ++byte) {
 
-		auto ink = attribute & EightBit::Processor::Mask3;
-		auto paper = (attribute >> 3) & EightBit::Processor::Mask3;
-		auto bright = !!(attribute & EightBit::Processor::Bit6);
-		auto flash = !!(attribute & EightBit::Processor::Bit7);
+		const auto bitmapAddress = bitmapAddressY + byte;
+		const auto bitmap = m_bus.peek(bitmapAddress);
 
-		auto background = m_palette.getColour(paper, bright);
-		auto foreground = m_palette.getColour(ink, bright);
+		const auto attributeAddress = attributeAddressY + byte;
+		const auto attribute = m_bus.peek(attributeAddress);
+
+		const auto ink = attribute & EightBit::Processor::Mask3;
+		const auto paper = (attribute >> 3) & EightBit::Processor::Mask3;
+		const auto bright = !!(attribute & EightBit::Processor::Bit6);
+		const auto flash = !!(attribute & EightBit::Processor::Bit7);
+
+		const auto background = m_palette.getColour(paper, bright);
+		const auto foreground = m_palette.getColour(ink, bright);
 
 		for (int bit = 0; bit < 8; ++bit) {
 
-			const auto pixel = row & (1 << bit);
-			const auto x = (7 - bit) + byte * 8;
+			const auto pixel = bitmap & (1 << bit);
+			const auto x = (~bit & EightBit::Processor::Mask3) | (byte << 3);
 
-			m_pixels[x + LeftRasterBorder + (y + UpperRasterBorder) * RasterWidth] = pixel ? foreground : background;
+			m_pixels[pixelBase + x] = pixel ? foreground : background;
 		}
 	}
 }
 
-void Ula::render(int absoluteY) {
+void Ula::render(const int absoluteY) {
 	renderLeftHorizontalBorder(absoluteY);
 	renderActive(absoluteY);
 	renderRightHorizontalBorder(absoluteY);
 }
 
 void Ula::Board_WrittenPort(const EightBit::PortEventArgs& event) {
-	auto port = event.getPort();
+	const auto port = event.getPort();
+	const auto value = m_bus.ports().readOutputPort(port);
 	switch (port) {
 	case 0xfe:
-		m_borderColour = m_palette.getColour(m_bus.ports().readOutputPort(port), false);
-		break;
-	default:
+		m_borderColour = m_palette.getColour(value, false);
 		break;
 	}
 }
