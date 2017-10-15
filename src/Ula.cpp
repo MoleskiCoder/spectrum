@@ -113,16 +113,16 @@ void Ula::pullKey(SDL_Keycode raw) {
 void Ula::initialiseKeyboardMapping() {
 
 	// Left side
-	m_keyboardMapping[0xF7] = { SDLK_5,     SDLK_4,     SDLK_3,		SDLK_2,		SDLK_1		};
-	m_keyboardMapping[0xFB] = { SDLK_t,		SDLK_r,		SDLK_e,		SDLK_w,		SDLK_q		};
-	m_keyboardMapping[0xFD] = { SDLK_g,     SDLK_f,     SDLK_d,		SDLK_s,		SDLK_a		};
-	m_keyboardMapping[0xFE] = { SDLK_v,		SDLK_c,		SDLK_x,		SDLK_z,		SDLK_LSHIFT	};
+	m_keyboardMapping[0xF7] = { SDLK_1,		SDLK_2,     SDLK_3,     SDLK_4,		SDLK_5,		};
+	m_keyboardMapping[0xFB] = { SDLK_q,		SDLK_w,		SDLK_e,		SDLK_r,		SDLK_t		};
+	m_keyboardMapping[0xFD] = { SDLK_a,     SDLK_s,     SDLK_d,		SDLK_f,		SDLK_g		};
+	m_keyboardMapping[0xFE] = { SDLK_LSHIFT,SDLK_z,		SDLK_x,		SDLK_c,		SDLK_v		};
 
 	// Right side
-	m_keyboardMapping[0xEF] = { SDLK_6,		SDLK_7,		SDLK_8,		SDLK_9,		SDLK_0		};
-	m_keyboardMapping[0xDF] = { SDLK_y,     SDLK_u,     SDLK_i,		SDLK_o,		SDLK_p		};
-	m_keyboardMapping[0xBF] = { SDLK_h,		SDLK_j,		SDLK_k,		SDLK_l,		SDLK_RETURN	};
-	m_keyboardMapping[0x7F] = { SDLK_b,     SDLK_n,     SDLK_m,		SDLK_RSHIFT,SDLK_SPACE	};
+	m_keyboardMapping[0xEF] = { SDLK_0,		SDLK_9,		SDLK_8,		SDLK_7,		SDLK_6		};
+	m_keyboardMapping[0xDF] = { SDLK_p,     SDLK_o,     SDLK_i,		SDLK_u,		SDLK_y		};
+	m_keyboardMapping[0xBF] = { SDLK_RETURN,SDLK_l,		SDLK_k,		SDLK_j,		SDLK_h		};
+	m_keyboardMapping[0x7F] = { SDLK_SPACE,	SDLK_RSHIFT,SDLK_m,		SDLK_n,		SDLK_b		};
 }
 
 uint8_t Ula::findSelectedKeys(uint8_t row) const {
