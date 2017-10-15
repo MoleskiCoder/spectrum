@@ -1,7 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <unordered_set>
+#include <unordered_map>
 #include <cstdint>
+#include <SDL.h>
 
 class Board;
 class ColourPalette;
@@ -40,6 +43,9 @@ public:
 	void renderBlank(int y);
 	void render(int absoluteY);
 
+	void pokeKey(SDL_Keycode raw);
+	void pullKey(SDL_Keycode raw);
+
 	const std::vector<uint32_t>& pixels() const;
 
 private:
@@ -48,10 +54,18 @@ private:
 	Board& m_bus;
 	uint32_t m_borderColour;
 
+	std::unordered_map<int, std::array<int, 5>> m_keyboardMapping;
+	std::unordered_set<SDL_Keycode> m_keyboardRaw;
+
+	void initialiseKeyboardMapping();
+
+	uint8_t findSelectedKeys(uint8_t row) const;
+
 	void renderLeftHorizontalBorder(int y);
 	void renderRightHorizontalBorder(int y);
 
 	void renderActive(int absoluteY);
 
+	void Board_ReadingPort(const EightBit::PortEventArgs& event);
 	void Board_WrittenPort(const EightBit::PortEventArgs& event);
 };

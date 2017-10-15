@@ -142,9 +142,11 @@ void Computer::runLoop() {
 }
 
 void Computer::handleKeyDown(SDL_Keycode key) {
+	m_board.ULA().pokeKey(key);
 }
 
 void Computer::handleKeyUp(SDL_Keycode key) {
+	m_board.ULA().pullKey(key);
 }
 
 void Computer::drawFrame() {
