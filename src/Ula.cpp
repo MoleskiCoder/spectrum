@@ -145,7 +145,7 @@ void Ula::Board_ReadingPort(const EightBit::PortEventArgs& event) {
 	if (ignored)
 		return;
 
-	const auto portHigh = m_bus.ADDRESS().low;
+	const auto portHigh = m_bus.ADDRESS().high;
 	auto selected = findSelectedKeys(portHigh);
 	m_bus.ports().writeInputPort(port, selected & EightBit::Processor::Mask5);
 }
