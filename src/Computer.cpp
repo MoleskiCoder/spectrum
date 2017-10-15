@@ -137,7 +137,7 @@ void Computer::runLoop() {
 			}
 		}
 
-		// Vertical blank??
+		m_board.CPU().interruptMaskable();
 	}
 }
 
