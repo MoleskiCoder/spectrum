@@ -34,12 +34,15 @@ public:
 		HorizontalCyclesTotal = HorizontalDrawCycles + HorizontalBlankCycles,
 
 		BitmapAddress = 0x4000,
-		AttributeAddress = 0x5800
+		AttributeAddress = BitmapAddress + 0x1800
 	};
 
 	Ula(const ColourPalette& palette, Board& bus);
 
 	void initialise();
+
+	void flash();
+
 	void renderBlank(int y);
 	void render(int absoluteY);
 
@@ -49,10 +52,13 @@ public:
 	const std::vector<uint32_t>& pixels() const;
 
 private:
+	std::array<uint16_t, 256> m_scanLineAddresses;
+	std::array<uint16_t, 256> m_attributeAddresses;
 	std::vector<uint32_t> m_pixels;
 	const ColourPalette& m_palette;
 	Board& m_bus;
 	uint32_t m_borderColour;
+	bool m_flash;
 
 	std::unordered_map<int, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;

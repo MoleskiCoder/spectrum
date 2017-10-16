@@ -9,7 +9,8 @@
 
 Ula::Ula(const ColourPalette& palette, Board& bus)
 : m_palette(palette),
-  m_bus(bus) {
+  m_bus(bus),
+  m_flash(false) {
 }
 
 const std::vector<uint32_t>& Ula::pixels() const {
@@ -21,6 +22,20 @@ void Ula::initialise() {
 	initialiseKeyboardMapping();
 	m_bus.ports().ReadingPort.connect(std::bind(&Ula::Board_ReadingPort, this, std::placeholders::_1));
 	m_bus.ports().WrittenPort.connect(std::bind(&Ula::Board_WrittenPort, this, std::placeholders::_1));
+
+	auto line = 0;
+	for (auto p = 0; p < 4; ++p) {
+		for (auto y = 0; y < 8; ++y) {
+			for (auto o = 0; o < 8; ++o, ++line) {
+				m_scanLineAddresses[line] = BitmapAddress + (p << 11) + (y << 5) + (o << 8);
+				m_attributeAddresses[line] = AttributeAddress + (((p << 3) + y) << 5);
+			}
+		}
+	}
+}
+
+void Ula::flash() {
+	m_flash = !m_flash;
 }
 
 void Ula::renderBlank(const int y) {
@@ -49,24 +64,10 @@ void Ula::renderActive(const int absoluteY) {
 	assert(absoluteY < RasterHeight);
 
 	const auto y = absoluteY - UpperRasterBorder;
-	assert((y < 192) && (y >= 0));
+	assert(y < ActiveRasterHeight);
 
-	const auto high = y >> 6;
-	assert((high < 3) && (high >= 0));
-
-	auto medium = (y >> 3) & EightBit::Processor::Mask3;
-	assert((medium < 8) && (medium >= 0));
-
-	const auto low = y & EightBit::Processor::Mask3;
-	assert((low < 8) && (low >= 0));
-
-	const auto bitmapAddressY =
-		BitmapAddress
-		| (high << 11)
-		| (low << 8)
-		| (medium << 5);
-
-	const auto attributeAddressY = AttributeAddress + (y % 32);
+	const auto bitmapAddressY = m_scanLineAddresses[y];
+	const auto attributeAddressY = m_attributeAddresses[y];
 
 	const auto pixelBase = LeftRasterBorder + absoluteY * RasterWidth;
 
@@ -83,8 +84,8 @@ void Ula::renderActive(const int absoluteY) {
 		const auto bright = !!(attribute & EightBit::Processor::Bit6);
 		const auto flash = !!(attribute & EightBit::Processor::Bit7);
 
-		const auto background = m_palette.getColour(paper, bright);
-		const auto foreground = m_palette.getColour(ink, bright);
+		const auto background = m_palette.getColour(flash && m_flash ? ink : paper, bright);
+		const auto foreground = m_palette.getColour(flash && m_flash ? paper : ink, bright);
 
 		for (int bit = 0; bit < 8; ++bit) {
 

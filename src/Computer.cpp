@@ -136,8 +136,6 @@ void Computer::runLoop() {
 				}
 			}
 		}
-
-		m_board.CPU().interruptMaskable();
 	}
 }
 

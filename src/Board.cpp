@@ -9,6 +9,7 @@ Board::Board(const ColourPalette& palette, const Configuration& configuration)
   m_palette(palette),
   m_cpu(*this, m_ports),
   m_ula(m_palette, *this),
+  m_frameCounter(0),
   m_contendedRam(0x4000),
   m_uncontendedRam(0x8000),
   m_profiler(m_cpu, m_disassembler) {
@@ -67,6 +68,11 @@ int Board::runRasterLines() {
 	count += runBlankLines(Ula::UpperRasterBorder * Ula::HorizontalCyclesTotal, Ula::UpperRasterBorder);
 	count += runRasterLines(Ula::ActiveRasterHeight * Ula::HorizontalCyclesTotal, Ula::ActiveRasterHeight);
 	count += runBlankLines(Ula::LowerRasterBorder * Ula::HorizontalCyclesTotal, Ula::LowerRasterBorder);
+
+	if ((++m_frameCounter & EightBit::Processor::Mask4) == 0)
+		m_ula.flash();
+
+	CPU().interruptMaskable(DATA());
 
 	return count;
 }
