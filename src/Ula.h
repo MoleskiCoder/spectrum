@@ -72,6 +72,6 @@ private:
 
 	void renderActive(int absoluteY);
 
-	void Board_ReadingPort(const EightBit::PortEventArgs& event);
-	void Board_WrittenPort(const EightBit::PortEventArgs& event);
+	void Board_ReadingPort(const uint8_t& event);
+	void Board_WrittenPort(const uint8_t& event);
 };

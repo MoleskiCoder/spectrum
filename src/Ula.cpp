@@ -139,9 +139,8 @@ uint8_t Ula::findSelectedKeys(uint8_t row) const {
 	return returned;
 }
 
-void Ula::Board_ReadingPort(const EightBit::PortEventArgs& event) {
+void Ula::Board_ReadingPort(const uint8_t& port) {
 
-	const auto port = event.getPort();
 	const auto ignored = !!(port & EightBit::Processor::Bit0);
 	if (ignored)
 		return;
@@ -151,8 +150,7 @@ void Ula::Board_ReadingPort(const EightBit::PortEventArgs& event) {
 	m_bus.ports().writeInputPort(port, selected & EightBit::Processor::Mask5);
 }
 
-void Ula::Board_WrittenPort(const EightBit::PortEventArgs& event) {
-	const auto port = event.getPort();
+void Ula::Board_WrittenPort(const uint8_t& port) {
 	const auto ignored = !!(port & EightBit::Processor::Bit0);
 	if (ignored)
 		return;
