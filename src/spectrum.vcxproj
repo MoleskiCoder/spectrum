@@ -28,26 +28,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -71,23 +71,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_63_0;C:\Libraries\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\SDL2-2.0.5\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_65_1;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libraries\SDL2-2.0.7\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_63_0;C:\Libraries\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\SDL2-2.0.5\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_65_1;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libraries\SDL2-2.0.7\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_63_0;C:\Libraries\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\SDL2-2.0.5\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_65_1;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libraries\SDL2-2.0.7\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_63_0;C:\Libraries\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\SDL2-2.0.5\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_65_1;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libraries\SDL2-2.0.7\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -131,6 +131,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -149,6 +150,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
