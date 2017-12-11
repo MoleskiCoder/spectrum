@@ -57,8 +57,8 @@ private:
 	std::vector<uint32_t> m_pixels;
 	const ColourPalette& m_palette;
 	Board& m_bus;
-	uint32_t m_borderColour;
-	bool m_flash;
+	uint32_t m_borderColour = 0;
+	bool m_flash = false;
 
 	std::unordered_map<int, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;

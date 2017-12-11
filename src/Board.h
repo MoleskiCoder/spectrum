@@ -27,7 +27,7 @@ public:
 	int runRasterLines();
 
 protected:
-	virtual uint8_t& reference(uint16_t address, bool& rom);
+	virtual uint8_t& reference(uint16_t address, bool& rom) final;
 
 private:
 	const Configuration& m_configuration;
@@ -35,16 +35,16 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu;
 	Ula m_ula;
-	uint8_t m_frameCounter;
+	uint8_t m_frameCounter = 0;
 
-	EightBit::Rom m_basicRom;		//0000h - 3FFFh  ROM(BASIC)
-	EightBit::Ram m_contendedRam;	//4000h - 7FFFh  RAM(Work RAM and VRAM) (with waitstates)
-	EightBit::Ram m_uncontendedRam;	//8000h - FFFFh  Additional RAM
+	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)
+	EightBit::Ram m_contendedRam = 0x4000;	//4000h - 7FFFh  RAM(Work RAM and VRAM) (with waitstates)
+	EightBit::Ram m_uncontendedRam = 0x8000;//8000h - FFFFh  Additional RAM
 
 	EightBit::Disassembler m_disassembler;
 	EightBit::Profiler m_profiler;
 
-	int m_scanLine;
+	int m_scanLine = 0;
 
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu);
 	void Cpu_ExecutingInstruction_Profile(const EightBit::Z80& cpu);

@@ -9,8 +9,7 @@
 
 Ula::Ula(const ColourPalette& palette, Board& bus)
 : m_palette(palette),
-  m_bus(bus),
-  m_flash(false) {
+  m_bus(bus) {
 }
 
 const std::vector<uint32_t>& Ula::pixels() const {
@@ -146,7 +145,7 @@ void Ula::Board_ReadingPort(const uint8_t& port) {
 		return;
 
 	const auto portHigh = m_bus.ADDRESS().high;
-	auto selected = findSelectedKeys(portHigh);
+	const auto selected = findSelectedKeys(portHigh);
 	m_bus.ports().writeInputPort(port, selected & EightBit::Processor::Mask5);
 }
 

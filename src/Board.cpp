@@ -9,9 +9,6 @@ Board::Board(const ColourPalette& palette, const Configuration& configuration)
   m_palette(palette),
   m_cpu(*this, m_ports),
   m_ula(m_palette, *this),
-  m_frameCounter(0),
-  m_contendedRam(0x4000),
-  m_uncontendedRam(0x8000),
   m_profiler(m_cpu, m_disassembler) {
 }
 
@@ -22,28 +19,28 @@ void Board::initialise() {
 	m_basicRom.load(romDirectory + "\\48.rom");
 
 	if (m_configuration.isProfileMode()) {
-		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
+		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
 	}
 
 	if (m_configuration.isDebugMode()) {
-		m_cpu.ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Debug, this, std::placeholders::_1));
+		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Debug, this, std::placeholders::_1));
 	}
 
-	m_cpu.initialise();
-	m_ula.initialise();
+	CPU().powerOn();
+	ULA().initialise();
 }
 
 void Board::Cpu_ExecutingInstruction_Profile(const EightBit::Z80& cpu) {
-	const auto pc = m_cpu.PC();
+	const auto pc = CPU().PC();
 	m_profiler.addAddress(pc.word);
 	m_profiler.addInstruction(peek(pc.word));
 }
 
 void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu) {
 	std::cerr
-		<< EightBit::Disassembler::state(m_cpu)
+		<< EightBit::Disassembler::state(CPU())
 		<< " "
-		<< m_disassembler.disassemble(m_cpu)
+		<< m_disassembler.disassemble(CPU())
 		<< '\n';
 }
 
@@ -70,9 +67,9 @@ int Board::runRasterLines() {
 	count += runBlankLines(Ula::LowerRasterBorder * Ula::HorizontalCyclesTotal, Ula::LowerRasterBorder);
 
 	if ((++m_frameCounter & EightBit::Processor::Mask4) == 0)
-		m_ula.flash();
+		ULA().flash();
 
-	CPU().interruptMaskable(DATA());
+	EightBit::Z80::lower(CPU().INT());
 
 	return count;
 }
@@ -81,7 +78,7 @@ int Board::runRasterLines(int limit, int lines) {
 	int count = 0;
 	int allowed = Ula::HorizontalCyclesTotal;
 	for (int line = 0; line < lines; ++line) {
-		auto executed = runRasterLine(allowed);
+		const auto executed = runRasterLine(allowed);
 		count += executed;
 		allowed = Ula::HorizontalCyclesTotal - (executed - Ula::HorizontalCyclesTotal);
 	}
@@ -92,25 +89,25 @@ int Board::runRasterLine(int limit) {
 
 	int count = 0;
 
-	count += m_cpu.run(Ula::HorizontalDrawCycles);
-	m_ula.render(m_scanLine++);
-	count += m_cpu.run(limit - Ula::HorizontalDrawCycles);
+	count += CPU().run(Ula::HorizontalDrawCycles);
+	ULA().render(m_scanLine++);
+	count += CPU().run(limit - Ula::HorizontalDrawCycles);
 
 	return count;
 }
 
-int Board::runBlankLines(int limit, int lines) {
+int Board::runBlankLines(const int limit, const int lines) {
 	int count = 0;
 	int allowed = Ula::HorizontalCyclesTotal;
 	for (int line = 0; line < lines; ++line) {
-		auto executed = runBlankLine(allowed);
+		const auto executed = runBlankLine(allowed);
 		count += executed;
 		allowed = Ula::HorizontalCyclesTotal - (executed - Ula::HorizontalCyclesTotal);
 	}
 	return count;
 }
 
-int Board::runBlankLine(int limit) {
-	m_ula.renderBlank(m_scanLine++);
-	return m_cpu.run(limit);
+int Board::runBlankLine(const int limit) {
+	ULA().renderBlank(m_scanLine++);
+	return CPU().run(limit);
 }
