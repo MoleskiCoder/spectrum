@@ -1,9 +1,12 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 
-#include <Rom.h>
+#include <Bus.h>
+#include <InputOutput.h>
 #include <Ram.h>
+#include <Rom.h>
 
 #include <Z80.h>
 #include <Profiler.h>
@@ -14,13 +17,15 @@
 class Configuration;
 class ColourPalette;
 
-class Board : public EightBit::Bus {
+class Board final : public EightBit::Bus {
 public:
 	Board(const ColourPalette& palette, const Configuration& configuration);
 
 	EightBit::Z80& CPU() { return m_cpu; }
 	Ula &ULA() { return m_ula; }
 	EightBit::InputOutput &ports() { return m_ports; }
+	EightBit::Ram& VRAM() { return m_contendedRam; }
+	EightBit::Ram& WRAM() { return m_uncontendedRam; }
 
 	void initialise();
 

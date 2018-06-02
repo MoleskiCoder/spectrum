@@ -1,15 +1,16 @@
 #pragma once
 
-#include <vector>
-#include <unordered_set>
-#include <unordered_map>
 #include <cstdint>
+#include <array>
+#include <unordered_map>
+#include <unordered_set>
+
 #include <SDL.h>
 
 class Board;
 class ColourPalette;
 
-class Ula {
+class Ula final {
 public:
 	enum {
 		UpperRasterBorder = 64,
@@ -33,8 +34,7 @@ public:
 		HorizontalBlankCycles = 96,
 		HorizontalCyclesTotal = HorizontalDrawCycles + HorizontalBlankCycles,
 
-		BitmapAddress = 0x4000,
-		AttributeAddress = BitmapAddress + 0x1800
+		AttributeAddress = 0x1800
 	};
 
 	Ula(const ColourPalette& palette, Board& bus);
@@ -49,12 +49,12 @@ public:
 	void pokeKey(SDL_Keycode raw);
 	void pullKey(SDL_Keycode raw);
 
-	const std::vector<uint32_t>& pixels() const;
+	const auto& pixels() const { return m_pixels; }
 
 private:
 	std::array<uint16_t, 256> m_scanLineAddresses;
 	std::array<uint16_t, 256> m_attributeAddresses;
-	std::vector<uint32_t> m_pixels;
+	std::array<uint32_t, RasterWidth * RasterHeight> m_pixels;
 	const ColourPalette& m_palette;
 	Board& m_bus;
 	uint32_t m_borderColour = 0;
@@ -62,6 +62,8 @@ private:
 
 	std::unordered_map<int, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;
+
+	Board& BUS() { return m_bus; }
 
 	void initialiseKeyboardMapping();
 

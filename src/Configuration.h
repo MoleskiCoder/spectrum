@@ -2,9 +2,9 @@
 
 #include <string>
 
-class Configuration {
+class Configuration final {
 public:
-	Configuration();
+	Configuration() = default;
 
 	bool isDebugMode() const {
 		return m_debugMode;
@@ -43,9 +43,9 @@ public:
 	}
 
 private:
-	bool m_debugMode;
-	bool m_profileMode;
-	bool m_drawGraphics;
-	bool m_vsyncLocked;
-	std::string m_romDirectory;
+	bool m_debugMode = false;
+	bool m_profileMode = false;
+	bool m_drawGraphics = true;
+	bool m_vsyncLocked = true;
+	std::string m_romDirectory = "roms";
 };

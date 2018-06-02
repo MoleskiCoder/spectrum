@@ -4,16 +4,7 @@
 
 Computer::Computer(const Configuration& configuration)
 : m_configuration(configuration),
-  m_board(m_colours, configuration),
-  m_window(nullptr),
-  m_renderer(nullptr),
-  m_bitmapTexture(nullptr),
-  m_pixelType(SDL_PIXELFORMAT_ARGB8888),
-  m_pixelFormat(nullptr),
-  m_fps(Ula::FramesPerSecond),
-  m_startTicks(0UL),
-  m_frames(0UL),
-  m_vsync(false) {
+  m_board(m_colours, configuration) {
 }
 
 void Computer::initialise() {

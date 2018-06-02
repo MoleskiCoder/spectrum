@@ -2,16 +2,23 @@
 #pragma once
 #endif
 
-#include <stdexcept>
-#include <string>
-#include <iostream>
+#include <array>
 #include <cassert>
-#include <unordered_set>
+#include <cstdint>
+#include <stdexcept>
+#include <iostream>
+#include <string>
+#include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <SDL.h>
 
 #include <Bus.h>
+#include <InputOutput.h>
+#include <Ram.h>
+#include <Rom.h>
+
 #include <Z80.h>
 #include <Profiler.h>
 #include <Disassembler.h>

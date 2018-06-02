@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
+#include <array>
 #include <cstdint>
 
 struct SDL_PixelFormat;
 
-class ColourPalette {
+class ColourPalette final {
 public:
 	enum {
 		Bright = 0x28,
@@ -19,9 +19,7 @@ public:
 		White
 	};
 
-	ColourPalette()
-	: m_colours(16) {
-	}
+	ColourPalette() = default;
 
 	uint32_t getColour(size_t index, bool bright) const {
 		assert(index < 8);
@@ -36,7 +34,7 @@ public:
 	void load(SDL_PixelFormat* hardware);
 
 private:
-	std::vector<uint32_t> m_colours;
+	std::array<uint32_t, 16> m_colours;
 
 	void loadColour(SDL_PixelFormat* hardware, size_t idx, Uint8 red, Uint8 green, Uint8 blue);
 };

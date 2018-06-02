@@ -12,21 +12,16 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
   m_bus(bus) {
 }
 
-const std::vector<uint32_t>& Ula::pixels() const {
-	return m_pixels;
-}
-
 void Ula::initialise() {
-	m_pixels.resize(RasterWidth * RasterHeight);
 	initialiseKeyboardMapping();
-	m_bus.ports().ReadingPort.connect(std::bind(&Ula::Board_ReadingPort, this, std::placeholders::_1));
-	m_bus.ports().WrittenPort.connect(std::bind(&Ula::Board_WrittenPort, this, std::placeholders::_1));
+	BUS().ports().ReadingPort.connect(std::bind(&Ula::Board_ReadingPort, this, std::placeholders::_1));
+	BUS().ports().WrittenPort.connect(std::bind(&Ula::Board_WrittenPort, this, std::placeholders::_1));
 
 	auto line = 0;
 	for (auto p = 0; p < 4; ++p) {
 		for (auto y = 0; y < 8; ++y) {
 			for (auto o = 0; o < 8; ++o, ++line) {
-				m_scanLineAddresses[line] = BitmapAddress + (p << 11) + (y << 5) + (o << 8);
+				m_scanLineAddresses[line] = (p << 11) + (y << 5) + (o << 8);
 				m_attributeAddresses[line] = AttributeAddress + (((p << 3) + y) << 5);
 			}
 		}
@@ -73,10 +68,10 @@ void Ula::renderActive(const int absoluteY) {
 	for (int byte = 0; byte < BytesPerLine; ++byte) {
 
 		const auto bitmapAddress = bitmapAddressY + byte;
-		const auto bitmap = m_bus.peek(bitmapAddress);
+		const auto bitmap = BUS().VRAM().peek(bitmapAddress);
 
 		const auto attributeAddress = attributeAddressY + byte;
-		const auto attribute = m_bus.peek(attributeAddress);
+		const auto attribute = BUS().VRAM().peek(attributeAddress);
 
 		const auto ink = attribute & EightBit::Processor::Mask3;
 		const auto paper = (attribute >> 3) & EightBit::Processor::Mask3;
@@ -144,9 +139,9 @@ void Ula::Board_ReadingPort(const uint8_t& port) {
 	if (ignored)
 		return;
 
-	const auto portHigh = m_bus.ADDRESS().high;
+	const auto portHigh = BUS().ADDRESS().high;
 	const auto selected = findSelectedKeys(portHigh);
-	m_bus.ports().writeInputPort(port, selected & EightBit::Processor::Mask5);
+	BUS().ports().writeInputPort(port, selected & EightBit::Processor::Mask5);
 }
 
 void Ula::Board_WrittenPort(const uint8_t& port) {
@@ -154,6 +149,6 @@ void Ula::Board_WrittenPort(const uint8_t& port) {
 	if (ignored)
 		return;
 
-	const auto value = m_bus.ports().readOutputPort(port);
+	const auto value = BUS().ports().readOutputPort(port);
 	m_borderColour = m_palette.getColour(value & EightBit::Processor::Mask3, false);
 }

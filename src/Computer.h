@@ -12,7 +12,7 @@
 
 class Configuration;
 
-class Computer {
+class Computer final {
 public:
 
 	static void throwSDLException(std::string failure) {
@@ -39,19 +39,19 @@ private:
 
 	const Configuration& m_configuration;
 	ColourPalette m_colours;
-	mutable Board m_board;
+	Board m_board;
 
-	SDL_Window* m_window;
-	SDL_Renderer* m_renderer;
+	SDL_Window* m_window = nullptr;
+	SDL_Renderer* m_renderer = nullptr;
 
-	SDL_Texture* m_bitmapTexture;
-	Uint32 m_pixelType;
-	SDL_PixelFormat* m_pixelFormat;
+	SDL_Texture* m_bitmapTexture = nullptr;
+	Uint32 m_pixelType = SDL_PIXELFORMAT_ARGB8888;
+	SDL_PixelFormat* m_pixelFormat = nullptr;
 
-	int m_fps;
-	Uint32 m_startTicks;
-	Uint32 m_frames;
-	bool m_vsync;
+	int m_fps = Ula::FramesPerSecond;
+	Uint32 m_startTicks = 0UL;
+	Uint32 m_frames = 0UL;
+	bool m_vsync = false;
 
 	void drawFrame();
 
