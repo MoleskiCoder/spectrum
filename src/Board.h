@@ -33,6 +33,7 @@ public:
 
 protected:
 	virtual uint8_t& reference(uint16_t address, bool& rom) final;
+	virtual uint8_t reference(uint16_t address, bool& rom) const final;
 
 private:
 	const Configuration& m_configuration;
