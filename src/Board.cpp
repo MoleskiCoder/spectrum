@@ -44,25 +44,11 @@ void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu) {
 		<< '\n';
 }
 
-uint8_t& Board::reference(uint16_t address, bool& rom) {
+uint8_t& Board::reference(uint16_t address) {
 
-	rom = true;
 	if (address < 0x4000)
-		return DATA() = m_basicRom.reference(address);
+		return DATA() = m_basicRom.peek(address);
 
-	rom = false;
-	if (address < 0x8000)
-		return m_contendedRam.reference(address - 0x4000);
-	return m_uncontendedRam.reference(address - 0x8000);
-}
-
-uint8_t Board::reference(uint16_t address, bool& rom) const {
-
-	rom = true;
-	if (address < 0x4000)
-		return m_basicRom.reference(address);
-
-	rom = false;
 	if (address < 0x8000)
 		return m_contendedRam.reference(address - 0x4000);
 	return m_uncontendedRam.reference(address - 0x8000);

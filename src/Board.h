@@ -32,8 +32,7 @@ public:
 	int runRasterLines();
 
 protected:
-	virtual uint8_t& reference(uint16_t address, bool& rom) final;
-	virtual uint8_t reference(uint16_t address, bool& rom) const final;
+	virtual uint8_t& reference(uint16_t address) final;
 
 private:
 	const Configuration& m_configuration;
