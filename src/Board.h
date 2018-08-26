@@ -6,7 +6,6 @@
 #include <Bus.h>
 #include <InputOutput.h>
 #include <Ram.h>
-#include <Rom.h>
 
 #include <Z80.h>
 #include <Profiler.h>
