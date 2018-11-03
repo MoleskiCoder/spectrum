@@ -31,7 +31,7 @@ public:
 	int runRasterLines();
 
 protected:
-	virtual uint8_t& reference(uint16_t address) final;
+	virtual EightBit::MemoryMapping mapping(uint16_t address) final;
 
 private:
 	const Configuration& m_configuration;

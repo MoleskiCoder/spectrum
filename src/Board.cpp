@@ -9,6 +9,7 @@ Board::Board(const ColourPalette& palette, const Configuration& configuration)
   m_palette(palette),
   m_cpu(*this, m_ports),
   m_ula(m_palette, *this),
+  m_disassembler(*this),
   m_profiler(m_cpu, m_disassembler) {
 }
 
@@ -16,7 +17,7 @@ void Board::initialise() {
 
 	auto romDirectory = m_configuration.getRomDirectory();
 
-	m_basicRom.load(romDirectory + "\\48.rom");
+	ROM().load(romDirectory + "\\48.rom");
 
 	if (m_configuration.isProfileMode()) {
 		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
@@ -44,14 +45,12 @@ void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu) {
 		<< '\n';
 }
 
-uint8_t& Board::reference(uint16_t address) {
-
+EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 	if (address < 0x4000)
-		return DATA() = m_basicRom.peek(address);
-
+		return { ROM(), 0x0000, 0xffff, EightBit::MemoryMapping::ReadOnly };
 	if (address < 0x8000)
-		return m_contendedRam.reference(address - 0x4000);
-	return m_uncontendedRam.reference(address - 0x8000);
+		return { VRAM(), 0x4000, 0xffff, EightBit::MemoryMapping::ReadWrite };
+	return { WRAM(), 0x8000, 0xffff,  EightBit::MemoryMapping::ReadWrite };
 }
 
 int Board::runRasterLines() {
