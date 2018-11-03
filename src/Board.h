@@ -23,6 +23,7 @@ public:
 	EightBit::Z80& CPU() { return m_cpu; }
 	Ula &ULA() { return m_ula; }
 	EightBit::InputOutput &ports() { return m_ports; }
+	EightBit::Rom& ROM() { return m_basicRom; }
 	EightBit::Ram& VRAM() { return m_contendedRam; }
 	EightBit::Ram& WRAM() { return m_uncontendedRam; }
 
