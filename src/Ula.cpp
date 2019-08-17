@@ -127,14 +127,14 @@ void Ula::initialiseKeyboardMapping() {
 }
 
 uint8_t Ula::findSelectedKeys(uint8_t row) const {
-	auto pKeys = m_keyboardMapping.find(row);
-	if (pKeys == m_keyboardMapping.cend())
-		throw std::runtime_error("Invalid keyboard row selected.");
 	uint8_t returned = 0xff;
-	const auto& keys = pKeys->second;
-	for (int column = 0; column < 5; ++column) {
-		if (m_keyboardRaw.find(keys[column]) != m_keyboardRaw.cend())
-			returned &= ~(1 << column);
+	auto pKeys = m_keyboardMapping.find(row);
+	if (pKeys != m_keyboardMapping.cend()) {
+		const auto& keys = pKeys->second;
+		for (int column = 0; column < 5; ++column) {
+			if (m_keyboardRaw.find(keys[column]) != m_keyboardRaw.cend())
+				returned &= ~(1 << column);
+		}
 	}
 	return returned;
 }
