@@ -89,7 +89,7 @@ void Computer::runLoop() {
 
 	auto& cpu = m_board.CPU();
 
-	cpu.powerOn();
+	cpu.raisePOWER();
 
 	auto cycles = 0;
 
@@ -100,7 +100,7 @@ void Computer::runLoop() {
 		while (::SDL_PollEvent(&e)) {
 			switch (e.type) {
 			case SDL_QUIT:
-				cpu.powerOff();
+				cpu.lowerPOWER();
 				break;
 			case SDL_KEYDOWN:
 				handleKeyDown(e.key.keysym.sym);

@@ -27,7 +27,6 @@ void Board::initialise() {
 		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Debug, this, std::placeholders::_1));
 	}
 
-	CPU().powerOn();
 	ULA().initialise();
 }
 
@@ -47,10 +46,10 @@ void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu) {
 
 EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 	if (address < 0x4000)
-		return { ROM(), 0x0000, 0xffff, EightBit::MemoryMapping::ReadOnly };
+		return { ROM(), 0x0000, 0xffff, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 	if (address < 0x8000)
-		return { VRAM(), 0x4000, 0xffff, EightBit::MemoryMapping::ReadWrite };
-	return { WRAM(), 0x8000, 0xffff,  EightBit::MemoryMapping::ReadWrite };
+		return { VRAM(), 0x4000, 0xffff, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+	return { WRAM(), 0x8000, 0xffff,  EightBit::MemoryMapping::AccessLevel::ReadWrite };
 }
 
 int Board::runRasterLines() {
