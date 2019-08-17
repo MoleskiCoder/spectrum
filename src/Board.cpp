@@ -62,10 +62,7 @@ int Board::runRasterLines() {
 	count += runRasterLines(Ula::ActiveRasterHeight * Ula::HorizontalCyclesTotal, Ula::ActiveRasterHeight);
 	count += runBlankLines(Ula::LowerRasterBorder * Ula::HorizontalCyclesTotal, Ula::LowerRasterBorder);
 
-	if ((++m_frameCounter & EightBit::Processor::Mask4) == 0)
-		ULA().flash();
-
-	EightBit::Z80::lower(CPU().INT());
+	ULA().finishFrame();
 
 	return count;
 }

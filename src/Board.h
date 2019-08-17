@@ -40,7 +40,6 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu;
 	Ula m_ula;
-	uint8_t m_frameCounter = 0;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)
 	EightBit::Ram m_contendedRam = 0x4000;	//4000h - 7FFFh  RAM(Work RAM and VRAM) (with waitstates)

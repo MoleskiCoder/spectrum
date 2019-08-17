@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Ula.h"
 
-#include <Processor.h>
+#include <Chip.h>
 #include <cassert>
 
 #include "Board.h"
@@ -73,10 +73,10 @@ void Ula::renderActive(const int absoluteY) {
 		const auto attributeAddress = attributeAddressY + byte;
 		const auto attribute = BUS().VRAM().peek(attributeAddress);
 
-		const auto ink = attribute & EightBit::Processor::Mask3;
-		const auto paper = (attribute >> 3) & EightBit::Processor::Mask3;
-		const auto bright = !!(attribute & EightBit::Processor::Bit6);
-		const auto flash = !!(attribute & EightBit::Processor::Bit7);
+		const auto ink = attribute & EightBit::Chip::Mask3;
+		const auto paper = (attribute >> 3) & EightBit::Chip::Mask3;
+		const auto bright = !!(attribute & EightBit::Chip::Bit6);
+		const auto flash = !!(attribute & EightBit::Chip::Bit7);
 
 		const auto background = m_palette.getColour(flash && m_flash ? ink : paper, bright);
 		const auto foreground = m_palette.getColour(flash && m_flash ? paper : ink, bright);
@@ -84,7 +84,7 @@ void Ula::renderActive(const int absoluteY) {
 		for (int bit = 0; bit < 8; ++bit) {
 
 			const auto pixel = bitmap & (1 << bit);
-			const auto x = (~bit & EightBit::Processor::Mask3) | (byte << 3);
+			const auto x = (~bit & EightBit::Chip::Mask3) | (byte << 3);
 
 			m_pixels[pixelBase + x] = pixel ? foreground : background;
 		}
@@ -95,6 +95,12 @@ void Ula::render(const int absoluteY) {
 	renderLeftHorizontalBorder(absoluteY);
 	renderActive(absoluteY);
 	renderRightHorizontalBorder(absoluteY);
+}
+
+void Ula::finishFrame() {
+	if ((++m_frameCounter & EightBit::Chip::Mask4) == 0)
+		flash();
+	BUS().CPU().lowerINT();
 }
 
 void Ula::pokeKey(SDL_Keycode raw) {
@@ -135,20 +141,20 @@ uint8_t Ula::findSelectedKeys(uint8_t row) const {
 
 void Ula::Board_ReadingPort(const uint8_t& port) {
 
-	const auto ignored = !!(port & EightBit::Processor::Bit0);
+	const auto ignored = !!(port & EightBit::Chip::Bit0);
 	if (ignored)
 		return;
 
 	const auto portHigh = BUS().ADDRESS().high;
 	const auto selected = findSelectedKeys(portHigh);
-	BUS().ports().writeInputPort(port, selected & EightBit::Processor::Mask5);
+	BUS().ports().writeInputPort(port, selected & EightBit::Chip::Mask5);
 }
 
 void Ula::Board_WrittenPort(const uint8_t& port) {
-	const auto ignored = !!(port & EightBit::Processor::Bit0);
+	const auto ignored = !!(port & EightBit::Chip::Bit0);
 	if (ignored)
 		return;
 
 	const auto value = BUS().ports().readOutputPort(port);
-	m_borderColour = m_palette.getColour(value & EightBit::Processor::Mask3, false);
+	m_borderColour = m_palette.getColour(value & EightBit::Chip::Mask3, false);
 }

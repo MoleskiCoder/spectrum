@@ -41,7 +41,7 @@ public:
 
 	void initialise();
 
-	void flash();
+	void finishFrame();
 
 	void renderBlank(int y);
 	void render(int absoluteY);
@@ -59,6 +59,7 @@ private:
 	Board& m_bus;
 	uint32_t m_borderColour = 0;
 	bool m_flash = false;
+	uint8_t m_frameCounter = 0;
 
 	std::unordered_map<int, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;
@@ -68,6 +69,8 @@ private:
 	void initialiseKeyboardMapping();
 
 	uint8_t findSelectedKeys(uint8_t row) const;
+
+	void flash();
 
 	void renderLeftHorizontalBorder(int y);
 	void renderRightHorizontalBorder(int y);
