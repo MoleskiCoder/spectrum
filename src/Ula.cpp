@@ -140,21 +140,39 @@ uint8_t Ula::findSelectedKeys(uint8_t row) const {
 }
 
 void Ula::Board_ReadingPort(const uint8_t& port) {
-
-	const auto ignored = !!(port & EightBit::Chip::Bit0);
-	if (ignored)
-		return;
-
-	const auto portHigh = BUS().ADDRESS().high;
-	const auto selected = findSelectedKeys(portHigh);
-	BUS().ports().writeInputPort(port, selected & EightBit::Chip::Mask5);
+	maybeReadingPort(port);
 }
 
 void Ula::Board_WrittenPort(const uint8_t& port) {
-	const auto ignored = !!(port & EightBit::Chip::Bit0);
-	if (ignored)
-		return;
+	maybeWrittenPort(port);
+}
 
+void Ula::maybeWrittenPort(const uint8_t port) {
+	if (ignoredPort(port))
+		return;
+	writtenPort(port);
+}
+
+void Ula::writtenPort(const uint8_t port) {
 	const auto value = BUS().ports().readOutputPort(port);
 	m_borderColour = m_palette.getColour(value & EightBit::Chip::Mask3, false);
+	m_mic = !!(value & EightBit::Chip::Bit3);
+	m_speaker = !!(value & EightBit::Chip::Bit4);
+}
+
+void Ula::maybeReadingPort(const uint8_t port) {
+	if (ignoredPort(port))
+		return;
+	readingPort(port);
+}
+
+void Ula::readingPort(const uint8_t port) {
+	const auto portHigh = BUS().ADDRESS().high;
+	m_selected = findSelectedKeys(portHigh);
+	const uint8_t value = (m_selected & EightBit::Chip::Mask5) | (m_ear ? 1 << 6 : 0);
+	BUS().ports().writeInputPort(port, value);
+}
+
+bool Ula::ignoredPort(const uint8_t port) const {
+	return !!(port & EightBit::Chip::Bit0);
 }
