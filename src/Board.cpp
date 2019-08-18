@@ -43,7 +43,7 @@ void Board::raisePOWER() {
 	CPU().raiseNMI();
 }
 
-void Board::lowerPOWER() noexcept {
+void Board::lowerPOWER() {
 	CPU().lowerPOWER();
 	EightBit::Bus::lowerPOWER();
 }
