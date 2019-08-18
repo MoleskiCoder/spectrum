@@ -86,15 +86,13 @@ void Computer::runLoop() {
 
 	m_frames = 0UL;
 	m_startTicks = ::SDL_GetTicks();
-
-	auto& cpu = m_board.CPU();
-
-	cpu.raisePOWER();
-
 	auto cycles = 0;
 
 	auto graphics = m_configuration.isDrawGraphics();
 
+	m_board.raisePOWER();
+
+	auto& cpu = m_board.CPU();
 	while (cpu.powered()) {
 		::SDL_Event e;
 		while (::SDL_PollEvent(&e)) {
