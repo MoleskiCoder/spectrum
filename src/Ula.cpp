@@ -154,10 +154,14 @@ void Ula::maybeWrittenPort(const uint8_t port) {
 }
 
 void Ula::writtenPort(const uint8_t port) {
+
 	const auto value = BUS().ports().readOutputPort(port);
-	m_borderColour = m_palette.getColour(value & EightBit::Chip::Mask3, false);
-	m_mic = !!(value & EightBit::Chip::Bit3);
-	m_speaker = !!(value & EightBit::Chip::Bit4);
+
+	m_border = value & EightBit::Chip::Mask3;
+	m_mic = (value & EightBit::Chip::Bit3) >> 3;
+	m_speaker = (value & EightBit::Chip::Bit4) >> 4;
+
+	m_borderColour = m_palette.getColour(m_border, false);
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {
@@ -169,7 +173,7 @@ void Ula::maybeReadingPort(const uint8_t port) {
 void Ula::readingPort(const uint8_t port) {
 	const auto portHigh = BUS().ADDRESS().high;
 	m_selected = findSelectedKeys(portHigh);
-	const uint8_t value = (m_selected & EightBit::Chip::Mask5) | (m_ear ? 1 << 6 : 0);
+	const uint8_t value = m_selected | (m_ear << 6);
 	BUS().ports().writeInputPort(port, value);
 }
 

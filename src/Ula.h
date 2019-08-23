@@ -59,15 +59,16 @@ private:
 	Board& m_bus;
 	bool m_flash = false;
 	uint8_t m_frameCounter = 0;
+	uint32_t m_borderColour;
 
 	// Output port information
-	uint32_t m_borderColour = 0;	// Bits 0 - 2, converted from palette
-	bool m_mic;						// Bit 3
-	bool m_speaker;					// Bit 4
+	uint8_t m_border : 3;		// Bits 0 - 2
+	uint8_t m_mic : 1;			// Bit 3
+	uint8_t m_speaker : 1;		// Bit 4
 
 	// Input port information
-	uint8_t m_selected;				// Bits 0 - 4 
-	bool m_ear = false;				// Bit 6
+	uint8_t m_selected : 5;		// Bits 0 - 4 
+	uint8_t m_ear : 1;			// Bit 6
 
 	std::unordered_map<int, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;
