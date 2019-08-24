@@ -32,7 +32,7 @@ void Ula::flash() {
 	m_flash = !m_flash;
 }
 
-void Ula::renderBlank(const int y) {
+void Ula::renderBlankLine(const int y) {
 	std::fill_n(
 		m_pixels.begin() + y * RasterWidth,
 		(int)RasterWidth,
@@ -57,7 +57,7 @@ void Ula::renderActive(const int absoluteY) {
 
 	assert(absoluteY < RasterHeight);
 
-	const auto y = absoluteY - UpperRasterBorder;
+	const auto y = absoluteY - (UpperRasterBorder + VerticalRetraceLines);
 	assert(y < ActiveRasterHeight);
 
 	const auto bitmapAddressY = m_scanLineAddresses[y];
@@ -91,10 +91,19 @@ void Ula::renderActive(const int absoluteY) {
 	}
 }
 
-void Ula::render(const int absoluteY) {
-	renderLeftHorizontalBorder(absoluteY);
-	renderActive(absoluteY);
-	renderRightHorizontalBorder(absoluteY);
+void Ula::renderActiveLine(const int y) {
+	renderLeftHorizontalBorder(y);
+	renderActive(y);
+	renderRightHorizontalBorder(y);
+}
+
+void Ula::renderLine(const int y) {
+	if ((y & ~EightBit::Chip::Mask6) == 0)
+		renderBlankLine(y);
+	else if ((y & ~EightBit::Chip::Mask8) == 0)
+		renderActiveLine(y);
+	else
+		renderBlankLine(y);
 }
 
 void Ula::finishFrame() {

@@ -10,41 +10,45 @@
 class Board;
 class ColourPalette;
 
+// http://www.worldofspectrum.org/faq/reference/48kreference.htm
+
 class Ula final {
 public:
 	enum {
-		UpperRasterBorder = 64,
+		VerticalRetraceLines = 16,
+		UpperRasterBorder = 48,
 		ActiveRasterHeight = 192,
 		LowerRasterBorder = 56,
+		RasterHeight = UpperRasterBorder + ActiveRasterHeight + LowerRasterBorder,
+		TotalHeight = VerticalRetraceLines + RasterHeight,
 
 		LeftRasterBorder = 64,
 		ActiveRasterWidth = 256,
 		RightRasterBorder = 64,
+		RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder,
 
 		BytesPerLine = ActiveRasterWidth / 8,
 
-		RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder,
-		RasterHeight = UpperRasterBorder + ActiveRasterHeight + LowerRasterBorder,
+		HorizontalBorderCycles = 24,
+		HorizontalFlybackCycles = 48,
+		HorizontalActiveCycles = 128,
+		CyclesPerLine = HorizontalBorderCycles * 2 + HorizontalFlybackCycles + HorizontalActiveCycles,
 
+		CyclesPerFrame = TotalHeight * CyclesPerLine,
 		CyclesPerSecond = 3500000,	// 3.5Mhz
-		FramesPerSecond = 50,
-		CyclesPerFrame = CyclesPerSecond / FramesPerSecond,
-
-		HorizontalDrawCycles = 128,
-		HorizontalBlankCycles = 96,
-		HorizontalCyclesTotal = HorizontalDrawCycles + HorizontalBlankCycles,
 
 		AttributeAddress = 0x1800
 	};
+
+	static constexpr float FramesPerSecond = 50.08;
 
 	Ula(const ColourPalette& palette, Board& bus);
 
 	void initialise();
 
-	void finishFrame();
+	void renderLine(int y);
 
-	void renderBlank(int y);
-	void render(int absoluteY);
+	void finishFrame();
 
 	void pokeKey(SDL_Keycode raw);
 	void pullKey(SDL_Keycode raw);
@@ -86,6 +90,9 @@ private:
 	void writtenPort(uint8_t port);
 
 	void flash();
+
+	void renderBlankLine(int y);
+	void renderActiveLine(int y);
 
 	void renderLeftHorizontalBorder(int y);
 	void renderRightHorizontalBorder(int y);

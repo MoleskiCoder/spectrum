@@ -22,6 +22,7 @@ void Board::initialise() {
 	//ROM().load(romDirectory + "\\G24R_ROM.bin");	// Horace and the Spiders
 	//ROM().load(romDirectory + "\\G9R_ROM.bin");	// Space Raiders (Space Invaders)
 	//ROM().load(romDirectory + "\\System_Test_ROM.bin");	// Sinclair test ROM by Dr. Ian Logan
+	//ROM().load(romDirectory + "\\\Release-v0.37\\testrom.bin");
 
 	if (m_configuration.isProfileMode()) {
 		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
@@ -70,55 +71,29 @@ EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 	return { WRAM(), 0x8000, 0xffff,  EightBit::MemoryMapping::AccessLevel::ReadWrite };
 }
 
-int Board::runRasterLines() {
+int Board::runFrame(int limit) {
 
 	int count = 0;
 
-	m_scanLine = 0;
+	int allowed = 0;
+	for (int i = 0; i < Ula::VerticalRetraceLines; ++i)
+		runLine(allowed, count);
 
-	count += runBlankLines(Ula::UpperRasterBorder * Ula::HorizontalCyclesTotal, Ula::UpperRasterBorder);
-	count += runRasterLines(Ula::ActiveRasterHeight * Ula::HorizontalCyclesTotal, Ula::ActiveRasterHeight);
-	count += runBlankLines(Ula::LowerRasterBorder * Ula::HorizontalCyclesTotal, Ula::LowerRasterBorder);
+	m_scanLine = 0;
+	for (int i = 0; i < Ula::RasterHeight; ++i) {
+		ULA().renderLine(m_scanLine);
+		runLine(allowed, count);
+		++m_scanLine;
+	}
 
 	ULA().finishFrame();
 
 	return count;
 }
 
-int Board::runRasterLines(int limit, int lines) {
-	int count = 0;
-	int allowed = Ula::HorizontalCyclesTotal;
-	for (int line = 0; line < lines; ++line) {
-		const auto executed = runRasterLine(allowed);
-		count += executed;
-		allowed = Ula::HorizontalCyclesTotal - (executed - Ula::HorizontalCyclesTotal);
-	}
-	return count;
-}
-
-int Board::runRasterLine(int limit) {
-
-	int count = 0;
-
-	count += CPU().run(Ula::HorizontalDrawCycles);
-	ULA().render(m_scanLine++);
-	count += CPU().run(limit - Ula::HorizontalDrawCycles);
-
-	return count;
-}
-
-int Board::runBlankLines(const int limit, const int lines) {
-	int count = 0;
-	int allowed = Ula::HorizontalCyclesTotal;
-	for (int line = 0; line < lines; ++line) {
-		const auto executed = runBlankLine(allowed);
-		count += executed;
-		allowed = Ula::HorizontalCyclesTotal - (executed - Ula::HorizontalCyclesTotal);
-	}
-	return count;
-}
-
-int Board::runBlankLine(const int limit) {
-	ULA().renderBlank(m_scanLine++);
-	return CPU().run(limit);
+void Board::runLine(int& allowed, int& count) {
+	allowed += Ula::CyclesPerLine;
+	const int taken = CPU().run(allowed);
+	count += taken;
+	allowed -= taken;
 }

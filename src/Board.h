@@ -31,7 +31,7 @@ public:
 	virtual void raisePOWER() final;
 	virtual void lowerPOWER() final;
 
-	int runRasterLines();
+	int runFrame(int limit);
 
 protected:
 	virtual EightBit::MemoryMapping mapping(uint16_t address) final;
@@ -55,9 +55,5 @@ private:
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu);
 	void Cpu_ExecutingInstruction_Profile(const EightBit::Z80& cpu);
 
-	int runRasterLines(int limit, int lines);
-	int runRasterLine(int limit);
-
-	int runBlankLines(int limit, int lines);
-	int runBlankLine(int limit);
+	void runLine(int& allowed, int& count);
 };

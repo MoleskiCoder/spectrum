@@ -48,10 +48,8 @@ private:
 	Uint32 m_pixelType = SDL_PIXELFORMAT_ARGB8888;
 	SDL_PixelFormat* m_pixelFormat = nullptr;
 
-	int m_fps = Ula::FramesPerSecond;
 	Uint32 m_startTicks = 0UL;
 	Uint32 m_frames = 0UL;
-	bool m_vsync = false;
 
 	void drawFrame();
 

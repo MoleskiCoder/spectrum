@@ -26,20 +26,7 @@ void Computer::initialise() {
 	::SDL_DisplayMode mode;
 	verifySDLCall(::SDL_GetWindowDisplayMode(m_window, &mode), "Unable to obtain window information");
 
-	m_vsync = m_configuration.getVsyncLocked();
-	Uint32 rendererFlags = 0;
-	if (m_vsync) {
-		auto required = m_fps;
-		if (required == mode.refresh_rate) {
-			rendererFlags |= SDL_RENDERER_PRESENTVSYNC;
-			::SDL_Log("Attempting to use SDL_RENDERER_PRESENTVSYNC");
-		}
-		else {
-			m_vsync = false;
-			::SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Display refresh rate is incompatible with required rate (%d)", required);
-		}
-	}
-	m_renderer = ::SDL_CreateRenderer(m_window, -1, rendererFlags);
+	m_renderer = ::SDL_CreateRenderer(m_window, -1, 0);
 	if (m_renderer == nullptr) {
 		throwSDLException("Unable to create renderer: ");
 	}
@@ -51,13 +38,6 @@ void Computer::initialise() {
 	verifySDLCall(::SDL_GetRendererInfo(m_renderer, &info), "Unable to obtain renderer information");
 	::SDL_Log("Using renderer:");
 	dumpRendererInformation(info);
-
-	if (m_vsync) {
-		if ((info.flags & SDL_RENDERER_PRESENTVSYNC) == 0) {
-			::SDL_LogWarn(::SDL_LOG_CATEGORY_APPLICATION, "Renderer does not support VSYNC, reverting to timed delay loop.");
-			m_vsync = false;
-		}
-	}
 
 	m_pixelFormat = ::SDL_AllocFormat(m_pixelType);
 	if (m_pixelFormat == nullptr) {
@@ -110,19 +90,16 @@ void Computer::runLoop() {
 		}
 
 		cycles += Ula::CyclesPerFrame;
-
-		cycles -= m_board.runRasterLines();
+		cycles -= m_board.runFrame(cycles);
 
 		if (graphics) {
 			drawFrame();
 			::SDL_RenderPresent(m_renderer);
-			if (!m_vsync) {
-				const auto elapsedTicks = ::SDL_GetTicks() - m_startTicks;
-				const auto neededTicks = (++m_frames / (float)m_fps) * 1000.0;
-				auto sleepNeeded = (int)(neededTicks - elapsedTicks);
-				if (sleepNeeded > 0) {
-					::SDL_Delay(sleepNeeded);
-				}
+			const auto elapsedTicks = ::SDL_GetTicks() - m_startTicks;
+			const auto neededTicks = (++m_frames / Ula::FramesPerSecond) * 1000.0;
+			auto sleepNeeded = (int)(neededTicks - elapsedTicks);
+			if (sleepNeeded > 0) {
+				::SDL_Delay(sleepNeeded);
 			}
 		}
 	}
