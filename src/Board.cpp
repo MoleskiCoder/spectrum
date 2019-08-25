@@ -79,11 +79,9 @@ int Board::runFrame(int limit) {
 	for (int i = 0; i < Ula::VerticalRetraceLines; ++i)
 		runLine(allowed, count);
 
-	m_scanLine = 0;
 	for (int i = 0; i < Ula::RasterHeight; ++i) {
-		ULA().renderLine(m_scanLine);
+		ULA().renderLine(i);
 		runLine(allowed, count);
-		++m_scanLine;
 	}
 
 	ULA().finishFrame();

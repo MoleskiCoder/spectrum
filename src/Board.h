@@ -50,8 +50,6 @@ private:
 	EightBit::Disassembler m_disassembler;
 	EightBit::Profiler m_profiler;
 
-	int m_scanLine = 0;
-
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu);
 	void Cpu_ExecutingInstruction_Profile(const EightBit::Z80& cpu);
 
