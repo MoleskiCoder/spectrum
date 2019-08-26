@@ -22,10 +22,9 @@ public:
 		RasterHeight = UpperRasterBorder + ActiveRasterHeight + LowerRasterBorder,
 		TotalHeight = VerticalRetraceLines + RasterHeight,
 
-		LeftRasterBorder = 48,
+		HorizontalRasterBorder = 48,
 		ActiveRasterWidth = 256,
-		RightRasterBorder = 48,
-		RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder,
+		RasterWidth = HorizontalRasterBorder * 2 + ActiveRasterWidth,
 
 		BytesPerLine = ActiveRasterWidth / 8,
 
@@ -96,6 +95,7 @@ private:
 
 	void renderLeftHorizontalBorder(int y);
 	void renderRightHorizontalBorder(int y);
+	void renderHorizontalBorder(int x, int y, int width = HorizontalRasterBorder);
 
 	void renderVRAM(int y);
 

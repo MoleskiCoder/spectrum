@@ -33,23 +33,21 @@ void Ula::flash() {
 }
 
 void Ula::renderBlankLine(const int y) {
-	std::fill_n(
-		m_pixels.begin() + y * RasterWidth,
-		(int)RasterWidth,
-		m_borderColour);
+	renderHorizontalBorder(0, y, RasterWidth);
 }
 
 void Ula::renderLeftHorizontalBorder(const int y) {
-	std::fill_n(
-		m_pixels.begin() + y * RasterWidth,
-		(int)LeftRasterBorder,
-		m_borderColour);
+	renderHorizontalBorder(0, y);
 }
 
 void Ula::renderRightHorizontalBorder(const int y) {
+	renderHorizontalBorder(HorizontalRasterBorder + ActiveRasterWidth, y);
+}
+
+void Ula::renderHorizontalBorder(int x, int y, int width) {
 	std::fill_n(
-		m_pixels.begin() + y * RasterWidth + LeftRasterBorder + ActiveRasterWidth,
-		(int)RightRasterBorder,
+		m_pixels.begin() + y * RasterWidth + x,
+		width,
 		m_borderColour);
 }
 
@@ -63,7 +61,7 @@ void Ula::renderVRAM(const int y) {
 	const auto attributeAddressY = m_attributeAddresses[y];
 
 	// Position in pixel render 
-	const auto pixelBase = LeftRasterBorder + (y + UpperRasterBorder) * RasterWidth;
+	const auto pixelBase = HorizontalRasterBorder + (y + UpperRasterBorder) * RasterWidth;
 
 	for (int byte = 0; byte < BytesPerLine; ++byte) {
 
