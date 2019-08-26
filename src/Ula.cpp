@@ -53,17 +53,17 @@ void Ula::renderRightHorizontalBorder(const int y) {
 		m_borderColour);
 }
 
-void Ula::renderActive(const int absoluteY) {
+void Ula::renderVRAM(const int y) {
 
-	assert(absoluteY < RasterHeight);
-
-	const auto y = absoluteY - (UpperRasterBorder + VerticalRetraceLines);
+	assert(y >= 0);
 	assert(y < ActiveRasterHeight);
 
+	// Position in VRAM
 	const auto bitmapAddressY = m_scanLineAddresses[y];
 	const auto attributeAddressY = m_attributeAddresses[y];
 
-	const auto pixelBase = LeftRasterBorder + absoluteY * RasterWidth;
+	// Position in pixel render 
+	const auto pixelBase = LeftRasterBorder + (y + UpperRasterBorder) * RasterWidth;
 
 	for (int byte = 0; byte < BytesPerLine; ++byte) {
 
@@ -93,20 +93,34 @@ void Ula::renderActive(const int absoluteY) {
 
 void Ula::renderActiveLine(const int y) {
 	renderLeftHorizontalBorder(y);
-	renderActive(y);
+	renderVRAM(y - UpperRasterBorder);
 	renderRightHorizontalBorder(y);
 }
 
 void Ula::renderLine(const int y) {
+
+	// Start of vertical retrace
+	if (y == 0)
+		startFrame();
+
+	// Vertical retrace?
+	if ((y & ~EightBit::Chip::Mask4) == 0)
+		return;
+
+	// Upper border
 	if ((y & ~EightBit::Chip::Mask6) == 0)
-		renderBlankLine(y);
+		renderBlankLine(y - VerticalRetraceLines);
+
+	// Rendered from Spectrum VRAM
 	else if ((y & ~EightBit::Chip::Mask8) == 0)
-		renderActiveLine(y);
+		renderActiveLine(y - VerticalRetraceLines);
+
+	// Lower border
 	else
-		renderBlankLine(y);
+		renderBlankLine(y - VerticalRetraceLines);
 }
 
-void Ula::finishFrame() {
+void Ula::startFrame() {
 	if ((++m_frameCounter & EightBit::Chip::Mask4) == 0)
 		flash();
 	BUS().CPU().lowerINT();

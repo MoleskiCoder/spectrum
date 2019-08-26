@@ -78,15 +78,10 @@ int Board::runFrame(int limit) {
 	int allowed = -excess;
 	resetFrameCycles();
 
-	for (int i = 0; i < Ula::VerticalRetraceLines; ++i)
-		runLine(allowed);
-
-	for (int i = 0; i < Ula::RasterHeight; ++i) {
+	for (int i = 0; i < Ula::TotalHeight; ++i) {
 		ULA().renderLine(i);
 		runLine(allowed);
 	}
-
-	ULA().finishFrame();
 
 	return frameCycles();
 }

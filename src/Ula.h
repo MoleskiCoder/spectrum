@@ -22,9 +22,9 @@ public:
 		RasterHeight = UpperRasterBorder + ActiveRasterHeight + LowerRasterBorder,
 		TotalHeight = VerticalRetraceLines + RasterHeight,
 
-		LeftRasterBorder = 64,
+		LeftRasterBorder = 48,
 		ActiveRasterWidth = 256,
-		RightRasterBorder = 64,
+		RightRasterBorder = 48,
 		RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder,
 
 		BytesPerLine = ActiveRasterWidth / 8,
@@ -47,8 +47,6 @@ public:
 	void initialise();
 
 	void renderLine(int y);
-
-	void finishFrame();
 
 	void pokeKey(SDL_Keycode raw);
 	void pullKey(SDL_Keycode raw);
@@ -89,6 +87,8 @@ private:
 	void maybeWrittenPort(uint8_t port);
 	void writtenPort(uint8_t port);
 
+	void startFrame();
+
 	void flash();
 
 	void renderBlankLine(int y);
@@ -97,7 +97,7 @@ private:
 	void renderLeftHorizontalBorder(int y);
 	void renderRightHorizontalBorder(int y);
 
-	void renderActive(int absoluteY);
+	void renderVRAM(int y);
 
 	void Board_ReadingPort(const uint8_t& event);
 	void Board_WrittenPort(const uint8_t& event);
