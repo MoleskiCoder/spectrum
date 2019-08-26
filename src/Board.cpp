@@ -33,6 +33,7 @@ void Board::initialise() {
 	}
 
 	ULA().initialise();
+	buzzer().initialise();
 }
 
 void Board::raisePOWER() {
@@ -73,25 +74,26 @@ EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 
 int Board::runFrame(int limit) {
 
-	int count = 0;
+	const auto excess = Ula::CyclesPerFrame - limit;
+	int allowed = -excess;
+	resetFrameCycles();
 
-	int allowed = 0;
 	for (int i = 0; i < Ula::VerticalRetraceLines; ++i)
-		runLine(allowed, count);
+		runLine(allowed);
 
 	for (int i = 0; i < Ula::RasterHeight; ++i) {
 		ULA().renderLine(i);
-		runLine(allowed, count);
+		runLine(allowed);
 	}
 
 	ULA().finishFrame();
 
-	return count;
+	return frameCycles();
 }
 
-void Board::runLine(int& allowed, int& count) {
+void Board::runLine(int& allowed) {
 	allowed += Ula::CyclesPerLine;
 	const int taken = CPU().run(allowed);
-	count += taken;
+	m_frameCycles += taken;
 	allowed -= taken;
 }

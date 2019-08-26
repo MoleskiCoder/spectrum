@@ -12,6 +12,7 @@
 #include <Disassembler.h>
 
 #include "Ula.h"
+#include "Buzzer.h"
 
 class Configuration;
 class ColourPalette;
@@ -22,6 +23,7 @@ public:
 
 	EightBit::Z80& CPU() { return m_cpu; }
 	Ula &ULA() { return m_ula; }
+	Buzzer& buzzer() { return m_buzzer; }
 	EightBit::InputOutput &ports() { return m_ports; }
 	EightBit::Rom& ROM() { return m_basicRom; }
 	EightBit::Ram& VRAM() { return m_contendedRam; }
@@ -32,6 +34,7 @@ public:
 	virtual void lowerPOWER() final;
 
 	int runFrame(int limit);
+	int frameCycles() const { return m_frameCycles; }
 
 protected:
 	virtual EightBit::MemoryMapping mapping(uint16_t address) final;
@@ -42,6 +45,7 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu;
 	Ula m_ula;
+	Buzzer m_buzzer;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)
 	EightBit::Ram m_contendedRam = 0x4000;	//4000h - 7FFFh  RAM(Work RAM and VRAM) (with waitstates)
@@ -50,8 +54,11 @@ private:
 	EightBit::Disassembler m_disassembler;
 	EightBit::Profiler m_profiler;
 
+	int m_frameCycles = 0;
+
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu);
 	void Cpu_ExecutingInstruction_Profile(const EightBit::Z80& cpu);
 
-	void runLine(int& allowed, int& count);
+	void resetFrameCycles() { m_frameCycles = 0; }
+	void runLine(int& allowed);
 };

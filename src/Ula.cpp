@@ -170,6 +170,7 @@ void Ula::writtenPort(const uint8_t port) {
 	m_mic = (value & EightBit::Chip::Bit3) >> 3;
 	m_speaker = (value & EightBit::Chip::Bit4) >> 4;
 
+	BUS().buzzer().buzz(m_speaker, BUS().frameCycles());
 	m_borderColour = m_palette.getColour(m_border, false);
 }
 
