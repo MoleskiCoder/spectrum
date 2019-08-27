@@ -49,6 +49,10 @@ void Computer::initialise() {
 	createBitmapTexture();
 }
 
+void Computer::plug(const std::string& path) {
+	m_board.plug(path);
+}
+
 void Computer::configureBackground() const {
 	Uint8 r, g, b;
 	::SDL_GetRGB(m_colours.getColour(0), m_pixelFormat, &r, &g, &b);

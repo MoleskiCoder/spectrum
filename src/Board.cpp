@@ -16,13 +16,7 @@ Board::Board(const ColourPalette& palette, const Configuration& configuration)
 void Board::initialise() {
 
 	auto romDirectory = m_configuration.getRomDirectory();
-
-	ROM().load(romDirectory + "\\48.rom");	// ZX Spectrum Basic
-	//ROM().load(romDirectory + "\\G12R_ROM.bin");	// Planetoids (Asteroids)
-	//ROM().load(romDirectory + "\\G24R_ROM.bin");	// Horace and the Spiders
-	//ROM().load(romDirectory + "\\G9R_ROM.bin");	// Space Raiders (Space Invaders)
-	//ROM().load(romDirectory + "\\System_Test_ROM.bin");	// Sinclair test ROM by Dr. Ian Logan
-	//ROM().load(romDirectory + "\\\Release-v0.37\\testrom.bin");
+	plug(romDirectory + "\\48.rom");	// ZX Spectrum Basic
 
 	if (m_configuration.isProfileMode()) {
 		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
@@ -34,6 +28,10 @@ void Board::initialise() {
 
 	ULA().initialise();
 	buzzer().initialise();
+}
+
+void Board::plug(const std::string& path) {
+	ROM().load(path);
 }
 
 void Board::raisePOWER() {

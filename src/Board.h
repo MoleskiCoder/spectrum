@@ -29,6 +29,8 @@ public:
 	EightBit::Ram& VRAM() { return m_contendedRam; }
 	EightBit::Ram& WRAM() { return m_uncontendedRam; }
 
+	void plug(const std::string& path);
+
 	virtual void initialise() final;
 	virtual void raisePOWER() final;
 	virtual void lowerPOWER() final;

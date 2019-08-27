@@ -30,6 +30,8 @@ public:
 	void runLoop();
 	void initialise();
 
+	void plug(const std::string& path);
+
 private:
 	enum {
 		DisplayScale = 2,
