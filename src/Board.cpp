@@ -26,6 +26,8 @@ void Board::initialise() {
 		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Debug, this, std::placeholders::_1));
 	}
 
+	ULA().Proceed.connect(std::bind(&Board::Ula_Proceed, this, std::placeholders::_1));
+
 	ULA().initialise();
 	buzzer().initialise();
 }
@@ -70,23 +72,19 @@ EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 	return { WRAM(), 0x8000, 0xffff,  EightBit::MemoryMapping::AccessLevel::ReadWrite };
 }
 
-int Board::runFrame(int limit) {
-
-	const auto excess = Ula::CyclesPerFrame - limit;
-	int allowed = -excess;
+void Board::runFrame() {
 	resetFrameCycles();
-
-	for (int i = 0; i < Ula::TotalHeight; ++i) {
+	for (int i = 0; i < Ula::TotalHeight; ++i)
 		ULA().renderLine(i);
-		runLine(allowed);
-	}
-
-	return frameCycles();
 }
 
-void Board::runLine(int& allowed) {
-	allowed += Ula::CyclesPerLine;
-	const int taken = CPU().run(allowed);
+void Board::Ula_Proceed(const int& cycles) {
+	runCycles(cycles);
+}
+
+void Board::runCycles(int suggested) {
+	m_allowed += suggested;
+	const int taken = CPU().run(m_allowed);
 	m_frameCycles += taken;
-	allowed -= taken;
+	m_allowed -= taken;
 }

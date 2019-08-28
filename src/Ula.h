@@ -7,41 +7,43 @@
 
 #include <SDL.h>
 
+#include <Signal.h>
+
 class Board;
 class ColourPalette;
 
 // http://www.worldofspectrum.org/faq/reference/48kreference.htm
 
 class Ula final {
+private:
+	static const int VerticalRetraceLines = 16;
+	static const int UpperRasterBorder = 48;
+	static const int ActiveRasterHeight = 192;
+	static const int LowerRasterBorder = 56;
+
+	static const int HorizontalRasterBorder = 48;
+	static const int ActiveRasterWidth = 256;
+
+	static const int BytesPerLine = ActiveRasterWidth / 8;
+
+	static const int HorizontalBorderCycles = 24;
+	static const int HorizontalFlybackCycles = 48;
+	static const int HorizontalActiveCycles = 128;
+	static const int CyclesPerLine = HorizontalBorderCycles * 2 + HorizontalFlybackCycles + HorizontalActiveCycles;
+
+	static const int AttributeAddress = 0x1800;
+
 public:
-	enum {
-		VerticalRetraceLines = 16,
-		UpperRasterBorder = 48,
-		ActiveRasterHeight = 192,
-		LowerRasterBorder = 56,
-		RasterHeight = UpperRasterBorder + ActiveRasterHeight + LowerRasterBorder,
-		TotalHeight = VerticalRetraceLines + RasterHeight,
+	static const int RasterWidth = HorizontalRasterBorder * 2 + ActiveRasterWidth;
+	static const int RasterHeight = UpperRasterBorder + ActiveRasterHeight + LowerRasterBorder;
+	static const int TotalHeight = VerticalRetraceLines + RasterHeight;
 
-		HorizontalRasterBorder = 48,
-		ActiveRasterWidth = 256,
-		RasterWidth = HorizontalRasterBorder * 2 + ActiveRasterWidth,
-
-		BytesPerLine = ActiveRasterWidth / 8,
-
-		HorizontalBorderCycles = 24,
-		HorizontalFlybackCycles = 48,
-		HorizontalActiveCycles = 128,
-		CyclesPerLine = HorizontalBorderCycles * 2 + HorizontalFlybackCycles + HorizontalActiveCycles,
-
-		CyclesPerFrame = TotalHeight * CyclesPerLine,
-		CyclesPerSecond = 3500000,	// 3.5Mhz
-
-		AttributeAddress = 0x1800
-	};
-
+	static const int CyclesPerSecond = 3500000;	// 3.5Mhz
 	static constexpr float FramesPerSecond = 50.08;
 
 	Ula(const ColourPalette& palette, Board& bus);
+
+	EightBit::Signal<int> Proceed;
 
 	void initialise();
 
@@ -101,4 +103,6 @@ private:
 
 	void Board_ReadingPort(const uint8_t& event);
 	void Board_WrittenPort(const uint8_t& event);
+
+	void proceed(int cycles);
 };

@@ -35,7 +35,7 @@ public:
 	virtual void raisePOWER() final;
 	virtual void lowerPOWER() final;
 
-	int runFrame(int limit);
+	void runFrame();
 	int frameCycles() const { return m_frameCycles; }
 
 protected:
@@ -57,10 +57,13 @@ private:
 	EightBit::Profiler m_profiler;
 
 	int m_frameCycles = 0;
+	int m_allowed = 0;	// To track "overdrawn" cycle expendature
 
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu);
 	void Cpu_ExecutingInstruction_Profile(const EightBit::Z80& cpu);
 
+	void Ula_Proceed(const int& cycles);
+
 	void resetFrameCycles() { m_frameCycles = 0; }
-	void runLine(int& allowed);
+	void runCycles(int suggested);
 };

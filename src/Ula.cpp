@@ -49,6 +49,7 @@ void Ula::renderHorizontalBorder(int x, int y, int width) {
 		m_pixels.begin() + y * RasterWidth + x,
 		width,
 		m_borderColour);
+	proceed(width / 2);
 }
 
 void Ula::renderVRAM(const int y) {
@@ -87,6 +88,8 @@ void Ula::renderVRAM(const int y) {
 			m_pixels[pixelBase + x] = pixel ? foreground : background;
 		}
 	}
+
+	proceed(ActiveRasterWidth / 2);
 }
 
 void Ula::renderActiveLine(const int y) {
@@ -102,8 +105,10 @@ void Ula::renderLine(const int y) {
 		startFrame();
 
 	// Vertical retrace?
-	if ((y & ~EightBit::Chip::Mask4) == 0)
+	if ((y & ~EightBit::Chip::Mask4) == 0) {
+		proceed(RasterWidth / 2);
 		return;
+	}
 
 	// Upper border
 	if ((y & ~EightBit::Chip::Mask6) == 0)
@@ -201,4 +206,8 @@ void Ula::readingPort(const uint8_t port) {
 
 bool Ula::ignoredPort(const uint8_t port) const {
 	return !!(port & EightBit::Chip::Bit0);
+}
+
+void Ula::proceed(int cycles) {
+	Proceed.fire(cycles);
 }

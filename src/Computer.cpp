@@ -70,7 +70,6 @@ void Computer::runLoop() {
 
 	m_frames = 0UL;
 	m_startTicks = ::SDL_GetTicks();
-	auto cycles = 0;
 
 	auto graphics = m_configuration.isDrawGraphics();
 
@@ -93,8 +92,7 @@ void Computer::runLoop() {
 			}
 		}
 
-		cycles += Ula::CyclesPerFrame;
-		cycles -= m_board.runFrame(cycles);
+		m_board.runFrame();
 
 		if (graphics) {
 			drawFrame();
