@@ -26,11 +26,6 @@ private:
 
 	static const int BytesPerLine = ActiveRasterWidth / 8;
 
-	static const int HorizontalBorderCycles = 24;
-	static const int HorizontalFlybackCycles = 48;
-	static const int HorizontalActiveCycles = 128;
-	static const int CyclesPerLine = HorizontalBorderCycles * 2 + HorizontalFlybackCycles + HorizontalActiveCycles;
-
 	static const int AttributeAddress = 0x1800;
 
 public:
