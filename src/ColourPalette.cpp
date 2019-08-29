@@ -4,14 +4,14 @@
 #include <SDL.h>
 
 void ColourPalette::load(SDL_PixelFormat* hardware) {
-	m_colours[Black] = ::SDL_MapRGBA(hardware, 0x00, 0x00, 0x00, SDL_ALPHA_OPAQUE);
-	m_colours[Blue] = ::SDL_MapRGBA(hardware, 0x00, 0x00, 0xd7, SDL_ALPHA_OPAQUE);
-	m_colours[Red] = ::SDL_MapRGBA(hardware, 0xd7, 0x00, 0x00, SDL_ALPHA_OPAQUE);
-	m_colours[Magenta] = ::SDL_MapRGBA(hardware, 0xd7, 0x00, 0xd7, SDL_ALPHA_OPAQUE);
-	m_colours[Green] = ::SDL_MapRGBA(hardware, 0x00, 0xd7, 0x00, SDL_ALPHA_OPAQUE);
-	m_colours[Cyan] = ::SDL_MapRGBA(hardware, 0x00, 0xd7, 0xd7, SDL_ALPHA_OPAQUE);
-	m_colours[Yellow] = ::SDL_MapRGBA(hardware, 0xd7, 0xd7, 0x00, SDL_ALPHA_OPAQUE);
-	m_colours[White] = ::SDL_MapRGBA(hardware, 0xd7, 0xd7, 0xd7, SDL_ALPHA_OPAQUE);
+	loadColour(hardware, Black, 0x00, 0x00, 0x00);
+	loadColour(hardware, Blue, 0x00, 0x00, 0xd7);
+	loadColour(hardware, Red, 0xd7, 0x00, 0x00);
+	loadColour(hardware, Magenta, 0xd7, 0x00, 0xd7);
+	loadColour(hardware, Green, 0x00, 0xd7, 0x00);
+	loadColour(hardware, Cyan, 0x00, 0xd7, 0xd7);
+	loadColour(hardware, Yellow, 0xd7, 0xd7, 0x00);
+	loadColour(hardware, White, 0xd7, 0xd7, 0xd7);
 }
 
 void ColourPalette::loadColour(SDL_PixelFormat* hardware, size_t idx, Uint8 red, Uint8 green, Uint8 blue) {
