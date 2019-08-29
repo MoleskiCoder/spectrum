@@ -34,7 +34,7 @@ public:
 	static const int TotalHeight = VerticalRetraceLines + RasterHeight;
 
 	static const int CyclesPerSecond = 3500000;	// 3.5Mhz
-	static constexpr float FramesPerSecond = 50.08;
+	static constexpr float FramesPerSecond = 50.08f;
 
 	Ula(const ColourPalette& palette, Board& bus);
 
