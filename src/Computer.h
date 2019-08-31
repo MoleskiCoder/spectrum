@@ -31,6 +31,7 @@ public:
 	void initialise();
 
 	void plug(const std::string& path);
+	void loadSna(const std::string& path);
 
 private:
 	enum {

@@ -32,6 +32,9 @@
     <ClInclude Include="Buzzer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SnaFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -53,6 +56,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Buzzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SnaFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

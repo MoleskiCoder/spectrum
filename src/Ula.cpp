@@ -183,12 +183,12 @@ void Ula::writtenPort(const uint8_t port) {
 
 	const auto value = BUS().ports().readOutputPort(port);
 
-	m_border = value & EightBit::Chip::Mask3;
 	m_mic = (value & EightBit::Chip::Bit3) >> 3;
 	m_speaker = (value & EightBit::Chip::Bit4) >> 4;
 
+	setBorder(value & EightBit::Chip::Mask3);
+
 	BUS().buzzer().buzz(m_speaker, BUS().frameCycles());
-	m_borderColour = m_palette.getColour(m_border, false);
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {

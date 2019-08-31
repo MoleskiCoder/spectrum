@@ -53,6 +53,10 @@ void Computer::plug(const std::string& path) {
 	m_board.plug(path);
 }
 
+void Computer::loadSna(const std::string& path) {
+	m_board.loadSna(path);
+}
+
 void Computer::configureBackground() const {
 	Uint8 r, g, b;
 	::SDL_GetRGB(m_colours.getColour(0), m_pixelFormat, &r, &g, &b);
@@ -73,9 +77,10 @@ void Computer::runLoop() {
 
 	auto graphics = m_configuration.isDrawGraphics();
 
-	m_board.raisePOWER();
-
 	auto& cpu = m_board.CPU();
+	if (!cpu.powered())
+		m_board.raisePOWER();
+
 	while (cpu.powered()) {
 		::SDL_Event e;
 		while (::SDL_PollEvent(&e)) {

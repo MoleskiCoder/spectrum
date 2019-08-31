@@ -34,9 +34,14 @@ public:
 		return m_romDirectory;
 	}
 
+	std::string getProgramDirectory() const {
+		return m_programDirectory;
+	}
+
 private:
 	bool m_debugMode = false;
 	bool m_profileMode = false;
 	bool m_drawGraphics = true;
 	std::string m_romDirectory = "roms";
+	std::string m_programDirectory = "programs";
 };

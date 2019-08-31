@@ -9,8 +9,9 @@
 
 #include <Signal.h>
 
+#include "ColourPalette.h"
+
 class Board;
-class ColourPalette;
 
 // http://www.worldofspectrum.org/faq/reference/48kreference.htm
 
@@ -46,6 +47,11 @@ public:
 
 	void pokeKey(SDL_Keycode raw);
 	void pullKey(SDL_Keycode raw);
+
+	void setBorder(uint8_t border) {
+		m_border = border;
+		m_borderColour = m_palette.getColour(m_border, false);
+	}
 
 	const auto& pixels() const { return m_pixels; }
 

@@ -30,6 +30,7 @@ public:
 	EightBit::Ram& WRAM() { return m_uncontendedRam; }
 
 	void plug(const std::string& path);
+	void loadSna(const std::string& path);
 
 	virtual void initialise() final;
 	virtual void raisePOWER() final;
