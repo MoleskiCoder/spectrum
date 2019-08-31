@@ -38,49 +38,8 @@ void Board::plug(const std::string& path) {
 }
 
 void Board::loadSna(const std::string& path) {
-
-	raisePOWER();
-
 	SnaFile sna(path);
-	sna.load();
-
-	CPU().IV() = sna.peek(SnaFile::Offset_I);
-
-	CPU().HL().word = sna.peekWord(SnaFile::Offset_HL_);
-	CPU().DE().word = sna.peekWord(SnaFile::Offset_DE_);
-	CPU().BC().word = sna.peekWord(SnaFile::Offset_BC_);
-	CPU().AF().word = sna.peekWord(SnaFile::Offset_AF_);
-
-	CPU().exx();
-	CPU().exxAF();
-
-	CPU().HL().word = sna.peekWord(SnaFile::Offset_HL);
-	CPU().DE().word = sna.peekWord(SnaFile::Offset_DE);
-	CPU().BC().word = sna.peekWord(SnaFile::Offset_BC);
-
-	CPU().IY().word = sna.peekWord(SnaFile::Offset_IY);
-	CPU().IX().word = sna.peekWord(SnaFile::Offset_IX);
-
-	CPU().IFF2() = (sna.peek(SnaFile::Offset_IFF2) >> 2) != 0;
-	CPU().REFRESH() = sna.peek(SnaFile::Offset_R);
-
-	CPU().AF().word = sna.peekWord(SnaFile::Offset_AF);
-	CPU().SP().word = sna.peekWord(SnaFile::Offset_SP);
-
-	CPU().IM() = sna.peek(SnaFile::Offset_IM);
-
-	ULA().setBorder(sna.peek(SnaFile::Offset_BorderColour));
-
-	for (int i = 0; i < SnaFile::RamSize; ++i)
-		poke(ROM().size() + i, sna.peek(SnaFile::HeaderSize + i));
-
-	// XXXX HACK, HACK, HACK!!
-	CPU().raiseRESET();
-	poke(0xfffe, 0xed);
-	poke(0xffff, 0x45);
-	CPU().PC().word = 0xfffe;
-	CPU().step();
-	CPU().pokeWord(0xfffe, sna.peekWord(SnaFile::HeaderSize + 0xfffe));
+	sna.load(*this);
 }
 
 void Board::raisePOWER() {

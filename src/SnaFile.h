@@ -5,8 +5,10 @@
 #include <Rom.h>
 #include <Register.h>
 
+#include "Board.h"
+
 class SnaFile {
-public:
+private:
 	const static size_t Offset_I = 0x0;
 	const static size_t Offset_HL_ = 0x1;
 	const static size_t Offset_DE_ = 0x3;
@@ -28,9 +30,16 @@ public:
 
 	const static size_t RamSize = (32 + 16) * 1024;
 
+public:
 	SnaFile(const std::string& path);
 
-	void load();
+	// Read + load into the emulator
+	void load(Board& board);
+
+private:
+	[[nodiscard]] const EightBit::Rom& ROM() const noexcept { return m_rom; }
+
+	void read();
 
 	uint8_t peek(uint16_t offset) const {
 		return ROM().peek(offset);
@@ -42,9 +51,6 @@ public:
 		const auto high = peek(offset);
 		return EightBit::register16_t(low, high).word;
 	}
-
-private:
-	[[nodiscard]] const EightBit::Rom& ROM() const noexcept { return m_rom; }
 
 	std::string m_path;
 	EightBit::Rom m_rom;
