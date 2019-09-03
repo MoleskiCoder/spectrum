@@ -4,9 +4,6 @@
 
 #include <stdexcept>
 
-
-#include <iostream>
-
 Z80File::Z80File(const std::string& path)
 : SnapshotFile(path) {
 }
@@ -64,29 +61,16 @@ void Z80File::load(Board& board) {
 			size_t position = board.ROM().size();
 			const auto fileSize = size() - 4;
 			for (size_t i = HeaderSize; i != fileSize; ++i) {
-
-				std::cout << std::hex << "i:" << i << " position:" << position << std::endl;
-
-
 				const auto current = ROM().peek(i);
-				std::cout << "** previous:" << previous << ", current:" << (int)current << std::endl;
-
-
 				if (current == 0xed && previous == 0xed) {
 					if (i > (fileSize - 2))
 						throw std::runtime_error("File is too short for repeat specification.");
-
 					const uint8_t repeats = peek(++i);
 					const uint8_t value = peek(++i);
-
-					std::cout << "** repeat, repeats:" << (int)repeats << ", value:" << (int)value << std::endl;
-
 					--position;
 					for (int j = 0; j < repeats; ++j)
 						board.poke(position++, value);
-
 					previous = 0x100;
-
 				} else {
 					board.poke(position++, current);
 					previous = current;
