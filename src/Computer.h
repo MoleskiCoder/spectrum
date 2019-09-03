@@ -32,6 +32,7 @@ public:
 
 	void plug(const std::string& path);
 	void loadSna(const std::string& path);
+	void loadZ80(const std::string& path);
 
 private:
 	enum {

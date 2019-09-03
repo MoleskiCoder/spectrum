@@ -2,12 +2,11 @@
 
 #include <string>
 
-#include <Rom.h>
-#include <Register.h>
+#include "SnapshotFile.h"
 
-#include "Board.h"
+class Board;
 
-class SnaFile {
+class SnaFile : public SnapshotFile {
 private:
 	const static size_t Offset_I = 0x0;
 	const static size_t Offset_HL_ = 0x1;
@@ -33,25 +32,5 @@ private:
 public:
 	SnaFile(const std::string& path);
 
-	// Read + load into the emulator
-	void load(Board& board);
-
-private:
-	[[nodiscard]] const EightBit::Rom& ROM() const noexcept { return m_rom; }
-
-	void read();
-
-	uint8_t peek(uint16_t offset) const {
-		return ROM().peek(offset);
-	}
-
-	// Assumed to be little-endian!
-	uint16_t peekWord(uint16_t offset) const {
-		const auto low = peek(offset++);
-		const auto high = peek(offset);
-		return EightBit::register16_t(low, high).word;
-	}
-
-	std::string m_path;
-	EightBit::Rom m_rom;
+	virtual void load(Board& board) override;
 };

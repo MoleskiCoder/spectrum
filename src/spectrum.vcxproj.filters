@@ -35,6 +35,12 @@
     <ClInclude Include="SnaFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Z80File.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SnapshotFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -59,6 +65,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SnaFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Z80File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SnapshotFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

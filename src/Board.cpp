@@ -2,6 +2,7 @@
 #include "Board.h"
 #include "Configuration.h"
 #include "SnaFile.h"
+#include "Z80File.h"
 
 #include <iostream>
 
@@ -40,6 +41,11 @@ void Board::plug(const std::string& path) {
 void Board::loadSna(const std::string& path) {
 	SnaFile sna(path);
 	sna.load(*this);
+}
+
+void Board::loadZ80(const std::string& path) {
+	Z80File z80(path);
+	z80.load(*this);
 }
 
 void Board::raisePOWER() {

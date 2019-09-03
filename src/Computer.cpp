@@ -57,6 +57,10 @@ void Computer::loadSna(const std::string& path) {
 	m_board.loadSna(path);
 }
 
+void Computer::loadZ80(const std::string& path) {
+	m_board.loadZ80(path);
+}
+
 void Computer::configureBackground() const {
 	Uint8 r, g, b;
 	::SDL_GetRGB(m_colours.getColour(0), m_pixelFormat, &r, &g, &b);
