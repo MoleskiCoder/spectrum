@@ -10,19 +10,19 @@ class Board;
 
 class Z80File : public SnapshotFile {
 private:
-	const static size_t Offset_A = 0;	// Y
-	const static size_t Offset_F = 1;	// Y
-	const static size_t Offset_BC = 2;	// Y
-	const static size_t Offset_HL = 4;	// Y
-	const static size_t Offset_PC = 6;	// Y
-	const static size_t Offset_SP = 8;	// Y
-	const static size_t Offset_I = 10;	// Y
-	const static size_t Offset_R = 11; // Y Bit 7 is not significant!
+	const static size_t Offset_A = 0;
+	const static size_t Offset_F = 1;
+	const static size_t Offset_BC = 2;
+	const static size_t Offset_HL = 4;
+	const static size_t Offset_PC = 6;
+	const static size_t Offset_SP = 8;
+	const static size_t Offset_I = 10;
+	const static size_t Offset_R = 11; // Bit 7 is not significant!
 
-	// Y Bit 0  : Bit 7 of the R - register
-	// Y Bit 1 - 3 : Border colour
-	// Bit 4 : 1 = Basic SamRom switched in
-	// Bit 5 : 1 = Block of data is compressed
+	// Bit 0	 : Bit 7 of the R - register
+	// Bit 1 - 3 : Border colour
+	// Bit 4     : 1 = Basic SamRom switched in
+	// Bit 5     : 1 = Block of data is compressed
 	// Bit 6 - 7 : No meaning
 	const static size_t Offset_misc_1 = 12;
 
@@ -37,9 +37,9 @@ private:
 	const static size_t Offset_IFF1 = 27;
 	const static size_t Offset_IFF2 = 28;
 
-	// Bit 0 - 1: Interrupt mode(0, 1 or 2)
-	// Bit 2 : 1 = Issue 2 emulation
-	// Bit 3 : 1 = Double interrupt frequency
+	// Bit 0 - 1 : Interrupt mode(0, 1 or 2)
+	// Bit 2     : 1 = Issue 2 emulation
+	// Bit 3     : 1 = Double interrupt frequency
 	// Bit 4 - 5 : 1 = High video synchronisation
 	//             3 = Low video synchronisation
 	//             0, 2 = Normal

@@ -10,31 +10,35 @@ void SnaFile::load(Board& board) {
 
 	read();
 
+	EightBit::Z80& cpu = board.CPU();
+
 	board.raisePOWER();
 	board.CPU().raiseRESET();
 
-	board.CPU().AF().word = peekWord(Offset_AF_);
-	board.CPU().BC().word = peekWord(Offset_BC_);
-	board.CPU().DE().word = peekWord(Offset_DE_);
-	board.CPU().HL().word = peekWord(Offset_HL_);
+	cpu.IV() = peek(Offset_I);
 
-	board.CPU().exx();
-	board.CPU().exxAF();
+	cpu.HL().word = peekWord(Offset_HL_);
+	cpu.DE().word = peekWord(Offset_DE_);
+	cpu.BC().word = peekWord(Offset_BC_);
+	cpu.AF().word = peekWord(Offset_AF_);
 
-	board.CPU().AF().word = peekWord(Offset_AF);
-	board.CPU().BC().word = peekWord(Offset_BC);
-	board.CPU().DE().word = peekWord(Offset_DE);
-	board.CPU().HL().word = peekWord(Offset_HL);
+	cpu.exx();
 
-	board.CPU().SP().word = peekWord(Offset_SP);
+	cpu.HL().word = peekWord(Offset_HL);
+	cpu.DE().word = peekWord(Offset_DE);
+	cpu.BC().word = peekWord(Offset_BC);
 
-	board.CPU().IY().word = peekWord(Offset_IY);
-	board.CPU().IX().word = peekWord(Offset_IX);
+	cpu.IY().word = peekWord(Offset_IY);
+	cpu.IX().word = peekWord(Offset_IX);
 
-	board.CPU().IV() = peek(Offset_I);
-	board.CPU().IM() = peek(Offset_IM);
-	board.CPU().IFF2() = (peek(Offset_IFF2) >> 2) != 0;
-	board.CPU().REFRESH() = peek(Offset_R);
+	cpu.IFF2() = (peek(Offset_IFF2) >> 2) != 0;
+	cpu.REFRESH() = peek(Offset_R);
+
+	cpu.exxAF();
+
+	cpu.AF().word = peekWord(Offset_AF);
+	cpu.SP().word = peekWord(Offset_SP);
+	cpu.IM() = peek(Offset_IM);
 
 	board.ULA().setBorder(peek(Offset_BorderColour));
 
@@ -44,7 +48,7 @@ void SnaFile::load(Board& board) {
 	// XXXX HACK, HACK, HACK!!
 	board.poke(0xfffe, 0xed);
 	board.poke(0xffff, 0x45);	// ED45 is RETN
-	board.CPU().PC().word = 0xfffe;
-	board.CPU().step();
-	board.CPU().pokeWord(0xfffe, peekWord(HeaderSize + 0xfffe));
+	cpu.PC().word = 0xfffe;
+	cpu.step();
+	cpu.pokeWord(0xfffe, peekWord(HeaderSize + 0xfffe));
 }
