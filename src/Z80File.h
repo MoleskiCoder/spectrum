@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cstdint>
 
 #include "SnapshotFile.h"
 
@@ -54,8 +55,18 @@ private:
 
 	const static size_t RamSize = (32 + 16) * 1024;
 
+	uint8_t misc1() const;
+
+	void loadMemoryV1(Board& board) const;
+	void loadMemoryCompressed(Board& board) const;
+	void loadMemoryUncompressed(Board& board) const;
+
+protected:
+	virtual void loadRegisters(EightBit::Z80& cpu) const final;
+	virtual void loadMemory(Board& board) const final;
+
 public:
 	Z80File(const std::string& path);
 
-	virtual void load(Board& board) override;
+	virtual void load(Board& board) final;
 };

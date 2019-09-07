@@ -6,14 +6,9 @@ SnaFile::SnaFile(const std::string& path)
 : SnapshotFile(path) {
 }
 
-void SnaFile::load(Board& board) {
+void SnaFile::loadRegisters(EightBit::Z80& cpu) const {
 
-	read();
-
-	EightBit::Z80& cpu = board.CPU();
-
-	board.raisePOWER();
-	board.CPU().raiseRESET();
+	cpu.raiseRESET();
 
 	cpu.IV() = peek(Offset_I);
 
@@ -39,16 +34,23 @@ void SnaFile::load(Board& board) {
 	cpu.AF().word = peekWord(Offset_AF);
 	cpu.SP().word = peekWord(Offset_SP);
 	cpu.IM() = peek(Offset_IM);
+}
 
-	board.ULA().setBorder(peek(Offset_BorderColour));
-
+void SnaFile::loadMemory(Board& board) const {
 	for (int i = 0; i < RamSize; ++i)
 		board.poke(board.ROM().size() + i, peek(HeaderSize + i));
+}
+
+void SnaFile::load(Board& board) {
+
+	SnapshotFile::load(board);
+
+	board.ULA().setBorder(peek(Offset_BorderColour));
 
 	// XXXX HACK, HACK, HACK!!
 	board.poke(0xfffe, 0xed);
 	board.poke(0xffff, 0x45);	// ED45 is RETN
-	cpu.PC().word = 0xfffe;
-	cpu.step();
-	cpu.pokeWord(0xfffe, peekWord(HeaderSize + 0xfffe));
+	board.CPU().PC().word = 0xfffe;
+	board.CPU().step();
+	board.CPU().pokeWord(0xfffe, peekWord(HeaderSize + 0xfffe));
 }

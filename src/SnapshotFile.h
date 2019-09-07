@@ -7,7 +7,6 @@
 class Board;
 
 class SnapshotFile {
-
 private:
 	std::string m_path;
 	EightBit::Rom m_rom;
@@ -15,6 +14,10 @@ private:
 protected:
 	SnapshotFile(const std::string& path);
 
+	virtual void loadRegisters(EightBit::Z80& cpu) const = 0;
+	virtual void loadMemory(Board& board) const = 0;
+
+	const EightBit::Rom& ROM() const { return m_rom; }
 	EightBit::Rom& ROM() { return m_rom; }
 
 	void read();
@@ -25,6 +28,6 @@ protected:
 	auto size() const { return m_rom.size(); }
 
 public:
-	virtual void load(Board& board) = 0;
+	virtual void load(Board& board);
 };
 

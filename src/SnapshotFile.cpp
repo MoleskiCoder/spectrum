@@ -23,3 +23,16 @@ uint16_t SnapshotFile::peekWord(uint16_t offset) const {
 void SnapshotFile::read() {
 	m_rom.load(m_path);
 }
+
+void SnapshotFile::load(Board& board) {
+
+	read();
+
+	// N.B. Power must be raised prior to loading
+	// registers, otherwise power on defaults will override
+	// loaded values.
+	board.raisePOWER();
+
+	loadRegisters(board.CPU());
+	loadMemory(board);
+}
