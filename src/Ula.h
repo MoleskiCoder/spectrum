@@ -7,6 +7,7 @@
 
 #include <SDL.h>
 
+#include <ClockedChip.h>
 #include <Signal.h>
 
 #include "ColourPalette.h"
@@ -15,7 +16,7 @@ class Board;
 
 // http://www.worldofspectrum.org/faq/reference/48kreference.htm
 
-class Ula final {
+class Ula final : public EightBit::ClockedChip {
 private:
 	static const int VerticalRetraceLines = 16;
 	static const int UpperRasterBorder = 48;
@@ -40,8 +41,6 @@ public:
 	Ula(const ColourPalette& palette, Board& bus);
 
 	EightBit::Signal<int> Proceed;
-
-	void initialise();
 
 	void renderLine(int y);
 

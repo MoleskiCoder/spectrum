@@ -10,10 +10,9 @@
 Ula::Ula(const ColourPalette& palette, Board& bus)
 : m_palette(palette),
   m_bus(bus) {
-}
 
-void Ula::initialise() {
 	initialiseKeyboardMapping();
+
 	BUS().ports().ReadingPort.connect(std::bind(&Ula::Board_ReadingPort, this, std::placeholders::_1));
 	BUS().ports().WrittenPort.connect(std::bind(&Ula::Board_WrittenPort, this, std::placeholders::_1));
 
@@ -26,6 +25,20 @@ void Ula::initialise() {
 			}
 		}
 	}
+
+	RaisedPOWER.connect([this](EightBit::EventArgs) {
+		m_frameCounter = 0;
+		m_borderColour = 0;
+		m_flash = false;
+	});
+
+	Ticked.connect([this](EightBit::EventArgs) {
+		const auto available = cycles() / 2;
+		if (available > 0) {
+			proceed(cycles() / 2);
+			resetCycles();
+		}
+	});
 }
 
 void Ula::flash() {
@@ -45,11 +58,11 @@ void Ula::renderRightHorizontalBorder(const int y) {
 }
 
 void Ula::renderHorizontalBorder(int x, int y, int width) {
-	std::fill_n(
-		m_pixels.begin() + y * RasterWidth + x,
-		width,
-		m_borderColour);
-	proceed(width / 2);
+	const size_t begin = y * RasterWidth + x;
+	for (int i = 0; i < width; ++i) {
+		m_pixels[begin + i] = m_borderColour;
+		tick();
+	}
 }
 
 void Ula::renderVRAM(const int y) {
@@ -72,10 +85,10 @@ void Ula::renderVRAM(const int y) {
 		const auto attributeAddress = attributeAddressY + byte;
 		const auto attribute = BUS().VRAM().peek(attributeAddress);
 
-		const auto ink = attribute & EightBit::Chip::Mask3;
-		const auto paper = (attribute >> 3) & EightBit::Chip::Mask3;
-		const auto bright = !!(attribute & EightBit::Chip::Bit6);
-		const auto flash = !!(attribute & EightBit::Chip::Bit7);
+		const auto ink = attribute & Mask3;
+		const auto paper = (attribute >> 3) & Mask3;
+		const auto bright = !!(attribute & Bit6);
+		const auto flash = !!(attribute & Bit7);
 
 		const auto background = m_palette.getColour(flash && m_flash ? ink : paper, bright);
 		const auto foreground = m_palette.getColour(flash && m_flash ? paper : ink, bright);
@@ -83,13 +96,13 @@ void Ula::renderVRAM(const int y) {
 		for (int bit = 0; bit < 8; ++bit) {
 
 			const auto pixel = bitmap & (1 << bit);
-			const auto x = (~bit & EightBit::Chip::Mask3) | (byte << 3);
+			const auto x = (~bit & Mask3) | (byte << 3);
 
 			m_pixels[pixelBase + x] = pixel ? foreground : background;
+
+			tick();
 		}
 	}
-
-	proceed(ActiveRasterWidth / 2);
 }
 
 void Ula::renderActiveLine(const int y) {
@@ -105,17 +118,17 @@ void Ula::renderLine(const int y) {
 		startFrame();
 
 	// Vertical retrace?
-	if ((y & ~EightBit::Chip::Mask4) == 0) {
-		proceed(RasterWidth / 2);
+	if ((y & ~Mask4) == 0) {
+		tick(RasterWidth);
 		return;
 	}
 
 	// Upper border
-	if ((y & ~EightBit::Chip::Mask6) == 0)
+	if ((y & ~Mask6) == 0)
 		renderBlankLine(y - VerticalRetraceLines);
 
 	// Rendered from Spectrum VRAM
-	else if ((y & ~EightBit::Chip::Mask8) == 0)
+	else if ((y & ~Mask8) == 0)
 		renderActiveLine(y - VerticalRetraceLines);
 
 	// Lower border
@@ -124,7 +137,7 @@ void Ula::renderLine(const int y) {
 }
 
 void Ula::startFrame() {
-	if ((++m_frameCounter & EightBit::Chip::Mask4) == 0)
+	if ((++m_frameCounter & Mask4) == 0)
 		flash();
 	BUS().CPU().lowerINT();
 }
@@ -183,10 +196,10 @@ void Ula::writtenPort(const uint8_t port) {
 
 	const auto value = BUS().ports().readOutputPort(port);
 
-	m_mic = (value & EightBit::Chip::Bit3) >> 3;
-	m_speaker = (value & EightBit::Chip::Bit4) >> 4;
+	m_mic = (value & Bit3) >> 3;
+	m_speaker = (value & Bit4) >> 4;
 
-	setBorder(value & EightBit::Chip::Mask3);
+	setBorder(value & Mask3);
 
 	BUS().buzzer().buzz(m_speaker, BUS().frameCycles());
 }
@@ -205,7 +218,7 @@ void Ula::readingPort(const uint8_t port) {
 }
 
 bool Ula::ignoredPort(const uint8_t port) const {
-	return !!(port & EightBit::Chip::Bit0);
+	return !!(port & Bit0);
 }
 
 void Ula::proceed(int cycles) {

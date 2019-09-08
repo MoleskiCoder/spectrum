@@ -30,7 +30,6 @@ void Board::initialise() {
 
 	ULA().Proceed.connect(std::bind(&Board::Ula_Proceed, this, std::placeholders::_1));
 
-	ULA().initialise();
 	buzzer().initialise();
 }
 
@@ -50,6 +49,7 @@ void Board::loadZ80(const std::string& path) {
 
 void Board::raisePOWER() {
 	EightBit::Bus::raisePOWER();
+	ULA().raisePOWER();
 	CPU().raisePOWER();
 	CPU().lowerRESET();
 	CPU().raiseHALT();
@@ -59,6 +59,7 @@ void Board::raisePOWER() {
 
 void Board::lowerPOWER() {
 	CPU().lowerPOWER();
+	ULA().lowerPOWER();
 	EightBit::Bus::lowerPOWER();
 }
 
