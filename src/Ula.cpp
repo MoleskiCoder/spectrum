@@ -137,7 +137,7 @@ void Ula::renderLine(const int y) {
 }
 
 void Ula::startFrame() {
-	if ((++m_frameCounter & Mask4) == 0)
+	if (++m_frameCounter == 0)
 		flash();
 	BUS().CPU().lowerINT();
 }
@@ -153,7 +153,7 @@ void Ula::pullKey(SDL_Keycode raw) {
 void Ula::initialiseKeyboardMapping() {
 
 	// Left side
-	m_keyboardMapping[0xF7] = { SDLK_1,		SDLK_2,     SDLK_3,     SDLK_4,		SDLK_5,		};
+	m_keyboardMapping[0xF7] = { SDLK_1,		SDLK_2,     SDLK_3,     SDLK_4,		SDLK_5		};
 	m_keyboardMapping[0xFB] = { SDLK_q,		SDLK_w,		SDLK_e,		SDLK_r,		SDLK_t		};
 	m_keyboardMapping[0xFD] = { SDLK_a,     SDLK_s,     SDLK_d,		SDLK_f,		SDLK_g		};
 	m_keyboardMapping[0xFE] = { SDLK_LSHIFT,SDLK_z,		SDLK_x,		SDLK_c,		SDLK_v		};
@@ -191,6 +191,17 @@ void Ula::maybeWrittenPort(const uint8_t port) {
 		return;
 	writtenPort(port);
 }
+// 0 - 2	Border Color(0..7) (always with Bright = off)
+// 3		MIC Output(CAS SAVE) (0 = On, 1 = Off)
+// 4		Beep Output(ULA Sound)    (0 = Off, 1 = On)
+// 5 - 7	Not used
+
+// 128 64 32 16  8  4  2  U
+//   7  6  5  4  3  2  1  0
+//                  <----->	Border colour
+//               -		    Mic output
+//            -				Beep output
+//   <----->				Not used
 
 void Ula::writtenPort(const uint8_t port) {
 
@@ -210,10 +221,23 @@ void Ula::maybeReadingPort(const uint8_t port) {
 	readingPort(port);
 }
 
+// 0 - 4	Keyboard Inputs(0 = Pressed, 1 = Released)
+// 5		Not used
+// 6		EAR Input(CAS LOAD)
+// 7		Not used
+// A8..A15	Keyboard Address Output(0 = Select)
+
+// 128 64 32 16  8  4  2  U
+//   7  6  5  4  3  2  1  0
+//            <----------->	Keyboard
+//         -				Not used
+//      -					Ear input
+//   -						Not used
+
 void Ula::readingPort(const uint8_t port) {
 	const auto portHigh = BUS().ADDRESS().high;
-	m_selected = findSelectedKeys(portHigh);
-	const uint8_t value = m_selected | (m_ear << 6);
+	const auto  selected = findSelectedKeys(portHigh);
+	const uint8_t value = selected | (m_ear << 6);
 	BUS().ports().writeInputPort(port, value);
 }
 
