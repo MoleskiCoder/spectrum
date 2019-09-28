@@ -2,10 +2,13 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
+#include <memory>
 
 #include <Bus.h>
 #include <InputOutput.h>
 #include <Ram.h>
+#include <Rom.h>
 
 #include <Z80.h>
 #include <Profiler.h>
@@ -16,19 +19,22 @@
 
 class Configuration;
 class ColourPalette;
+class Expansion;
 
 class Board final : public EightBit::Bus {
 public:
 	Board(const ColourPalette& palette, const Configuration& configuration);
 
 	EightBit::Z80& CPU() { return m_cpu; }
-	Ula &ULA() { return m_ula; }
+	Ula& ULA() { return m_ula; }
+	const Ula& ULA() const { return m_ula; }
 	Buzzer& buzzer() { return m_buzzer; }
-	EightBit::InputOutput &ports() { return m_ports; }
+	EightBit::InputOutput& ports() { return m_ports; }
 	EightBit::Rom& ROM() { return m_basicRom; }
 	EightBit::Ram& VRAM() { return m_contendedRam; }
 	EightBit::Ram& WRAM() { return m_uncontendedRam; }
 
+	void plug(std::shared_ptr<Expansion> expansion);
 	void plug(const std::string& path);
 	void loadSna(const std::string& path);
 	void loadZ80(const std::string& path);
@@ -50,6 +56,7 @@ private:
 	EightBit::Z80 m_cpu;
 	Ula m_ula;
 	Buzzer m_buzzer;
+	std::vector<std::shared_ptr<Expansion>> m_expansions;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)
 	EightBit::Ram m_contendedRam = 0x4000;	//4000h - 7FFFh  RAM(Work RAM and VRAM) (with waitstates)

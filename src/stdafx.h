@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -14,9 +15,12 @@
 
 #include <SDL.h>
 
+#include <Game.h>
+
 #include <Bus.h>
 #include <InputOutput.h>
 #include <Ram.h>
+#include <Rom.h>
 
 #include <Z80.h>
 #include <Profiler.h>

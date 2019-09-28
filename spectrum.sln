@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spectrum", "src\spectrum.vcxproj", "{AAD95487-2238-4C6D-BE3A-41CA8E9424F4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EightBit", "libraries\EightBit\src\EightBit.vcxproj", "{A9C24BD9-0CB4-4C84-B09B-46B815F9DA47}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Z80", "libraries\EightBit\Z80\src\Z80.vcxproj", "{01974F81-2750-45AF-B845-2C903A54A334}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Gaming", "libraries\EightBit\Gaming\src\Gaming.vcxproj", "{BC526300-E3D0-44B1-B57B-312BAA6566AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{01974F81-2750-45AF-B845-2C903A54A334}.Release|x64.Build.0 = Release|x64
 		{01974F81-2750-45AF-B845-2C903A54A334}.Release|x86.ActiveCfg = Release|Win32
 		{01974F81-2750-45AF-B845-2C903A54A334}.Release|x86.Build.0 = Release|Win32
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Debug|x64.ActiveCfg = Debug|x64
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Debug|x64.Build.0 = Debug|x64
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Debug|x86.ActiveCfg = Debug|Win32
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Debug|x86.Build.0 = Debug|Win32
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Release|x64.ActiveCfg = Release|x64
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Release|x64.Build.0 = Release|x64
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Release|x86.ActiveCfg = Release|Win32
+		{BC526300-E3D0-44B1-B57B-312BAA6566AC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

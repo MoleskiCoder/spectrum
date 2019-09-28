@@ -67,22 +67,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libraries\SDL2-2.0.7\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libraries\SDL2-2.0.7\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libraries\SDL2-2.0.7\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.7\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libraries\SDL2-2.0.7\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -159,6 +159,8 @@
     <ClInclude Include="ColourPalette.h" />
     <ClInclude Include="Computer.h" />
     <ClInclude Include="Configuration.h" />
+    <ClInclude Include="Expansion.h" />
+    <ClInclude Include="KempstonJoystick.h" />
     <ClInclude Include="SnaFile.h" />
     <ClInclude Include="SnapshotFile.h" />
     <ClInclude Include="stdafx.h" />
@@ -170,6 +172,8 @@
     <ClCompile Include="Buzzer.cpp" />
     <ClCompile Include="ColourPalette.cpp" />
     <ClCompile Include="Computer.cpp" />
+    <ClCompile Include="Expansion.cpp" />
+    <ClCompile Include="KempstonJoystick.cpp" />
     <ClCompile Include="SnaFile.cpp" />
     <ClCompile Include="SnapshotFile.cpp" />
     <ClCompile Include="spectrum.cpp" />
@@ -183,6 +187,9 @@
     <ClCompile Include="Z80File.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\libraries\EightBit\Gaming\src\Gaming.vcxproj">
+      <Project>{bc526300-e3d0-44b1-b57b-312baa6566ac}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\libraries\EightBit\src\EightBit.vcxproj">
       <Project>{a9c24bd9-0cb4-4c84-b09b-46b815f9da47}</Project>
     </ProjectReference>

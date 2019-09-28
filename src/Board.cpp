@@ -3,6 +3,7 @@
 #include "Configuration.h"
 #include "SnaFile.h"
 #include "Z80File.h"
+#include "Expansion.h"
 
 #include <iostream>
 
@@ -33,6 +34,10 @@ void Board::initialise() {
 	buzzer().initialise();
 }
 
+void Board::plug(std::shared_ptr<Expansion> expansion) {
+	m_expansions.push_back(expansion);
+}
+
 void Board::plug(const std::string& path) {
 	ROM().load(path);
 }
@@ -49,6 +54,8 @@ void Board::loadZ80(const std::string& path) {
 
 void Board::raisePOWER() {
 	EightBit::Bus::raisePOWER();
+	for (auto expansion : m_expansions)
+		expansion->raisePOWER();
 	ULA().raisePOWER();
 	CPU().raisePOWER();
 	CPU().lowerRESET();
@@ -60,6 +67,8 @@ void Board::raisePOWER() {
 void Board::lowerPOWER() {
 	CPU().lowerPOWER();
 	ULA().lowerPOWER();
+	for (auto expansion : m_expansions)
+		expansion->lowerPOWER();
 	EightBit::Bus::lowerPOWER();
 }
 

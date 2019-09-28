@@ -1,68 +1,48 @@
 #pragma once
 
-#include <stdexcept>
+#include <cstdint>
+#include <memory>
 #include <string>
-#include <array>
 
-#include <SDL.h>
+#include <Game.h>
 
 #include "Board.h"
-#include "Ula.h"
 #include "ColourPalette.h"
 
 class Configuration;
+class Expansion;
 
-class Computer final {
+class Computer final : public Gaming::Game {
 public:
-
-	static void throwSDLException(std::string failure) {
-		throw std::runtime_error(failure + ::SDL_GetError());
-	}
-
-	static void verifySDLCall(int returned, std::string failure) {
-		if (returned < 0) {
-			throwSDLException(failure);
-		}
-	}
-
 	Computer(const Configuration& configuration);
 
-	void runLoop();
-	void initialise();
+	virtual void raisePOWER() override;
 
+	void plug(std::shared_ptr<Expansion> expansion);
 	void plug(const std::string& path);
 	void loadSna(const std::string& path);
 	void loadZ80(const std::string& path);
 
-private:
-	enum {
-		DisplayScale = 2,
-		ScreenWidth = Ula::RasterWidth * DisplayScale,
-		ScreenHeight = Ula::RasterHeight * DisplayScale,
-	};
+	Board& BUS() { return m_board; }
+	const Board& BUS() const { return m_board; }
 
+protected:
+	virtual int fps() const final { return Ula::FramesPerSecond; }
+	virtual bool useVsync() const final { return false; }
+	virtual int displayScale() const noexcept final { return 2; }
+	virtual int rasterWidth() const noexcept final { return Ula::RasterWidth; }
+	virtual int rasterHeight() const noexcept final { return Ula::RasterHeight; }
+	virtual std::string title() const noexcept final { return "Spectrum"; }
+
+	virtual const uint32_t* pixels() const override;
+
+	virtual void runFrame() override;
+
+	virtual void handleKeyDown(SDL_Keycode key) override;
+	virtual void handleKeyUp(SDL_Keycode key) override;
+
+private:
 	const Configuration& m_configuration;
 	ColourPalette m_colours;
 	Board m_board;
-
-	SDL_Window* m_window = nullptr;
-	SDL_Renderer* m_renderer = nullptr;
-
-	SDL_Texture* m_bitmapTexture = nullptr;
-	Uint32 m_pixelType = SDL_PIXELFORMAT_ARGB8888;
-	SDL_PixelFormat* m_pixelFormat = nullptr;
-
-	Uint32 m_startTicks = 0UL;
-	Uint32 m_frames = 0UL;
-
-	void drawFrame();
-
-	void configureBackground() const;
-	void createBitmapTexture();
-
-	void handleKeyDown(SDL_Keycode key);
-	void handleKeyUp(SDL_Keycode key);
-
-	static void dumpRendererInformation();
-	static void dumpRendererInformation(::SDL_RendererInfo info);
 };
