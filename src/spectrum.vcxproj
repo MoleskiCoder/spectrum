@@ -160,6 +160,7 @@
     <ClInclude Include="Computer.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Expansion.h" />
+    <ClInclude Include="Joystick.h" />
     <ClInclude Include="KempstonJoystick.h" />
     <ClInclude Include="SnaFile.h" />
     <ClInclude Include="SnapshotFile.h" />
@@ -173,6 +174,7 @@
     <ClCompile Include="ColourPalette.cpp" />
     <ClCompile Include="Computer.cpp" />
     <ClCompile Include="Expansion.cpp" />
+    <ClCompile Include="Joystick.cpp" />
     <ClCompile Include="KempstonJoystick.cpp" />
     <ClCompile Include="SnaFile.cpp" />
     <ClCompile Include="SnapshotFile.cpp" />

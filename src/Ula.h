@@ -18,7 +18,6 @@ class Board;
 
 class Ula final : public EightBit::ClockedChip {
 private:
-	static const int VerticalRetraceLines = 16;
 	static const int UpperRasterBorder = 48;
 	static const int ActiveRasterHeight = 192;
 	static const int LowerRasterBorder = 56;
@@ -31,6 +30,7 @@ private:
 	static const int AttributeAddress = 0x1800;
 
 public:
+	static const int VerticalRetraceLines = 16;
 	static const int RasterWidth = HorizontalRasterBorder * 2 + ActiveRasterWidth;
 	static const int RasterHeight = UpperRasterBorder + ActiveRasterHeight + LowerRasterBorder;
 	static const int TotalHeight = VerticalRetraceLines + RasterHeight;

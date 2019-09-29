@@ -35,6 +35,9 @@ public:
 	EightBit::Ram& WRAM() { return m_uncontendedRam; }
 
 	void plug(std::shared_ptr<Expansion> expansion);
+	size_t numberOfExpansions() const { return m_expansions.size(); }
+	std::shared_ptr<Expansion > expansion(size_t i) { return m_expansions[i]; }
+
 	void plug(const std::string& path);
 	void loadSna(const std::string& path);
 	void loadZ80(const std::string& path);
@@ -43,7 +46,9 @@ public:
 	virtual void raisePOWER() final;
 	virtual void lowerPOWER() final;
 
-	void runFrame();
+	void runVerticalBlank();
+	void runRasterLines();
+
 	int frameCycles() const { return m_frameCycles; }
 
 protected:

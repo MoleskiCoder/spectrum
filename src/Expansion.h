@@ -8,6 +8,10 @@ class Expansion : public EightBit::Device {
 public:
 	Expansion(Board& motherboard);
 
+	enum Type { JOYSTICK };
+
+	virtual Type expansionType() const = 0;
+
 protected:
 	Board& BUS() { return m_motherboard; }
 

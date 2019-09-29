@@ -37,10 +37,17 @@ protected:
 
 	virtual const uint32_t* pixels() const override;
 
-	virtual void runRasterLines() override;
+	void runVerticalBlank() final;
+	void runRasterLines() final;
 
 	virtual void handleKeyDown(SDL_Keycode key) override;
 	virtual void handleKeyUp(SDL_Keycode key) override;
+
+	void handleJoyButtonDown(SDL_JoyButtonEvent event) final;
+	void handleJoyButtonUp(SDL_JoyButtonEvent event) final;
+
+	void handleControllerButtonDown(SDL_ControllerButtonEvent event) final;
+	void handleControllerButtonUp(SDL_ControllerButtonEvent event) final;
 
 private:
 	const Configuration& m_configuration;
