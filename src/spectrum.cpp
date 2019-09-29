@@ -15,6 +15,9 @@ int main(int, char*[])
 #endif
 
 	Computer computer(configuration);
+
+	computer.plug(std::make_shared<KempstonJoystick>(computer.BUS()));
+
 	computer.raisePOWER();
 
 	auto romDirectory = configuration.getRomDirectory();
@@ -24,7 +27,7 @@ int main(int, char*[])
 	//computer.plug(romDirectory + "\\Jet Pac (1983)(Sinclair Research)(GB).rom");	// Jet Pac
 	
 	//computer.plug(romDirectory + "\\System_Test_ROM.bin");	// Sinclair test ROM by Dr. Ian Logan
-	computer.plug(romDirectory + "\\Release-v0.37\\testrom.bin");
+	//computer.plug(romDirectory + "\\Release-v0.37\\testrom.bin");
 	//computer.plug(romDirectory + "\\smart\\ROMs\\DiagROM.v41");
 
 	auto programDirectory = configuration.getProgramDirectory();
@@ -32,7 +35,7 @@ int main(int, char*[])
 	//computer.loadSna(programDirectory + "\\ant_attack.sna");	// 3D ant attack
 	//computer.loadSna(programDirectory + "\\zexall.sna");
 
-	//computer.loadZ80(programDirectory + "\\Jetpac (1983)(Ultimate Play The Game)[a][16K].z80");
+	computer.loadZ80(programDirectory + "\\Jetpac (1983)(Ultimate Play The Game)[a][16K].z80");
 	//computer.loadZ80(programDirectory + "\\HELCHOP.Z80");
 	//computer.loadZ80(programDirectory + "\\TFF4.Z80");
 	//computer.loadZ80(programDirectory + "\\BABY.Z80");
@@ -40,8 +43,6 @@ int main(int, char*[])
 	//computer.loadZ80(programDirectory + "\\HEDGEHOG.Z80");
 	//computer.loadZ80(programDirectory + "\\Knight Lore (1984)(Ultimate).z80");
 
-	computer.plug(std::make_shared<KempstonJoystick>(computer.BUS()));
-	
 	try {
 		computer.runLoop();
 	} catch (const std::exception& error) {

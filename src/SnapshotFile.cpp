@@ -31,7 +31,8 @@ void SnapshotFile::load(Board& board) {
 	// N.B. Power must be raised prior to loading
 	// registers, otherwise power on defaults will override
 	// loaded values.
-	board.raisePOWER();
+	if (!board.CPU().powered())
+		throw std::runtime_error("Whoops: CPU has not been powered on.");
 
 	loadRegisters(board.CPU());
 	loadMemory(board);

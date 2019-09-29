@@ -18,6 +18,11 @@ void Computer::raisePOWER() {
 	BUS().raisePOWER();
 }
 
+void Computer::lowerPOWER() {
+	BUS().lowerPOWER();
+	Game::lowerPOWER();
+}
+
 void Computer::plug(std::shared_ptr<Expansion> expansion) {
 	BUS().plug(expansion);
 }

@@ -6,7 +6,7 @@ class KempstonJoystick final : public Expansion {
 public:
 	KempstonJoystick(Board& motherboard);
 
-	virtual void raisePOWER() final;
-private:
+	void raisePOWER() final;
+	void lowerPOWER() final;
 };
 

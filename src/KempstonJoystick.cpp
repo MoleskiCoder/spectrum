@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "KempstonJoystick.h"
 
+#include <iostream>
+
 KempstonJoystick::KempstonJoystick(Board& motherboard)
 : Expansion(motherboard) {
 
@@ -11,4 +13,9 @@ KempstonJoystick::KempstonJoystick(Board& motherboard)
 }
 
 void KempstonJoystick::raisePOWER() {
+	std::cout << "Kempston joystick: power on" << std::endl;
+}
+
+void KempstonJoystick::lowerPOWER() {
+	std::cout << "Kempston joystick: power off" << std::endl;
 }

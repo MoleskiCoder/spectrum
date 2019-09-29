@@ -16,7 +16,8 @@ class Computer final : public Gaming::Game {
 public:
 	Computer(const Configuration& configuration);
 
-	virtual void raisePOWER() override;
+	void raisePOWER() override;
+	void lowerPOWER() override;
 
 	void plug(std::shared_ptr<Expansion> expansion);
 	void plug(const std::string& path);
