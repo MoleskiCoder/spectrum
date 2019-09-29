@@ -3,11 +3,13 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <Game.h>
 
 #include "Board.h"
 #include "ColourPalette.h"
+#include "Joystick.h"
 
 class Configuration;
 class Expansion;
@@ -53,4 +55,12 @@ private:
 	const Configuration& m_configuration;
 	ColourPalette m_colours;
 	Board m_board;
+
+	std::vector<Joystick*> joysticks();
+
+	void handleJoyButtonDown(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event);
+	void handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event);
+	void handleControllerButtonDown(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
+	void handleControllerButtonUp(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
+
 };

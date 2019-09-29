@@ -57,55 +57,79 @@ void Computer::handleKeyUp(SDL_Keycode key) {
 }
 
 void Computer::handleJoyButtonDown(const SDL_JoyButtonEvent event) {
-	const auto joystick = (Joystick*)BUS().expansion(0).get();
-	switch (event.button) {
-	case SDL_CONTROLLER_BUTTON_A:
-		joystick->pushFire();
-		break;
-	}
+	handleJoyButtonDown(joysticks(), event);
 }
 
 void Computer::handleJoyButtonUp(const SDL_JoyButtonEvent event) {
-	const auto joystick = (Joystick*)BUS().expansion(0).get();
-	switch (event.button) {
-	case SDL_CONTROLLER_BUTTON_A:
-		joystick->releaseFire();
-		break;
-	}
+	handleJoyButtonUp(joysticks(), event);
 }
 
 void Computer::handleControllerButtonDown(SDL_ControllerButtonEvent event) {
-	const auto joystick = (Joystick*)BUS().expansion(0).get();
+	handleControllerButtonDown(joysticks(), event);
+}
+
+void Computer::handleControllerButtonUp(SDL_ControllerButtonEvent event) {
+	handleControllerButtonUp(joysticks(), event);
+}
+
+void Computer::handleJoyButtonDown(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event) {
 	switch (event.button) {
-	case SDL_CONTROLLER_BUTTON_DPAD_UP:
-		joystick->pushUp();
-		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-		joystick->pushDown();
-		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-		joystick->pushLeft();
-		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-		joystick->pushRight();
+	case SDL_CONTROLLER_BUTTON_A:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->pushFire(); });
 		break;
 	}
 }
 
-void Computer::handleControllerButtonUp(SDL_ControllerButtonEvent event) {
-	const auto joystick = (Joystick*)BUS().expansion(0).get();
+void Computer::handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event) {
 	switch (event.button) {
-	case SDL_CONTROLLER_BUTTON_DPAD_UP:
-		joystick->releaseUp();
-		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-		joystick->releaseDown();
-		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-		joystick->releaseLeft();
-		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-		joystick->releaseRight();
+	case SDL_CONTROLLER_BUTTON_A:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->releaseFire(); });
 		break;
 	}
+}
+
+void Computer::handleControllerButtonDown(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event) {
+	switch (event.button) {
+	case SDL_CONTROLLER_BUTTON_DPAD_UP:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->pushUp(); });
+		break;
+	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->pushDown(); });
+		break;
+	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->pushLeft(); });
+		break;
+	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->pushRight(); });
+		break;
+	}
+}
+
+void Computer::handleControllerButtonUp(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event) {
+	switch (event.button) {
+	case SDL_CONTROLLER_BUTTON_DPAD_UP:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->releaseUp(); });
+		break;
+	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->releaseDown(); });
+		break;
+	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->releaseLeft(); });
+		break;
+	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+		std::for_each(joysticks.begin(), joysticks.end(), [](Joystick* joystick) { joystick->releaseRight(); });
+		break;
+	}
+}
+
+std::vector<Joystick*> Computer::joysticks() {
+	std::vector<Joystick*> returned;
+	for (size_t i = 0; i != BUS().numberOfExpansions(); ++i) {
+		auto expansion = BUS().expansion(i);
+		if (expansion->expansionType() == Expansion::JOYSTICK) {
+			auto joystick = (Joystick*)expansion.get();
+			returned.push_back(joystick);
+		}
+	}
+	return returned;
 }
