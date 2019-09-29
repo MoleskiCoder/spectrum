@@ -34,7 +34,7 @@ void Computer::loadZ80(const std::string& path) {
 	BUS().loadZ80(path);
 }
 
-void Computer::runFrame() {
+void Computer::runRasterLines() {
 	BUS().runFrame();
 }
 

@@ -36,7 +36,7 @@ protected:
 
 	virtual const uint32_t* pixels() const override;
 
-	virtual void runFrame() override;
+	virtual void runRasterLines() override;
 
 	virtual void handleKeyDown(SDL_Keycode key) override;
 	virtual void handleKeyUp(SDL_Keycode key) override;
