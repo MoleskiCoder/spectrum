@@ -30,7 +30,7 @@ public:
 	const Board& BUS() const { return m_board; }
 
 protected:
-	virtual int fps() const final { return Ula::FramesPerSecond; }
+	virtual float fps() const final { return Ula::FramesPerSecond; }
 	virtual bool useVsync() const final { return false; }
 	virtual int displayScale() const noexcept final { return 2; }
 	virtual int rasterWidth() const noexcept final { return Ula::RasterWidth; }
@@ -42,14 +42,14 @@ protected:
 	void runVerticalBlank() final;
 	void runRasterLines() final;
 
-	virtual void handleKeyDown(SDL_Keycode key) override;
-	virtual void handleKeyUp(SDL_Keycode key) override;
+	bool handleKeyDown(SDL_Keycode key) final;
+	bool handleKeyUp(SDL_Keycode key) final;
 
-	void handleJoyButtonDown(SDL_JoyButtonEvent event) final;
-	void handleJoyButtonUp(SDL_JoyButtonEvent event) final;
+	bool handleJoyButtonDown(SDL_JoyButtonEvent event) final;
+	bool handleJoyButtonUp(SDL_JoyButtonEvent event) final;
 
-	void handleControllerButtonDown(SDL_ControllerButtonEvent event) final;
-	void handleControllerButtonUp(SDL_ControllerButtonEvent event) final;
+	bool handleControllerButtonDown(SDL_ControllerButtonEvent event) final;
+	bool handleControllerButtonUp(SDL_ControllerButtonEvent event) final;
 
 private:
 	const Configuration& m_configuration;
@@ -62,5 +62,4 @@ private:
 	void handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event);
 	void handleControllerButtonDown(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
 	void handleControllerButtonUp(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
-
 };

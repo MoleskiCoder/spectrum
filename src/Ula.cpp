@@ -35,7 +35,7 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 	Ticked.connect([this](EightBit::EventArgs) {
 		const auto available = cycles() / 2;
 		if (available > 0) {
-			proceed(cycles() / 2);
+			proceed(available);
 			resetCycles();
 		}
 	});
