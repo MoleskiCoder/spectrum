@@ -3,6 +3,7 @@
 #include "Configuration.h"
 #include "Computer.h"
 #include "KempstonJoystick.h"
+#include "Interface2Joystick.h"
 
 int main(int, char*[])
 {
@@ -17,6 +18,7 @@ int main(int, char*[])
 	Computer computer(configuration);
 
 	computer.plug(std::make_shared<KempstonJoystick>(computer.BUS()));
+	computer.plug(std::make_shared<Interface2Joystick>(computer.BUS()));
 
 	computer.raisePOWER();
 
@@ -42,6 +44,9 @@ int main(int, char*[])
 	//computer.loadZ80(programDirectory + "\\ATARI2.Z80");
 	//computer.loadZ80(programDirectory + "\\HEDGEHOG.Z80");
 	//computer.loadZ80(programDirectory + "\\Knight Lore (1984)(Ultimate).z80");
+	//computer.loadZ80(programDirectory + "\\R-Type (1988)(Activision).z80");		// v3
+	//computer.loadZ80(programDirectory + "\\Head Over Heels (1987)(Ocean Software).z80");
+	//computer.loadZ80(programDirectory + "\\Alien 8 (1985)(Ultimate).z80");
 
 	try {
 		computer.runLoop();

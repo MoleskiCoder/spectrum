@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "KempstonJoystick.h"
 
-#include <iostream>
-
 KempstonJoystick::KempstonJoystick(Board& motherboard)
 : Joystick(motherboard) {
 
