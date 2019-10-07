@@ -72,14 +72,14 @@ private:
 	// Input port information
 	uint8_t m_ear;			// Bit 6
 
-	std::unordered_map<int, std::array<int, 5>> m_keyboardMapping;
+	std::unordered_map<uint8_t, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;
 
 	Board& BUS() { return m_bus; }
 
 	void initialiseKeyboardMapping();
 
-	uint8_t findSelectedKeys(uint8_t row) const;
+	uint8_t findSelectedKeys(uint8_t rows) const;
 
 	bool ignoredPort(uint8_t port) const;
 	void maybeReadingPort(uint8_t port);
