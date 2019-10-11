@@ -26,7 +26,7 @@ Buzzer::~Buzzer() {
 void Buzzer::initialise() {
 	m_device = ::SDL_OpenAudioDevice(NULL, 0, &m_want, &m_have, SDL_AUDIO_ALLOW_ANY_CHANGE);
 	if (m_device == 0)
-		Computer::throwSDLException("Unable to open audio device");
+		Gaming::SDLWrapper::throwSDLException("Unable to open audio device");
 	::SDL_PauseAudioDevice(m_device, false);
 }
 
@@ -41,10 +41,10 @@ void Buzzer::off(const int cycle) {
 }
 
 int Buzzer::convertCycle2Sample(int cycle) {
-	const float sampleFrequency = m_have.freq;
+	const float sampleFrequency = (float)m_have.freq;
 	const float cycleFrequency = Ula::CyclesPerSecond;
 	const auto cyclesPerSample = cycleFrequency / sampleFrequency;
-	return (float)cycle / cyclesPerSample;
+	return (int)((float)cycle / cyclesPerSample);
 }
 
 void Buzzer::backFill(const int cycle) {
@@ -60,7 +60,7 @@ void Buzzer::backFill(const int cycle) {
 
 	std::vector<Sint8> m_buffer(length, m_last);	// Signed eight bit samples
 
-	Computer::verifySDLCall(::SDL_QueueAudio(m_device, m_buffer.data(), length), "xxxx");
+	Gaming::SDLWrapper::verifySDLCall(::SDL_QueueAudio(m_device, m_buffer.data(), length), "xxxx");
 
 	m_sample = previousSample;
 }
