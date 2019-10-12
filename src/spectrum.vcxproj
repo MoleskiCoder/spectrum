@@ -67,22 +67,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_71_0;C:\Libraries\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_71_0;C:\Libraries\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_71_0;C:\Libraries\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_68_0;C:\Libraries\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libraries\EightBit\inc;..\libraries\EightBit\Gaming\inc;..\libraries\EightBit\Z80\inc;C:\Libraries\boost_1_71_0;C:\Libraries\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libraries\SDL2-2.0.10\lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
