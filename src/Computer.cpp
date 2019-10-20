@@ -136,7 +136,7 @@ std::vector<Joystick*> Computer::joysticks() {
 	std::vector<Joystick*> returned;
 	for (size_t i = 0; i != BUS().numberOfExpansions(); ++i) {
 		auto expansion = BUS().expansion(i);
-		if (expansion->expansionType() == Expansion::JOYSTICK) {
+		if (expansion->expansionType() == Expansion::Type::JOYSTICK) {
 			auto joystick = (Joystick*)expansion.get();
 			returned.push_back(joystick);
 		}
