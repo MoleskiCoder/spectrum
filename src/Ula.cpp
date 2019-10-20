@@ -218,7 +218,7 @@ void Ula::writtenPort(const uint8_t port) {
 
 	setBorder(value & Mask3);
 
-	BUS().buzzer().buzz(m_speaker, frameCycles());
+	BUS().buzzer().buzz(m_speaker ? true : false, frameCycles());
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {
