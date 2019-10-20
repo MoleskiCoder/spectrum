@@ -95,7 +95,6 @@ EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 }
 
 void Board::runVerticalBlank() {
-	resetFrameCycles();
 	for (int i = 0; i < Ula::VerticalRetraceLines; ++i)
 		ULA().renderLine(i);
 }
@@ -112,6 +111,5 @@ void Board::Ula_Proceed(const int& cycles) {
 void Board::runCycles(int suggested) {
 	m_allowed += suggested;
 	const int taken = CPU().run(m_allowed);
-	m_frameCycles += taken;
 	m_allowed -= taken;
 }

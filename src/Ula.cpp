@@ -33,9 +33,10 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 	});
 
 	Ticked.connect([this](EightBit::EventArgs) {
-		const auto available = cycles() / 2;
+		 auto available = cycles() / 2;
 		if (available > 0) {
-			proceed(available);
+			Proceed.fire(available);
+			frameCycles() += available;
 			resetCycles();
 		}
 	});
@@ -137,6 +138,8 @@ void Ula::renderLine(const int y) {
 }
 
 void Ula::startFrame() {
+	BUS().buzzer().endFrame();
+	frameCycles() = 0;
 	if (++m_frameCounter == 0)
 		flash();
 	BUS().CPU().lowerINT();
@@ -215,7 +218,7 @@ void Ula::writtenPort(const uint8_t port) {
 
 	setBorder(value & Mask3);
 
-	BUS().buzzer().buzz(m_speaker, BUS().frameCycles());
+	BUS().buzzer().buzz(m_speaker, frameCycles());
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {
@@ -246,8 +249,4 @@ void Ula::readingPort(const uint8_t port) {
 
 bool Ula::ignoredPort(const uint8_t port) const {
 	return !!(port & Bit0);
-}
-
-void Ula::proceed(int cycles) {
-	Proceed.fire(cycles);
 }

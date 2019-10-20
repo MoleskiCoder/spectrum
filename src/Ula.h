@@ -75,7 +75,12 @@ private:
 	std::unordered_map<uint8_t, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;
 
+	int m_frameCycles = 0;
+
 	Board& BUS() { return m_bus; }
+
+	int frameCycles() const { return m_frameCycles; }
+	int& frameCycles() { return m_frameCycles; }
 
 	void initialiseKeyboardMapping();
 
@@ -102,6 +107,4 @@ private:
 
 	void Board_ReadingPort(const uint8_t& event);
 	void Board_WrittenPort(const uint8_t& event);
-
-	void proceed(int cycles);
 };

@@ -3,10 +3,11 @@
 #include "Computer.h"
 #include "Ula.h"
 
+#include <SDLWrapper.h>
+
 #include <algorithm>
 
 #include <iostream>
-
 
 Buzzer::Buzzer() {
 
@@ -14,9 +15,8 @@ Buzzer::Buzzer() {
 	SDL_zero(m_want);
 
 	m_want.freq = 44100;
-	m_want.format = AUDIO_S8;
+	m_want.format = AUDIO_U8;
 	m_want.channels = 1;
-	m_want.samples = 4096;
 }
 
 Buzzer::~Buzzer() {
@@ -24,43 +24,53 @@ Buzzer::~Buzzer() {
 }
 
 void Buzzer::initialise() {
-	m_device = ::SDL_OpenAudioDevice(NULL, 0, &m_want, &m_have, SDL_AUDIO_ALLOW_ANY_CHANGE);
+	m_device = ::SDL_OpenAudioDevice(NULL, 0, &m_want, &m_have, 0);
 	if (m_device == 0)
 		Gaming::SDLWrapper::throwSDLException("Unable to open audio device");
+
+	std::cout << "Sound frequency: " << m_have.freq << std::endl;
+	std::cout << "Sound format: " << std::hex << m_have.format << std::dec << std::endl;
+	std::cout << "Sound channels: " << (int)m_have.channels << std::endl;
+	std::cout << "Sound samples: " << m_have.samples << std::endl;
+
+	m_buffer.resize(samplesPerFrame() + 1);
+
 	::SDL_PauseAudioDevice(m_device, false);
 }
 
-void Buzzer::on(const int cycle) {
-	backFill(cycle);
-	m_last = 127;
+void Buzzer::buzz(bool state, int cycle) {
+	const auto currentSample = sample(cycle);
+	if (m_lastSample > currentSample)
+		m_lastSample = 0;
+	std::fill(m_buffer.begin() + m_lastSample, m_buffer.begin() + currentSample, m_lastState);
+	m_lastSample = currentSample;
+	m_lastState = state;
 }
 
-void Buzzer::off(const int cycle) {
-	backFill(cycle);
-	m_last = -128;
+void Buzzer::endFrame() {
+
+	assert(m_have.format == AUDIO_U8);
+	assert(m_have.channels == 1);
+
+	const auto length = m_buffer.size();
+
+	std::vector<uint8_t> audio(length, 0);
+	for (int i = 0; i < length; ++i) {
+		const auto current = m_buffer.at(i);
+		audio.at(i) = current ? 0xff : 0x00;
+	}
+
+	const int returned = ::SDL_QueueAudio(m_device, audio.data(), length * sizeof(uint8_t));
+	Gaming::SDLWrapper::verifySDLCall(returned, "Unable to queue buzzer audio: ");
+
+	std::fill(m_buffer.begin(), m_buffer.end(), false);
 }
 
-int Buzzer::convertCycle2Sample(int cycle) {
-	const float sampleFrequency = (float)m_have.freq;
-	const float cycleFrequency = Ula::CyclesPerSecond;
-	const auto cyclesPerSample = cycleFrequency / sampleFrequency;
-	return (int)((float)cycle / cyclesPerSample);
+int Buzzer::samplesPerFrame() const {
+	return m_have.freq / Ula::FramesPerSecond;
 }
 
-void Buzzer::backFill(const int cycle) {
-
-	const int currentSample = convertCycle2Sample(cycle);
-	const int previousSample = m_sample;
-
-	const int length = currentSample - previousSample;
-	// XXXX ???
-	if (length < 0)
-		return;
-	assert(length > 0);
-
-	std::vector<Sint8> m_buffer(length, m_last);	// Signed eight bit samples
-
-	Gaming::SDLWrapper::verifySDLCall(::SDL_QueueAudio(m_device, m_buffer.data(), length), "xxxx");
-
-	m_sample = previousSample;
+int Buzzer::sample(int cycle) const {
+	const float ratio = (float)m_have.freq / (float)Ula::CyclesPerSecond;
+	return (float)cycle * ratio;
 }

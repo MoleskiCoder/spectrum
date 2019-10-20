@@ -49,8 +49,6 @@ public:
 	void runVerticalBlank();
 	void runRasterLines();
 
-	int frameCycles() const { return m_frameCycles; }
-
 protected:
 	virtual EightBit::MemoryMapping mapping(uint16_t address) final;
 
@@ -70,7 +68,6 @@ private:
 	EightBit::Disassembler m_disassembler;
 	EightBit::Profiler m_profiler;
 
-	int m_frameCycles = 0;
 	int m_allowed = 0;	// To track "overdrawn" cycle expendature
 
 	void Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu);
@@ -78,6 +75,5 @@ private:
 
 	void Ula_Proceed(const int& cycles);
 
-	void resetFrameCycles() { m_frameCycles = 0; }
 	void runCycles(int suggested);
 };
