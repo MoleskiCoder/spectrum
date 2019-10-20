@@ -1,13 +1,10 @@
 #include "stdafx.h"
 #include "Buzzer.h"
-#include "Computer.h"
 #include "Ula.h"
 
 #include <SDLWrapper.h>
 
 #include <algorithm>
-
-#include <iostream>
 
 Buzzer::Buzzer() {
 
@@ -36,7 +33,7 @@ void Buzzer::initialise() {
 	assert(m_have.format == AUDIO_U8);
 	assert(m_have.channels == 1);
 
-	m_buffer.resize(samplesPerFrame() + 1);
+	m_buffer.resize(samplesPerFrame());
 
 	::SDL_PauseAudioDevice(m_device, false);
 }
@@ -48,25 +45,25 @@ void Buzzer::buzz(bool state, int cycle) {
 
 void Buzzer::buzz(Uint8 value, int sample) {
 	if (m_lastSample > sample)
-		m_lastSample = 0;
+		m_lastSample = 0;	// TODO: Means missed samples,  if m_lastSample != 0
 	std::fill(m_buffer.begin() + m_lastSample, m_buffer.begin() + sample, m_lastState);
 	m_lastSample = sample;
 	m_lastState = value;
 }
 
 void Buzzer::endFrame() {
-
-	const int returned = ::SDL_QueueAudio(m_device, m_buffer.data(), m_buffer.size() * sizeof(Uint8));
+	const auto length = static_cast<Uint32>(m_buffer.size() * sizeof(Uint8));
+	const int returned = ::SDL_QueueAudio(m_device, m_buffer.data(), length);
 	Gaming::SDLWrapper::verifySDLCall(returned, "Unable to queue buzzer audio: ");
-
 	std::fill(m_buffer.begin(), m_buffer.end(), false);
 }
 
 int Buzzer::samplesPerFrame() const {
-	return m_have.freq / Ula::FramesPerSecond;
+	return static_cast<int>(m_have.freq / Ula::FramesPerSecond + 1);
 }
 
 int Buzzer::sample(int cycle) const {
-	const float ratio = (float)m_have.freq / (float)Ula::CyclesPerSecond;
-	return (float)cycle * ratio;
+	const float ratio = static_cast<float>(m_have.freq) / static_cast<float>(Ula::CyclesPerSecond);
+	const auto sample = static_cast<float>(cycle) * ratio;
+	return static_cast<int>(sample);
 }
