@@ -21,6 +21,7 @@ private:
 	SDL_AudioDeviceID m_device = 0;
 
 	std::vector<Uint8> m_buffer;
+	Uint32 m_bufferLength = 0;
 	int m_lastSample = 0;
 	Uint8 m_lastState = 0;
 
