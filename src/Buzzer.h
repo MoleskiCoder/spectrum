@@ -11,7 +11,6 @@ public:
 	Buzzer();
 	~Buzzer();
 
-	void initialise();
 	void buzz(EightBit::Device::PinLevel state, int cycle);
 	void endFrame();
 

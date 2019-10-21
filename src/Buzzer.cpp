@@ -14,21 +14,10 @@ Buzzer::Buzzer() {
 	m_want.freq = 44100;
 	m_want.format = AUDIO_U8;
 	m_want.channels = 1;
-}
 
-Buzzer::~Buzzer() {
-	::SDL_CloseAudioDevice(m_device);
-}
-
-void Buzzer::initialise() {
 	m_device = ::SDL_OpenAudioDevice(NULL, 0, &m_want, &m_have, 0);
 	if (m_device == 0)
 		Gaming::SDLWrapper::throwSDLException("Unable to open audio device");
-
-	std::cout << "Sound frequency: " << m_have.freq << std::endl;
-	std::cout << "Sound format: " << std::hex << m_have.format << std::dec << std::endl;
-	std::cout << "Sound channels: " << (int)m_have.channels << std::endl;
-	std::cout << "Sound samples: " << m_have.samples << std::endl;
 
 	assert(m_have.format == AUDIO_U8);
 	assert(m_have.channels == 1);
@@ -37,6 +26,10 @@ void Buzzer::initialise() {
 	m_bufferLength = static_cast<Uint32>(m_buffer.size() * sizeof(Uint8));
 
 	::SDL_PauseAudioDevice(m_device, false);
+}
+
+Buzzer::~Buzzer() {
+	::SDL_CloseAudioDevice(m_device);
 }
 
 void Buzzer::buzz(EightBit::Device::PinLevel state, int cycle) {

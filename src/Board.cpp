@@ -30,8 +30,6 @@ void Board::initialise() {
 	}
 
 	ULA().Proceed.connect(std::bind(&Board::Ula_Proceed, this, std::placeholders::_1));
-
-	buzzer().initialise();
 }
 
 void Board::plug(std::shared_ptr<Expansion> expansion) {
