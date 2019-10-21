@@ -38,8 +38,8 @@ void Buzzer::initialise() {
 	::SDL_PauseAudioDevice(m_device, false);
 }
 
-void Buzzer::buzz(bool state, int cycle) {
-	const Uint8 level = state ? 0xff : 0x00;
+void Buzzer::buzz(EightBit::Device::PinLevel state, int cycle) {
+	const Uint8 level = EightBit::Device::raised(state) ? 0xff : 0x00;
 	buzz(level, sample(cycle));
 }
 
@@ -55,7 +55,7 @@ void Buzzer::endFrame() {
 	const auto length = static_cast<Uint32>(m_buffer.size() * sizeof(Uint8));
 	const int returned = ::SDL_QueueAudio(m_device, m_buffer.data(), length);
 	Gaming::SDLWrapper::verifySDLCall(returned, "Unable to queue buzzer audio: ");
-	std::fill(m_buffer.begin(), m_buffer.end(), false);
+	std::fill(m_buffer.begin(), m_buffer.end(), 0);
 }
 
 int Buzzer::samplesPerFrame() const {

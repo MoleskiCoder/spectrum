@@ -66,11 +66,11 @@ private:
 
 	// Output port information
 	uint8_t m_border;		// Bits 0 - 2
-	uint8_t m_mic;			// Bit 3
-	uint8_t m_speaker;		// Bit 4
+	PinLevel m_mic = PinLevel::Low;			// Bit 3
+	PinLevel m_speaker = PinLevel::Low;		// Bit 4
 
 	// Input port information
-	uint8_t m_ear;			// Bit 6
+	PinLevel m_ear = PinLevel::Low;			// Bit 6
 
 	std::unordered_map<uint8_t, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;

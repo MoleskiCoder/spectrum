@@ -1,6 +1,10 @@
 #pragma once
 
+#include <vector>
+
 #include <SDL.h>
+
+#include <Device.h>
 
 class Buzzer final {
 public:
@@ -8,7 +12,7 @@ public:
 	~Buzzer();
 
 	void initialise();
-	void buzz(bool state, int cycle);
+	void buzz(EightBit::Device::PinLevel state, int cycle);
 	void endFrame();
 
 private:

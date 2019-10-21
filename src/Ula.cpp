@@ -213,12 +213,12 @@ void Ula::writtenPort(const uint8_t port) {
 
 	const auto value = BUS().ports().readOutputPort(port);
 
-	m_mic = (value & Bit3) >> 3;
-	m_speaker = (value & Bit4) >> 4;
+	match(m_mic, value & Bit3);
+	match(m_speaker, value & Bit4);
 
 	setBorder(value & Mask3);
 
-	BUS().buzzer().buzz(m_speaker ? true : false, frameCycles());
+	BUS().buzzer().buzz(m_speaker, frameCycles());
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {
@@ -243,7 +243,7 @@ void Ula::maybeReadingPort(const uint8_t port) {
 void Ula::readingPort(const uint8_t port) {
 	const auto portHigh = BUS().ADDRESS().high;
 	const auto  selected = findSelectedKeys(~portHigh);
-	const uint8_t value = selected | (m_ear << 6);
+	const uint8_t value = selected | (raised(m_ear) ? 1 << 6 : 0);
 	BUS().ports().writeInputPort(port, value);
 }
 
