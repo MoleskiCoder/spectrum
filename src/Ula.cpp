@@ -138,7 +138,7 @@ void Ula::renderLine(const int y) {
 }
 
 void Ula::startFrame() {
-	BUS().buzzer().endFrame();
+	BUS().sound().endFrame();
 	frameCycles() = 0;
 	if (++m_frameCounter == 0)
 		flash();
@@ -218,7 +218,7 @@ void Ula::writtenPort(const uint8_t port) {
 
 	setBorder(value & Mask3);
 
-	BUS().buzzer().buzz(m_speaker, frameCycles());
+	BUS().sound().buzz(m_speaker, frameCycles());
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {

@@ -28,7 +28,7 @@ public:
 	EightBit::Z80& CPU() { return m_cpu; }
 	Ula& ULA() { return m_ula; }
 	const Ula& ULA() const { return m_ula; }
-	Buzzer& buzzer() { return m_buzzer; }
+	Buzzer& sound() { return m_sound; }
 	EightBit::InputOutput& ports() { return m_ports; }
 	EightBit::Rom& ROM() { return m_basicRom; }
 	EightBit::Ram& VRAM() { return m_contendedRam; }
@@ -36,7 +36,7 @@ public:
 
 	void plug(std::shared_ptr<Expansion> expansion);
 	size_t numberOfExpansions() const { return m_expansions.size(); }
-	std::shared_ptr<Expansion > expansion(size_t i) { return m_expansions[i]; }
+	std::shared_ptr<Expansion> expansion(size_t i) { return m_expansions[i]; }
 
 	void plug(const std::string& path);
 	void loadSna(const std::string& path);
@@ -58,7 +58,7 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu;
 	Ula m_ula;
-	Buzzer m_buzzer;
+	Buzzer m_sound;
 	std::vector<std::shared_ptr<Expansion>> m_expansions;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)

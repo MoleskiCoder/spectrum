@@ -47,7 +47,7 @@ public:
 	void pokeKey(SDL_Keycode raw);
 	void pullKey(SDL_Keycode raw);
 
-	void setBorder(uint8_t border) {
+	void setBorder(int border) {
 		m_border = border;
 		m_borderColour = m_palette.getColour(m_border, false);
 	}
@@ -65,9 +65,9 @@ private:
 	uint32_t m_borderColour;
 
 	// Output port information
-	uint8_t m_border;		// Bits 0 - 2
-	PinLevel m_mic = PinLevel::Low;			// Bit 3
-	PinLevel m_speaker = PinLevel::Low;		// Bit 4
+	int m_border; // Bits 0 - 2
+	PinLevel m_mic = PinLevel::Low; // Bit 3
+	PinLevel m_speaker = PinLevel::Low; // Bit 4
 
 	// Input port information
 	PinLevel m_ear = PinLevel::Low;			// Bit 6
