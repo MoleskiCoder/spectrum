@@ -48,9 +48,10 @@ void SnaFile::load(Board& board) {
 	board.ULA().setBorder(peek(Offset_BorderColour));
 
 	// XXXX HACK, HACK, HACK!!
+	const auto original = board.CPU().peekWord(0xfffe);
 	board.poke(0xfffe, 0xed);
 	board.poke(0xffff, 0x45);	// ED45 is RETN
 	board.CPU().PC().word = 0xfffe;
 	board.CPU().step();
-	board.CPU().pokeWord(0xfffe, peekWord(HeaderSize + 0xfffe));
+	board.CPU().pokeWord(0xfffe, original);
 }

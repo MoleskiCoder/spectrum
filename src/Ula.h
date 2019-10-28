@@ -86,7 +86,7 @@ private:
 
 	uint8_t findSelectedKeys(uint8_t rows) const;
 
-	bool ignoredPort(uint8_t port) const;
+	bool usedPort(uint8_t port) const;
 	void maybeReadingPort(uint8_t port);
 	void readingPort(uint8_t port);
 	void maybeWrittenPort(uint8_t port);

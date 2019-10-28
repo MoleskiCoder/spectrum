@@ -33,7 +33,7 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 	});
 
 	Ticked.connect([this](EightBit::EventArgs) {
-		 auto available = cycles() / 2;
+		auto available = cycles() / 2;
 		if (available > 0) {
 			Proceed.fire(available);
 			frameCycles() += available;
@@ -193,10 +193,10 @@ void Ula::Board_WrittenPort(const uint8_t& port) {
 }
 
 void Ula::maybeWrittenPort(const uint8_t port) {
-	if (ignoredPort(port))
-		return;
-	writtenPort(port);
+	if (usedPort(port))
+		writtenPort(port);
 }
+
 // 0 - 2	Border Color(0..7) (always with Bright = off)
 // 3		MIC Output(CAS SAVE) (0 = On, 1 = Off)
 // 4		Beep Output(ULA Sound)    (0 = Off, 1 = On)
@@ -222,9 +222,8 @@ void Ula::writtenPort(const uint8_t port) {
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {
-	if (ignoredPort(port))
-		return;
-	readingPort(port);
+	if (usedPort(port))
+		readingPort(port);
 }
 
 // 0 - 4	Keyboard Inputs(0 = Pressed, 1 = Released)
@@ -247,6 +246,6 @@ void Ula::readingPort(const uint8_t port) {
 	BUS().ports().writeInputPort(port, value);
 }
 
-bool Ula::ignoredPort(const uint8_t port) const {
-	return !!(port & Bit0);
+bool Ula::usedPort(const uint8_t port) const {
+	return (port & Bit0) == 0;
 }
