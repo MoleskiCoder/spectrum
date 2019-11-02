@@ -28,7 +28,7 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 
 	RaisedPOWER.connect([this](EightBit::EventArgs) {
 		m_frameCounter = 0;
-		m_borderColour = 0;
+		setBorder(0);
 		m_flash = false;
 	});
 

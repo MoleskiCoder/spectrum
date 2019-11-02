@@ -61,7 +61,7 @@ private:
 	const ColourPalette& m_palette;
 	Board& m_bus;
 	bool m_flash = false;
-	uint8_t m_frameCounter : 4;
+	int m_frameCounter : 4;
 	uint32_t m_borderColour;
 
 	// Output port information
