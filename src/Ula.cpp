@@ -96,7 +96,7 @@ void Ula::renderVRAM(const int y) {
 
 		for (int bit = 0; bit < 8; ++bit) {
 
-			const auto pixel = bitmap & (1 << bit);
+			const auto pixel = bitmap & Chip::bit(bit);
 			const auto x = (~bit & Mask3) | (byte << 3);
 
 			m_pixels[pixelBase + x] = pixel ? foreground : background;
@@ -156,29 +156,31 @@ void Ula::pullKey(SDL_Keycode raw) {
 void Ula::initialiseKeyboardMapping() {
 
 	// Left side
-	m_keyboardMapping[1 << 0] = { SDLK_LSHIFT,	SDLK_z,			SDLK_x,		SDLK_c,		SDLK_v	};
-	m_keyboardMapping[1 << 1] = { SDLK_a,		SDLK_s,			SDLK_d,		SDLK_f,		SDLK_g	};
-	m_keyboardMapping[1 << 2] = { SDLK_q,		SDLK_w,			SDLK_e,		SDLK_r,		SDLK_t	};
-	m_keyboardMapping[1 << 3] = { SDLK_1,		SDLK_2,			SDLK_3,     SDLK_4,		SDLK_5	};
+	m_keyboardMapping[bit(0)] = { SDLK_LSHIFT,	SDLK_z,			SDLK_x,		SDLK_c,		SDLK_v	};
+	m_keyboardMapping[bit(1)] = { SDLK_a,		SDLK_s,			SDLK_d,		SDLK_f,		SDLK_g	};
+	m_keyboardMapping[bit(2)] = { SDLK_q,		SDLK_w,			SDLK_e,		SDLK_r,		SDLK_t	};
+	m_keyboardMapping[bit(3)] = { SDLK_1,		SDLK_2,			SDLK_3,     SDLK_4,		SDLK_5	};
 
 	// Right side
-	m_keyboardMapping[1 << 4] = { SDLK_0,		SDLK_9,			SDLK_8,		SDLK_7,		SDLK_6	};
-	m_keyboardMapping[1 << 5] = { SDLK_p,		SDLK_o,			SDLK_i,		SDLK_u,		SDLK_y	};
-	m_keyboardMapping[1 << 6] = { SDLK_RETURN,	SDLK_l,			SDLK_k,		SDLK_j,		SDLK_h	};
-	m_keyboardMapping[1 << 7] = { SDLK_SPACE,	SDLK_RSHIFT,	SDLK_m,		SDLK_n,		SDLK_b	};
+	m_keyboardMapping[bit(4)] = { SDLK_0,		SDLK_9,			SDLK_8,		SDLK_7,		SDLK_6	};
+	m_keyboardMapping[bit(5)] = { SDLK_p,		SDLK_o,			SDLK_i,		SDLK_u,		SDLK_y	};
+	m_keyboardMapping[bit(6)] = { SDLK_RETURN,	SDLK_l,			SDLK_k,		SDLK_j,		SDLK_h	};
+	m_keyboardMapping[bit(7)] = { SDLK_SPACE,	SDLK_RSHIFT,	SDLK_m,		SDLK_n,		SDLK_b	};
 }
 
 uint8_t Ula::findSelectedKeys(uint8_t rows) const {
 	uint8_t returned = 0xff;
 	for (int row = 0; row < 8; ++row) {
-		const uint8_t current = 1 << row;
+		const uint8_t current = bit(row);
 		if ((rows & current) == 0)
 			continue;
 		auto pKeys = m_keyboardMapping.find(current);
-		const auto& keys = pKeys->second;
-		for (int column = 0; column < 5; ++column) {
-			if (m_keyboardRaw.find(keys[column]) != m_keyboardRaw.cend())
-				returned &= ~(1 << column);
+		if (pKeys != m_keyboardMapping.cend()) {
+			const auto& keys = pKeys->second;
+			for (int column = 0; column < 5; ++column) {
+				if (m_keyboardRaw.find(keys[column]) != m_keyboardRaw.cend())
+					returned &= ~bit(column);
+			}
 		}
 	}
 	return returned;
@@ -242,7 +244,7 @@ void Ula::maybeReadingPort(const uint8_t port) {
 void Ula::readingPort(const uint8_t port) {
 	const auto portHigh = BUS().ADDRESS().high;
 	const auto  selected = findSelectedKeys(~portHigh);
-	const uint8_t value = selected | (raised(m_ear) ? 1 << 6 : 0);
+	const uint8_t value = selected | (raised(m_ear) ? bit(6) : 0);
 	BUS().ports().writeInputPort(port, value);
 }
 
