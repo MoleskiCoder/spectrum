@@ -13,6 +13,17 @@ uint8_t Z80File::misc1() const {
 	return misc1 == 0xff ? 1 : misc1;
 }
 
+void Z80File::examineHeaders() {
+	switch (peekWord(Offset_PC)) {
+	case 0:
+		m_version = 2;
+		break;
+	default:
+		m_version = 1;
+		break;
+	}
+}
+
 void Z80File::loadRegisters(EightBit::Z80& cpu) const {
 
 	cpu.raiseRESET();
@@ -22,7 +33,7 @@ void Z80File::loadRegisters(EightBit::Z80& cpu) const {
 
 	cpu.BC().word = peekWord(Offset_BC);
 	cpu.HL().word = peekWord(Offset_HL);
-	cpu.PC().word = peekWord(Offset_PC);
+	cpu.PC().word = m_version == 1 ? peekWord(Offset_PC) : peekWord(Offset_additional_PC);
 	cpu.SP().word = peekWord(Offset_SP);
 
 	cpu.IV() = peek(Offset_I);
@@ -57,51 +68,75 @@ void Z80File::loadRegisters(EightBit::Z80& cpu) const {
 	cpu.exxAF();
 }
 
-void Z80File::loadMemoryCompressed(Board& board) const {
-	int previous = 0x100;
-	size_t position = board.ROM().size();
+void Z80File::loadMemoryCompressedV1(Board& board, size_t offset) const {
+	const size_t position = board.ROM().size();
 	const auto fileSize = size() - 4;
-	for (size_t i = HeaderSize; i != fileSize; ++i) {
+	loadCompressedBlock(board, offset, position, fileSize);
+}
+
+uint16_t Z80File::loadCompressedBlock(Board& board, uint16_t source) const {
+	const auto length = peekWord(source);
+	const auto block = peek(source + 2);
+	loadCompressedBlock(board, source + 3, block * 0x4000, length);
+	return length;
+}
+
+void Z80File::loadCompressedBlock(Board& board, uint16_t source, uint16_t destination, uint16_t length) const {
+	int previous = 0x100;
+	for (size_t i = source; i != length; ++i) {
 		const auto current = ROM().peek(i);
 		if (current == 0xed && previous == 0xed) {
-			if (i > (fileSize - 2))
-				throw std::runtime_error("File is too short for repeat specification.");
 			const uint8_t repeats = peek(++i);
 			const uint8_t value = peek(++i);
-			--position;
+			--destination;
 			for (int j = 0; j < repeats; ++j)
-				board.poke(position++, value);
+				board.poke(destination++, value);
 			previous = 0x100;
-		} else {
-			board.poke(position++, current);
+		}
+		else {
+			board.poke(destination++, current);
 			previous = current;
 		}
 	}
 }
 
-void Z80File::loadMemoryUncompressed(Board& board) const {
+void Z80File::loadMemoryUncompressed(Board& board, size_t offset) const {
 	for (int i = 0; i < RamSize; ++i)
-		board.poke(board.ROM().size() + i, peek(HeaderSize + i));
+		board.poke(board.ROM().size() + i, peek(offset + i));
 }
 
 void Z80File::loadMemoryV1(Board& board) const {
 	const bool compressed = (misc1() & EightBit::Chip::Bit5) != 0;
 	if (compressed)
-		loadMemoryCompressed(board);
+		loadMemoryCompressedV1(board, HeaderSizeV1);
 	else
-		loadMemoryUncompressed(board);
+		loadMemoryUncompressed(board, HeaderSizeV1);
+}
+
+void Z80File::loadMemoryV2(Board& board) const {
+	const auto extra = peekWord(Offset_additional_header_block_length) + 2;
+	auto position = HeaderSizeV1 + extra + 2;
+	while (position < size()) {
+		const auto size = loadCompressedBlock(board, position);
+		position += size;
+	}
 }
 
 void Z80File::loadMemory(Board& board) const {
-	const bool v1 = board.CPU().PC().word != 0;
-	if (!v1)
-		throw std::runtime_error("Only V1 Z80 files are handled.");
-	loadMemoryV1(board);
+	switch (m_version) {
+	case 1:
+		loadMemoryV1(board);
+		break;
+	case 2:
+		loadMemoryV2(board);
+		break;
+	default:
+		throw std::runtime_error("Only V1 or V2 Z80 files are handled.");
+		break;
+	}
 }
 
 void Z80File::load(Board& board) {
-
 	SnapshotFile::load(board);
-
 	board.ULA().setBorder((misc1() >> 1) & EightBit::Chip::Mask3);
 }

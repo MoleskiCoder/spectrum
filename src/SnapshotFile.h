@@ -14,6 +14,7 @@ private:
 protected:
 	SnapshotFile(const std::string& path);
 
+	virtual void examineHeaders();
 	virtual void loadRegisters(EightBit::Z80& cpu) const = 0;
 	virtual void loadMemory(Board& board) const = 0;
 

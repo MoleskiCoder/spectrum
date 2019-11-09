@@ -34,6 +34,11 @@ void SnapshotFile::load(Board& board) {
 	if (!board.CPU().powered())
 		throw std::runtime_error("Whoops: CPU has not been powered on.");
 
+	examineHeaders();
 	loadRegisters(board.CPU());
 	loadMemory(board);
+}
+
+void SnapshotFile::examineHeaders() {
+
 }
