@@ -15,7 +15,7 @@ Buzzer::Buzzer() {
 	m_want.format = AUDIO_U8;
 	m_want.channels = 1;
 
-	m_device = ::SDL_OpenAudioDevice(NULL, 0, &m_want, &m_have, 0);
+	m_device = ::SDL_OpenAudioDevice(nullptr, SDL_FALSE, &m_want, &m_have, 0);
 	if (m_device == 0)
 		Gaming::SDLWrapper::throwSDLException("Unable to open audio device");
 
@@ -25,7 +25,7 @@ Buzzer::Buzzer() {
 	m_buffer.resize(samplesPerFrame());
 	m_bufferLength = static_cast<Uint32>(m_buffer.size() * sizeof(Uint8));
 
-	::SDL_PauseAudioDevice(m_device, false);
+	::SDL_PauseAudioDevice(m_device, SDL_FALSE);
 }
 
 Buzzer::~Buzzer() {
@@ -33,7 +33,7 @@ Buzzer::~Buzzer() {
 }
 
 void Buzzer::buzz(EightBit::Device::PinLevel state, int cycle) {
-	const Uint8 level = EightBit::Device::raised(state) ? 0xff : 0x00;
+	const Uint8 level = EightBit::Device::raised(state) ? 0x7f : 0x00;
 	buzz(level, sample(cycle));
 }
 
