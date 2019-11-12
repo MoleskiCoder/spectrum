@@ -37,15 +37,15 @@ void Buzzer::buzz(EightBit::Device::PinLevel state, int cycle) {
 	buzz(level, sample(cycle));
 }
 
-void Buzzer::buzz(Uint8 value, int sample) {
+void Buzzer::buzz(Uint8 level, int sample) {
 	assert(sample >= m_lastSample);
-	std::fill(m_buffer.begin() + m_lastSample, m_buffer.begin() + sample, m_lastState);
+	std::fill(m_buffer.begin() + m_lastSample, m_buffer.begin() + sample, m_lastLevel);
 	m_lastSample = sample;
-	m_lastState = value;
+	m_lastLevel = level;
 }
 
 void Buzzer::endFrame() {
-	std::fill(m_buffer.begin() + m_lastSample, m_buffer.end(), m_lastState);
+	std::fill(m_buffer.begin() + m_lastSample, m_buffer.end(), m_lastLevel);
 	const int returned = ::SDL_QueueAudio(m_device, m_buffer.data(), m_bufferLength);
 	Gaming::SDLWrapper::verifySDLCall(returned, "Unable to queue buzzer audio: ");
 	m_lastSample = 0;

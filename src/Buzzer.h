@@ -22,11 +22,11 @@ private:
 	std::vector<Uint8> m_buffer;
 	Uint32 m_bufferLength = 0;
 	int m_lastSample = 0;
-	Uint8 m_lastState = 0;
+	Uint8 m_lastLevel = 0;
 
 	int samplesPerFrame() const;
 	int sample(int cycle) const;
 
-	void buzz(Uint8 value, int sample);
+	void buzz(Uint8 level, int sample);
 };
 
