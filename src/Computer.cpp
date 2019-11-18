@@ -40,12 +40,8 @@ void Computer::loadZ80(const std::string& path) {
 	BUS().loadZ80(path);
 }
 
-void Computer::runVerticalBlank() {
-	BUS().runVerticalBlank();
-}
-
 void Computer::runRasterLines() {
-	BUS().runRasterLines();
+	BUS().renderLines();
 }
 
 bool Computer::handleKeyDown(SDL_Keycode key) {

@@ -46,8 +46,7 @@ public:
 	virtual void raisePOWER() final;
 	virtual void lowerPOWER() final;
 
-	void runVerticalBlank();
-	void runRasterLines();
+	void renderLines();
 
 protected:
 	virtual EightBit::MemoryMapping mapping(uint16_t address) final;

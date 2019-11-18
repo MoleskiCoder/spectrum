@@ -92,14 +92,9 @@ EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 	return { WRAM(), 0x8000, 0xffff,  EightBit::MemoryMapping::AccessLevel::ReadWrite };
 }
 
-void Board::runVerticalBlank() {
-	for (int i = 0; i < Ula::VerticalRetraceLines; ++i)
+void Board::renderLines() {
+	for (int i = 0; i < Ula::TotalHeight; ++i)
 		ULA().renderLine(i);
-}
-
-void Board::runRasterLines() {
-	for (int i = 0; i < Ula::RasterHeight; ++i)
-		ULA().renderLine(i + Ula::VerticalRetraceLines);
 }
 
 void Board::Ula_Proceed(const int& cycles) {
