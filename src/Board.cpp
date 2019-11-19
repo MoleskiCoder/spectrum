@@ -57,7 +57,6 @@ void Board::raisePOWER() {
 	ULA().raisePOWER();
 	CPU().raisePOWER();
 	CPU().lowerRESET();
-	CPU().raiseHALT();
 	CPU().raiseINT();
 	CPU().raiseNMI();
 }
