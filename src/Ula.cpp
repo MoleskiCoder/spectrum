@@ -13,8 +13,13 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 
 	initialiseKeyboardMapping();
 
-	BUS().ports().ReadingPort.connect(std::bind(&Ula::Board_ReadingPort, this, std::placeholders::_1));
-	BUS().ports().WrittenPort.connect(std::bind(&Ula::Board_WrittenPort, this, std::placeholders::_1));
+	BUS().ReadingByte.connect([this](EightBit::EventArgs) {
+		maybeReadingPort(BUS().ADDRESS().low);
+	});
+
+	BUS().WrittenByte.connect([this](EightBit::EventArgs) {
+		maybeWrittenPort(BUS().ADDRESS().low);
+	});
 
 	auto line = 0;
 	for (auto p = 0; p < 4; ++p) {
@@ -114,12 +119,13 @@ void Ula::renderActiveLine(const int y) {
 
 void Ula::renderLine(const int y) {
 
-	// Start of vertical retrace
-	if (y == 0)
-		startFrame();
-
 	// Vertical retrace?
 	if ((y & ~Mask4) == 0) {
+
+		// Start of vertical retrace
+		if (y == 0)
+			startFrame();
+
 		tick(RasterWidth);
 		return;
 	}
@@ -186,16 +192,8 @@ uint8_t Ula::findSelectedKeys(uint8_t rows) const {
 	return returned;
 }
 
-void Ula::Board_ReadingPort(const uint8_t& port) {
-	maybeReadingPort(port);
-}
-
-void Ula::Board_WrittenPort(const uint8_t& port) {
-	maybeWrittenPort(port);
-}
-
 void Ula::maybeWrittenPort(const uint8_t port) {
-	if (usedPort(port))
+	if (BUS().CPU().requestingIO() && usedPort(port))
 		writtenPort(port);
 }
 
@@ -224,7 +222,7 @@ void Ula::writtenPort(const uint8_t port) {
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {
-	if (usedPort(port))
+	if (BUS().CPU().requestingIO() && usedPort(port))
 		readingPort(port);
 }
 

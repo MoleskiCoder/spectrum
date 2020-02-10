@@ -46,6 +46,9 @@ public:
 	virtual void raisePOWER() final;
 	virtual void lowerPOWER() final;
 
+	[[nodiscard]] uint8_t peek(uint16_t address) override;
+	void poke(uint16_t address, uint8_t value) override;
+
 	void renderLines();
 
 protected:

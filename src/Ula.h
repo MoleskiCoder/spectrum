@@ -104,7 +104,4 @@ private:
 	void renderHorizontalBorder(int x, int y, int width = HorizontalRasterBorder);
 
 	void renderVRAM(int y);
-
-	void Board_ReadingPort(const uint8_t& event);
-	void Board_WrittenPort(const uint8_t& event);
 };
