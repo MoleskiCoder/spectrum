@@ -9,11 +9,7 @@
 
 Board::Board(const ColourPalette& palette, const Configuration& configuration)
 : m_configuration(configuration),
-  m_palette(palette),
-  m_cpu(*this),
-  m_ula(m_palette, *this),
-  m_disassembler(*this),
-  m_profiler(m_cpu, m_disassembler) {
+  m_palette(palette) {
 }
 
 void Board::initialise() {
