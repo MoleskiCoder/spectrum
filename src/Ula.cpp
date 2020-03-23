@@ -13,11 +13,11 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 
 	initialiseKeyboardMapping();
 
-	BUS().ReadingByte.connect([this](EightBit::EventArgs) {
+	BUS().CPU().ReadingIO.connect([this](EightBit::EventArgs) {
 		maybeReadingPort(BUS().ADDRESS().low);
 	});
 
-	BUS().WrittenByte.connect([this](EightBit::EventArgs) {
+	BUS().CPU().WrittenIO.connect([this](EightBit::EventArgs) {
 		maybeWrittenPort(BUS().ADDRESS().low);
 	});
 
@@ -193,7 +193,7 @@ uint8_t Ula::findSelectedKeys(uint8_t rows) const {
 }
 
 void Ula::maybeWrittenPort(const uint8_t port) {
-	if (BUS().CPU().requestingIO() && usedPort(port))
+	if (usedPort(port))
 		writtenPort(port);
 }
 
@@ -222,7 +222,7 @@ void Ula::writtenPort(const uint8_t port) {
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {
-	if (BUS().CPU().requestingIO() && usedPort(port))
+	if (usedPort(port))
 		readingPort(port);
 }
 

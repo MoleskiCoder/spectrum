@@ -3,12 +3,10 @@
 
 KempstonJoystick::KempstonJoystick(Board& motherboard)
 : Joystick(motherboard) {
-	BUS().ReadingByte.connect([this](EightBit::EventArgs) {
-		if (BUS().CPU().requestingIO()) {
-			const auto port = BUS().ADDRESS().low;
-			if (port == 0x1f)
-				BUS().ports().writeInputPort(port, m_contents);
-		}
+	BUS().CPU().ReadingIO.connect([this](EightBit::EventArgs) {
+		const auto port = BUS().ADDRESS().low;
+		if (port == 0x1f)
+			BUS().ports().writeInputPort(port, m_contents);
 	});
 }
 
