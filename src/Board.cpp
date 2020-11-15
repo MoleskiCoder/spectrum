@@ -55,9 +55,11 @@ void Board::raisePOWER() {
 	CPU().lowerRESET();
 	CPU().raiseINT();
 	CPU().raiseNMI();
+	sound().start();
 }
 
 void Board::lowerPOWER() {
+	sound().stop();
 	CPU().lowerPOWER();
 	ULA().lowerPOWER();
 	for (auto expansion : m_expansions)

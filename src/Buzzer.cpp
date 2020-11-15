@@ -25,15 +25,23 @@ Buzzer::Buzzer() {
 	m_buffer.resize(samplesPerFrame());
 	m_bufferLength = static_cast<Uint32>(m_buffer.size() * sizeof(Uint8));
 
-	::SDL_PauseAudioDevice(m_device, SDL_FALSE);
+	stop();
 }
 
 Buzzer::~Buzzer() {
 	::SDL_CloseAudioDevice(m_device);
 }
 
+void Buzzer::stop() {
+	::SDL_PauseAudioDevice(m_device, SDL_TRUE);
+}
+
+void Buzzer::start() {
+	::SDL_PauseAudioDevice(m_device, SDL_FALSE);
+}
+
 void Buzzer::buzz(EightBit::Device::PinLevel state, int cycle) {
-	const Uint8 level = EightBit::Device::raised(state) ? 0x7f : 0x00;
+	const Uint8 level = EightBit::Device::raised(state) ? 0xff : 0x00;
 	buzz(level, sample(cycle));
 }
 
