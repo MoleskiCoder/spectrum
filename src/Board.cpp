@@ -95,7 +95,7 @@ void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu) {
 
 EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 
-	if (m_cpu.requestingMemory()) {
+	if (CPU().requestingMemory()) {
 		if (address < 0x4000)
 			return { ROM(), 0x0000, 0xffff, EightBit::MemoryMapping::AccessLevel::ReadOnly };
 		if (address < 0x8000)
@@ -103,11 +103,11 @@ EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 		return { WRAM(), 0x8000, 0xffff,  EightBit::MemoryMapping::AccessLevel::ReadWrite };
 	}
 
-	if (m_cpu.requestingIO()) {
-		if (m_cpu.requestingRead())
-			ports().setAccessType(EightBit::InputOutput::AccessType::Reading);
-		if (m_cpu.requestingWrite())
-			ports().setAccessType(EightBit::InputOutput::AccessType::Writing);
+	if (CPU().requestingIO()) {
+		if (CPU().requestingRead())
+			ports().accessType() = EightBit::InputOutput::AccessType::Reading;
+		if (CPU().requestingWrite())
+			ports().accessType() = EightBit::InputOutput::AccessType::Writing;
 		return { ports(), 0x00, 0xff, EightBit::MemoryMapping::AccessLevel::ReadWrite };
 	}
 
@@ -115,8 +115,7 @@ EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 }
 
 void Board::renderLines() {
-	for (int i = 0; i < Ula::TotalHeight; ++i)
-		ULA().renderLine(i);
+	ULA().renderLines();
 }
 
 void Board::Ula_Proceed(const int& cycles) {

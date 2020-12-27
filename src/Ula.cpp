@@ -32,12 +32,15 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 	}
 
 	RaisedPOWER.connect([this](EightBit::EventArgs) {
-		m_frameCounter = 0;
+		resetF();
+		resetV();
+		resetC();
 		setBorder(0);
 		m_flash = false;
 	});
 
 	Ticked.connect([this](EightBit::EventArgs) {
+		incrementC();
 		auto available = cycles() / 2;
 		if (available > 0) {
 			Proceed.fire(available);
@@ -45,6 +48,11 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 			resetCycles();
 		}
 	});
+}
+
+void Ula::maybeFlash() {
+	if (F() == 0)
+		flash();
 }
 
 void Ula::flash() {
@@ -117,38 +125,42 @@ void Ula::renderActiveLine(const int y) {
 	renderRightHorizontalBorder(y);
 }
 
-void Ula::renderLine(const int y) {
+void Ula::renderLine() {
+
+	resetC();
 
 	// Vertical retrace?
-	if ((y & ~Mask4) == 0) {
-
-		// Start of vertical retrace
-		if (y == 0)
-			startFrame();
-
+	if ((V() & ~Mask4) == 0)
 		tick(RasterWidth);
-		return;
-	}
 
 	// Upper border
-	if ((y & ~Mask6) == 0)
-		renderBlankLine(y - VerticalRetraceLines);
+	else if ((V() & ~Mask6) == 0)
+		renderBlankLine(V() - VerticalRetraceLines);
 
 	// Rendered from Spectrum VRAM
-	else if ((y & ~Mask8) == 0)
-		renderActiveLine(y - VerticalRetraceLines);
+	else if ((V() & ~Mask8) == 0)
+		renderActiveLine(V() - VerticalRetraceLines);
 
 	// Lower border
 	else
-		renderBlankLine(y - VerticalRetraceLines);
+		renderBlankLine(V() - VerticalRetraceLines);
+
+	incrementV();
+}
+
+void Ula::renderLines() {
+	startFrame();
+	for (int i = 0; i < Ula::TotalHeight; ++i)
+		renderLine();
 }
 
 void Ula::startFrame() {
 	BUS().sound().endFrame();
 	frameCycles() = 0;
-	if (++m_frameCounter == 0)
-		flash();
-	BUS().CPU().lowerINT();
+	resetV();
+	incrementF();
+	maybeFlash();
+	lower(BUS().CPU().INT());
 }
 
 void Ula::pokeKey(SDL_Keycode raw) {
@@ -213,12 +225,14 @@ void Ula::writtenPort(const uint8_t port) {
 
 	const auto value = BUS().ports().readOutputPort(port);
 
-	match(m_mic, value & Bit3);
-	match(m_speaker, value & Bit4);
-
 	setBorder(value & Mask3);
 
-	BUS().sound().buzz(m_speaker, frameCycles());
+	PinLevel mic = PinLevel::Low;
+	match(mic, value & Bit3);
+
+	PinLevel speaker = PinLevel::Low;
+	match(speaker, value & Bit4);
+	BUS().sound().buzz(speaker, frameCycles());
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {
