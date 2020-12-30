@@ -106,7 +106,7 @@ private:
 
 	int m_version = 0;	// Illegal, by default!
 
-	uint8_t misc1() const;
+	[[nodiscard]] uint8_t misc1() const;
 
 	void loadMemoryV1(Board& board) const;
 	void loadMemoryV2(Board& board) const;

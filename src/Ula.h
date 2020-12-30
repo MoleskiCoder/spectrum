@@ -51,7 +51,7 @@ public:
 		m_borderColour = m_palette.getColour(border, false);
 	}
 
-	const auto& pixels() const { return m_pixels; }
+	[[nodiscard]] const auto& pixels() const { return m_pixels; }
 
 private:
 	static const int TotalHeight = VerticalRetraceLines + RasterHeight;
@@ -75,38 +75,38 @@ private:
 
 	int m_frameCycles = 0;	// Needed to generate sound timing
 
-	Board& BUS() { return m_bus; }
+	[[nodiscard]] Board& BUS() { return m_bus; }
 
 	void renderLine();
 
 	// Frame counter, four bits
-	auto F() const { return m_frameCounter; }
+	[[nodiscard]] auto F() const { return m_frameCounter; }
 	void resetF() { m_frameCounter = 0; }
 	void incrementF() { ++m_frameCounter; }
 
 	// Vertical line counter, nine bits
-	auto V() const { return m_verticalCounter; }
+	[[nodiscard]] auto V() const { return m_verticalCounter; }
 	void resetV() { m_verticalCounter = 0; }
 	void incrementV() { ++m_verticalCounter; }
 
 	// Horizontal pixel counter, nine bits
-	auto C() const { return m_horizontalCounter; }
+	[[nodiscard]] auto C() const { return m_horizontalCounter; }
 	void resetC() { m_horizontalCounter = 0; }
 	void incrementC() { ++m_horizontalCounter; }
 
 	//		   ___________________________
 	//		   __   __   __   __   __
 	// VSync = V7 + V6 + V5 + V4 + V3 + V2
-	auto VSync() const { return (V() & 0b0011111100) == 0b0011111000; }
+	[[nodiscard]] auto VSync() const { return (V() & 0b0011111100) == 0b0011111000; }
 
-	int frameCycles() const { return m_frameCycles; }
-	int& frameCycles() { return m_frameCycles; }
+	[[nodiscard]] int frameCycles() const { return m_frameCycles; }
+	[[nodiscard]] int& frameCycles() { return m_frameCycles; }
 
 	void initialiseKeyboardMapping();
 
-	uint8_t findSelectedKeys(uint8_t rows) const;
+	[[nodiscard]] uint8_t findSelectedKeys(uint8_t rows) const;
 
-	bool usedPort(uint8_t port) const;
+	[[nodiscard]] bool usedPort(uint8_t port) const;
 	void maybeReadingPort(uint8_t port);
 	void readingPort(uint8_t port);
 	void maybeWrittenPort(uint8_t port);

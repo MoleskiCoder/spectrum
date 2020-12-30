@@ -10,10 +10,10 @@ public:
 
 	enum class Type { JOYSTICK };
 
-	virtual Type expansionType() const = 0;
+	[[nodiscard]] virtual Type expansionType() const = 0;
 
 protected:
-	Board& BUS() { return m_motherboard; }
+	[[nodiscard]] Board& BUS() { return m_motherboard; }
 
 private:
 	Board& m_motherboard;

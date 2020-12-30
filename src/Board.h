@@ -25,18 +25,18 @@ class Board final : public EightBit::Bus {
 public:
 	Board(const ColourPalette& palette, const Configuration& configuration);
 
-	EightBit::Z80& CPU() { return m_cpu; }
-	Ula& ULA() { return m_ula; }
-	const Ula& ULA() const { return m_ula; }
-	Buzzer& sound() { return m_sound; }
-	EightBit::InputOutput& ports() { return m_ports; }
-	EightBit::Rom& ROM() { return m_basicRom; }
-	EightBit::Ram& VRAM() { return m_contendedRam; }
-	EightBit::Ram& WRAM() { return m_uncontendedRam; }
+	[[nodiscard]] EightBit::Z80& CPU() { return m_cpu; }
+	[[nodiscard]] Ula& ULA() { return m_ula; }
+	[[nodiscard]] const Ula& ULA() const { return m_ula; }
+	[[nodiscard]] Buzzer& sound() { return m_sound; }
+	[[nodiscard]] EightBit::InputOutput& ports() { return m_ports; }
+	[[nodiscard]] EightBit::Rom& ROM() { return m_basicRom; }
+	[[nodiscard]] EightBit::Ram& VRAM() { return m_contendedRam; }
+	[[nodiscard]] EightBit::Ram& WRAM() { return m_uncontendedRam; }
 
 	void plug(std::shared_ptr<Expansion> expansion);
-	size_t numberOfExpansions() const { return m_expansions.size(); }
-	std::shared_ptr<Expansion> expansion(size_t i) { return m_expansions[i]; }
+	[[nodiscard]] size_t numberOfExpansions() const { return m_expansions.size(); }
+	[[nodiscard]] std::shared_ptr<Expansion> expansion(size_t i) { return m_expansions[i]; }
 
 	void plug(const std::string& path);
 	void loadSna(const std::string& path);

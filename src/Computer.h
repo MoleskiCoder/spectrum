@@ -26,18 +26,18 @@ public:
 	void loadSna(const std::string& path);
 	void loadZ80(const std::string& path);
 
-	Board& BUS() { return m_board; }
-	const Board& BUS() const { return m_board; }
+	[[nodiscard]] Board& BUS() { return m_board; }
+	[[nodiscard]] const Board& BUS() const { return m_board; }
 
 protected:
-	virtual float fps() const final { return Ula::FramesPerSecond; }
-	virtual bool useVsync() const final { return false; }
-	virtual int displayScale() const noexcept final { return 2; }
-	virtual int rasterWidth() const noexcept final { return Ula::RasterWidth; }
-	virtual int rasterHeight() const noexcept final { return Ula::RasterHeight; }
-	virtual std::string title() const noexcept final { return "Spectrum"; }
+	[[nodiscard]] float fps() const final { return Ula::FramesPerSecond; }
+	[[nodiscard]] bool useVsync() const final { return true; }
+	[[nodiscard]] int displayScale() const noexcept final { return 2; }
+	[[nodiscard]] int rasterWidth() const noexcept final { return Ula::RasterWidth; }
+	[[nodiscard]] int rasterHeight() const noexcept final { return Ula::RasterHeight; }
+	[[nodiscard]] std::string title() const noexcept final { return "Spectrum"; }
 
-	virtual const uint32_t* pixels() const override;
+	[[nodiscard]] const uint32_t* pixels() const final;
 
 	void runRasterLines() final;
 
@@ -55,7 +55,7 @@ private:
 	ColourPalette m_colours;
 	Board m_board;
 
-	std::vector<Joystick*> joysticks();
+	[[nodiscard]] std::vector<Joystick*> joysticks();
 
 	void handleJoyButtonDown(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event);
 	void handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event);

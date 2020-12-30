@@ -6,7 +6,7 @@ class Joystick : public Expansion {
 public:
 	Joystick(Board& motherboard);
 
-	Type expansionType() const final { return Type::JOYSTICK; }
+	[[nodiscard]] Type expansionType() const final { return Type::JOYSTICK; }
 
 	virtual void pushUp() = 0;
 	virtual void pushDown() = 0;

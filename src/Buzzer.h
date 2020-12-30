@@ -27,8 +27,8 @@ private:
 	int m_lastSample = 0;
 	Uint8 m_lastLevel = 0;
 
-	int samplesPerFrame() const;
-	int sample(int cycle) const;
+	[[nodiscard]] int samplesPerFrame() const;
+	[[nodiscard]] int sample(int cycle) const;
 
 	void buzz(Uint8 level, int sample);
 };
