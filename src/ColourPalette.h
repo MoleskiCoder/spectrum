@@ -21,12 +21,12 @@ public:
 
 	ColourPalette() = default;
 
-	[[nodiscard]] uint32_t getColour(size_t index, bool bright) const {
+	[[nodiscard]] uint32_t colour(size_t index, bool bright) const {
 		assert(index < 8);
-		return getColour(bright ? index + 8 : index);
+		return colour(bright ? index + 8 : index);
 	}
 
-	[[nodiscard]] uint32_t getColour(size_t index) const {
+	[[nodiscard]] uint32_t colour(size_t index) const {
 		assert(index < 16);
 		return m_colours[index];
 	}

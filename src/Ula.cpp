@@ -13,6 +13,14 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 
 	initialiseKeyboardMapping();
 
+	BUS().CPU().LoweringRD.connect([this](EightBit::EventArgs) {
+		maybeContend();
+	});
+
+	BUS().CPU().LoweringWR.connect([this](EightBit::EventArgs) {
+		maybeContend();
+	});
+
 	BUS().CPU().ReadingIO.connect([this](EightBit::EventArgs) {
 		maybeReadingPort(BUS().ADDRESS().low);
 	});
@@ -36,16 +44,17 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 		resetV();
 		resetC();
 		setBorder(0);
-		m_flash = false;
+		flashing() = false;
 	});
 
 	Ticked.connect([this](EightBit::EventArgs) {
 		incrementC();
-		auto available = cycles() / 2;
-		if (available > 0) {
-			Proceed.fire(available);
-			frameCycles() += available;
-			resetCycles();
+		if (!maybeApplyContention()) {
+			auto available = cycles() / 2;
+			if (available > 0) {
+				Proceed.fire(available);
+				resetCycles();
+			}
 		}
 	});
 }
@@ -56,7 +65,7 @@ void Ula::maybeFlash() {
 }
 
 void Ula::flash() {
-	m_flash = !m_flash;
+	flashing() = !flashing();
 }
 
 void Ula::renderBlankLine(const int y) {
@@ -73,10 +82,8 @@ void Ula::renderRightHorizontalBorder(const int y) {
 
 void Ula::renderHorizontalBorder(int x, int y, int width) {
 	const size_t begin = y * RasterWidth + x;
-	for (int i = 0; i < width; ++i) {
-		m_pixels[begin + i] = m_borderColour;
-		tick();
-	}
+	for (int i = 0; i < width; ++i)
+		setClockedPixel(begin + i, m_borderColour);
 }
 
 void Ula::renderVRAM(const int y) {
@@ -89,7 +96,7 @@ void Ula::renderVRAM(const int y) {
 	const auto attributeAddressY = m_attributeAddresses[y];
 
 	// Position in pixel render 
-	const auto pixelBase = HorizontalRasterBorder + (y + UpperRasterBorder) * RasterWidth;
+	const auto pixelBase = HorizontalRasterBorder + (y + VerticalRasterBorder) * RasterWidth;
 
 	for (int byte = 0; byte < BytesPerLine; ++byte) {
 
@@ -104,24 +111,66 @@ void Ula::renderVRAM(const int y) {
 		const auto bright = !!(attribute & Bit6);
 		const auto flash = !!(attribute & Bit7);
 
-		const auto background = m_palette.getColour(flash && m_flash ? ink : paper, bright);
-		const auto foreground = m_palette.getColour(flash && m_flash ? paper : ink, bright);
+		const auto background = m_palette.colour(flash && flashing() ? ink : paper, bright);
+		const auto foreground = m_palette.colour(flash && flashing() ? paper : ink, bright);
 
 		for (int bit = 0; bit < 8; ++bit) {
 
 			const auto pixel = bitmap & Chip::bit(bit);
 			const auto x = (~bit & Mask3) | (byte << 3);
 
-			m_pixels[pixelBase + x] = pixel ? foreground : background;
-
-			tick();
+			setClockedPixel(pixelBase + x, pixel ? foreground : background);
 		}
 	}
 }
 
+void Ula::setClockedPixel(const size_t offset, const uint32_t colour) {
+	setPixel(offset, colour);
+	tick();
+}
+
+void Ula::setPixel(const size_t offset, const uint32_t colour) {
+	m_pixels[offset] = colour;
+}
+
+bool Ula::contended(const uint16_t address) {
+	// Contended area is between 0x4000 (0100000000000000)
+	//						and  0x7fff (0111111111111111)
+	const auto mask = Bit15 | Bit14;
+	const auto masked = address & mask;
+	return masked == 0b0100000000000000;
+}
+
+bool Ula::maybeContend(const uint16_t address) {
+	const bool active = !withinVerticalRetrace() && !withinUpperBorder() && withinActiveArea();
+	const bool hit = active && contended(address);
+	if (hit)
+		addContention();
+	return hit;
+}
+
+bool Ula::maybeContend() {
+	return maybeContend(BUS().ADDRESS().word);
+}
+
+void Ula::resetContention() {
+	m_contention = 0;
+}
+
+void Ula::addContention() {
+	m_contention += 4;	// Should be based on frameCycles()!!
+}
+
+bool Ula::maybeApplyContention() {
+	const auto apply = contention() > 0;
+	if (apply)
+		--m_contention;
+	return apply;
+}
+
 void Ula::renderActiveLine(const int y) {
 	renderLeftHorizontalBorder(y);
-	renderVRAM(y - UpperRasterBorder);
+	renderVRAM(y - VerticalRasterBorder);
 	renderRightHorizontalBorder(y);
 }
 
@@ -129,16 +178,19 @@ void Ula::renderLine() {
 
 	resetC();
 
+	tick(HorizontalSyncClocks);
+	tick(HorizontalRetraceRemainingClocks);
+
 	// Vertical retrace?
-	if ((V() & ~Mask4) == 0)
+	if (withinVerticalRetrace())
 		tick(RasterWidth);
 
 	// Upper border
-	else if ((V() & ~Mask6) == 0)
+	else if (withinUpperBorder())
 		renderBlankLine(V() - VerticalRetraceLines);
 
 	// Rendered from Spectrum VRAM
-	else if ((V() & ~Mask8) == 0)
+	else if (withinActiveArea())
 		renderActiveLine(V() - VerticalRetraceLines);
 
 	// Lower border
@@ -156,7 +208,6 @@ void Ula::renderLines() {
 
 void Ula::startFrame() {
 	BUS().sound().endFrame();
-	frameCycles() = 0;
 	resetV();
 	incrementF();
 	maybeFlash();

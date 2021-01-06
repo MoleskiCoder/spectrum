@@ -64,7 +64,7 @@ int Buzzer::samplesPerFrame() const {
 }
 
 int Buzzer::sample(int cycle) const {
-	const float ratio = static_cast<float>(m_have.freq) / static_cast<float>(Ula::CyclesPerSecond);
+	const float ratio = static_cast<float>(m_have.freq) / static_cast<float>(Ula::ClockRate);
 	const auto sample = static_cast<float>(cycle) * ratio;
 	return static_cast<int>(sample);
 }
