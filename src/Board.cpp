@@ -18,14 +18,26 @@ void Board::initialise() {
 	plug(romDirectory + "\\48.rom");	// ZX Spectrum Basic
 
 	if (m_configuration.isProfileMode()) {
-		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Profile, this, std::placeholders::_1));
+		CPU().ExecutingInstruction.connect([this](const EightBit::Z80&) {
+			const auto pc = CPU().PC().word;
+			m_profiler.addAddress(pc);
+			m_profiler.addInstruction(peek(pc));
+		});
 	}
 
 	if (m_configuration.isDebugMode()) {
-		CPU().ExecutingInstruction.connect(std::bind(&Board::Cpu_ExecutingInstruction_Debug, this, std::placeholders::_1));
+		CPU().ExecutingInstruction.connect([this](const EightBit::Z80&) {
+			std::cerr
+				<< EightBit::Disassembler::state(CPU())
+				<< " "
+				<< m_disassembler.disassemble(CPU())
+				<< '\n';
+		});
 	}
 
-	ULA().Proceed.connect(std::bind(&Board::Ula_Proceed, this, std::placeholders::_1));
+	ULA().Proceed.connect([this](EightBit::EventArgs) {
+		runCycle();
+	});
 }
 
 void Board::plug(std::shared_ptr<Expansion> expansion) {
@@ -79,20 +91,6 @@ void Board::poke(uint16_t address, uint8_t value) {
 	return EightBit::Bus::poke(address, value);
 }
 
-void Board::Cpu_ExecutingInstruction_Profile(const EightBit::Z80& cpu) {
-	const auto pc = CPU().PC();
-	m_profiler.addAddress(pc.word);
-	m_profiler.addInstruction(peek(pc.word));
-}
-
-void Board::Cpu_ExecutingInstruction_Debug(const EightBit::Z80& cpu) {
-	std::cerr
-		<< EightBit::Disassembler::state(CPU())
-		<< " "
-		<< m_disassembler.disassemble(CPU())
-		<< '\n';
-}
-
 EightBit::MemoryMapping Board::mapping(const uint16_t address) {
 
 	if (CPU().requestingMemory()) {
@@ -118,12 +116,7 @@ void Board::renderLines() {
 	ULA().renderLines();
 }
 
-void Board::Ula_Proceed(const int& cycles) {
-	runCycles(cycles);
-}
-
-void Board::runCycles(int suggested) {
-	m_allowed += suggested;
-	const int taken = CPU().run(m_allowed);
+void Board::runCycle() {
+	const int taken = CPU().run(++m_allowed);
 	m_allowed -= taken;
 }

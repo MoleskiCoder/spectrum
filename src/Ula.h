@@ -83,7 +83,7 @@ public:
 public:
 	Ula(const ColourPalette& palette, Board& bus);
 
-	EightBit::Signal<int> Proceed;
+	EightBit::Signal<EightBit::EventArgs> Proceed;
 
 	void renderLines();
 
@@ -113,6 +113,7 @@ private:
 	unsigned m_horizontalCounter : 9;
 	uint32_t m_borderColour = 0;
 	int m_contention = 0;
+	bool m_accessingVRAM = false;
 
 	// Input port information
 	PinLevel m_ear = PinLevel::Low;			// Bit 6
@@ -129,29 +130,20 @@ private:
 	// Frame counter, four bits
 	[[nodiscard]] auto F() const { return m_frameCounter; }
 
-	// Reset frame counter
-	void resetF() { m_frameCounter = 0; }
-
-	// Increment frame counter
-	void incrementF() { ++m_frameCounter; }
+	void resetF();
+	void incrementF();
 
 	// Vertical line counter, nine bits
 	[[nodiscard]] auto V() const { return m_verticalCounter; }
 
-	// Reset vertical line counter
-	void resetV() { m_verticalCounter = 0; }
-
-	// Increment vertical line counter
-	void incrementV() { ++m_verticalCounter; }
+	void resetV();
+	void incrementV();
 
 	// Horizontal pixel counter, nine bits
 	[[nodiscard]] auto C() const { return m_horizontalCounter; }
 
-	// Reset horizontal pixel counter
-	void resetC() { m_horizontalCounter = 0; }
-
-	// Increment horizontal pixel counter
-	void incrementC() { ++m_horizontalCounter; }
+	void resetC();
+	void incrementC();
 
 	[[nodiscard]] auto frameCycles() const {
 		return TotalHorizontalClocks * V() + C();
@@ -197,8 +189,7 @@ private:
 	[[nodiscard]] static bool contended(uint16_t address);
 	bool maybeContend(uint16_t address);
 	bool maybeContend();
-	void resetContention();
-	void addContention();
+	void addContention(int cycles);
 	[[nodiscard]] auto contention() const { return m_contention; }
 	bool maybeApplyContention();
 };

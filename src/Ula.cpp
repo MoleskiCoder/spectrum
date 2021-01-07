@@ -49,13 +49,8 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 
 	Ticked.connect([this](EightBit::EventArgs) {
 		incrementC();
-		if (!maybeApplyContention()) {
-			auto available = cycles() / 2;
-			if (available > 0) {
-				Proceed.fire(available);
-				resetCycles();
-			}
-		}
+		if (((cycles() % 2) == 0) && !maybeApplyContention())
+			Proceed.fire();
 	});
 }
 
@@ -91,6 +86,8 @@ void Ula::renderVRAM(const int y) {
 	assert(y >= 0);
 	assert(y < ActiveRasterHeight);
 
+	m_accessingVRAM = true;
+
 	// Position in VRAM
 	const auto bitmapAddressY = m_scanLineAddresses[y];
 	const auto attributeAddressY = m_attributeAddresses[y];
@@ -122,6 +119,8 @@ void Ula::renderVRAM(const int y) {
 			setClockedPixel(pixelBase + x, pixel ? foreground : background);
 		}
 	}
+
+	m_accessingVRAM = false;
 }
 
 void Ula::setClockedPixel(const size_t offset, const uint32_t colour) {
@@ -142,10 +141,9 @@ bool Ula::contended(const uint16_t address) {
 }
 
 bool Ula::maybeContend(const uint16_t address) {
-	const bool active = !withinVerticalRetrace() && !withinUpperBorder() && withinActiveArea();
-	const bool hit = active && contended(address);
+	const bool hit = m_accessingVRAM && contended(address);
 	if (hit)
-		addContention();
+		addContention(3);
 	return hit;
 }
 
@@ -153,12 +151,8 @@ bool Ula::maybeContend() {
 	return maybeContend(BUS().ADDRESS().word);
 }
 
-void Ula::resetContention() {
-	m_contention = 0;
-}
-
-void Ula::addContention() {
-	m_contention += 4;	// Should be based on frameCycles()!!
+void Ula::addContention(int cycles) {
+	m_contention += 2 * cycles;
 }
 
 bool Ula::maybeApplyContention() {
@@ -175,8 +169,6 @@ void Ula::renderActiveLine(const int y) {
 }
 
 void Ula::renderLine() {
-
-	resetC();
 
 	tick(HorizontalSyncClocks);
 	tick(HorizontalRetraceRemainingClocks);
@@ -206,12 +198,37 @@ void Ula::renderLines() {
 		renderLine();
 }
 
+void Ula::resetF() {
+	m_frameCounter = 0;
+}
+
+void Ula::incrementF() {
+	++m_frameCounter;
+	maybeFlash();
+}
+
+void Ula::resetV() {
+	m_verticalCounter = 0;
+	incrementF();
+	lower(BUS().CPU().INT());
+}
+
+void Ula::incrementV() {
+	++m_verticalCounter;
+	resetC();
+}
+
+void Ula::resetC() {
+	m_horizontalCounter = 0;
+}
+
+void Ula::incrementC() {
+	++m_horizontalCounter;
+}
+
 void Ula::startFrame() {
 	BUS().sound().endFrame();
 	resetV();
-	incrementF();
-	maybeFlash();
-	lower(BUS().CPU().INT());
 }
 
 void Ula::pokeKey(SDL_Keycode raw) {
