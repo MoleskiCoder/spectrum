@@ -159,8 +159,6 @@ private:
 	void maybeWrittenPort(uint8_t port);
 	void writtenPort(uint8_t port);
 
-	void startFrame();
-
 	void maybeFlash();
 	void flash();
 	[[nodiscard]] auto& flashing() { return m_flashing; }

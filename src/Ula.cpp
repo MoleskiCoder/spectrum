@@ -193,7 +193,7 @@ void Ula::renderLine() {
 }
 
 void Ula::renderLines() {
-	startFrame();
+	resetV();
 	for (int i = 0; i < Ula::TotalHeight; ++i)
 		renderLine();
 }
@@ -208,6 +208,7 @@ void Ula::incrementF() {
 }
 
 void Ula::resetV() {
+	BUS().sound().endFrame();
 	m_verticalCounter = 0;
 	incrementF();
 	lower(BUS().CPU().INT());
@@ -224,11 +225,6 @@ void Ula::resetC() {
 
 void Ula::incrementC() {
 	++m_horizontalCounter;
-}
-
-void Ula::startFrame() {
-	BUS().sound().endFrame();
-	resetV();
 }
 
 void Ula::pokeKey(SDL_Keycode raw) {
