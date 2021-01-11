@@ -24,6 +24,9 @@ just so I can see any discrepencies, if/when they arise.  So far seems to be wor
 out.  It's interesting to see there is a slight mismatch in the ULA speed vs PAL
 standard, which apparently accounts for ZX Spectrum 16/48K pixel jitter in real life!
 
+The ZX Spectrum ULA, Chris Smith
+Chapter 9 (The Video Display), Figure 9-1, PAL horizontal and vertical screen dimensions
+
 						+--------------------------------------------+
 						+............................................+		^		^
 						+............................................+		|		|
@@ -41,7 +44,7 @@ standard, which apparently accounts for ZX Spectrum 16/48K pixel jitter in real 
 						|          |      display         |          |		|		|
 						|          |        area          |          |		|		|
      horizontal blank	|          |                      |          |		|		|
-<---------96px--------->|<--48px-->|<-------256px-------->|<--48px-->|	  192px	  312px
+<---------96px--------->|<--32px-->|<-------256px-------->|<--64px-->|	  192px	  312px
 						|          |                      |          |		|		|
 						|          |                      |          |		|		|
 						|          |                      |          |		|		|
@@ -53,21 +56,47 @@ standard, which apparently accounts for ZX Spectrum 16/48K pixel jitter in real 
 						|                                            |		|		|
 						|                                            |		V		V
 						+--------------------------------------------+
+
+The ZX Spectrum ULA, Chris Smith
+Chapter 11 (Video Sychronisation), Figure 11-1, Horizontal time points for the 5C and 6C ULA
+
+	Description			Cycle Start		Cycle End
+	---------------------------------------------
+	Pixel Output		0				255
+	Right Border		256				319
+	Blanking Period		320				415
+	Horzontal Sync		336 (5C)		367 (5C)
+						344 (6C)		375 (6C)
+	Left Border			416				447
+	Counter reset		447				448
+
+The ZX Spectrum ULA, Chris Smith
+Chapter 11 (Video Sychronisation), Figure 11-2, PAL horizontal vertical counter states and associated screen regions
+
+	Block description	Lines			Length
+	------------------------------------------
+	Display				0 - 191			192
+	Bottom border		192 - 247		56
+	Sync period			248 - 255		8
+	Sync pulse			248 - 251		4
+	Top border			256 - 311		56
+	Clock reset			312 - 312		0
+
 */
 
 // http://www.worldofspectrum.org/faq/reference/48kreference.htm
 
 class Ula final : public EightBit::ClockedChip {
 private:
-	static const int HorizontalRasterBorder = 48;
-	static const int VerticalRasterBorder = 56;
+	static const int LeftRasterBorder = 32;
+	static const int RightRasterBorder = 64;
+	static const int TopRasterBorder = 56;
+	static const int BottomRasterBorder = 56;
 
 	static const int ActiveRasterWidth = 256;
 	static const int ActiveRasterHeight = 192;
 
-	static const int HorizontalSyncClocks = 28;
 	static const int HorizontalRetraceClocks = 96;
-	static const int HorizontalRetraceRemainingClocks = HorizontalRetraceClocks - HorizontalSyncClocks;
 	static const int VerticalRetraceLines = 8;
 
 	static const int BytesPerLine = ActiveRasterWidth / 8;
@@ -77,8 +106,8 @@ public:
 	static constexpr float FramesPerSecond = 50.08f;
 	static const int ClockRate = 7000000; // 7Mhz
 
-	static const int RasterWidth = HorizontalRasterBorder * 2 + ActiveRasterWidth;
-	static const int RasterHeight = VerticalRasterBorder * 2 + ActiveRasterHeight;
+	static const int RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder;
+	static const int RasterHeight = TopRasterBorder + ActiveRasterHeight + BottomRasterBorder;
 
 public:
 	Ula(const ColourPalette& palette, Board& bus);
@@ -123,7 +152,7 @@ private:
 
 	int m_frameCycles = 0;	// Needed to generate sound timing
 
-	[[nodiscard]] Board& BUS() { return m_bus; }
+	[[nodiscard]] auto& BUS() { return m_bus; }
 
 	void renderLine();
 
@@ -145,11 +174,10 @@ private:
 	void resetC();
 	void incrementC();
 
-	[[nodiscard]] auto frameCycles() const {
-		return TotalHorizontalClocks * V() + C();
-	}
+	[[nodiscard]] auto frameCycles() const { return TotalHorizontalClocks * V() + C(); }
 
 	void initialiseKeyboardMapping();
+	void initialiseVRAMAddresses();
 
 	[[nodiscard]] uint8_t findSelectedKeys(uint8_t rows) const;
 
@@ -163,16 +191,23 @@ private:
 	void flash();
 	[[nodiscard]] auto& flashing() { return m_flashing; }
 
-	[[nodiscard]] auto withinVerticalRetrace() const { return (V() & ~Mask3) == 0; }
-	[[nodiscard]] auto withinUpperBorder() const { return (V() & ~Mask6) == 0; }
-	[[nodiscard]] auto withinActiveArea() const { return (V() & ~Mask8) == 0; }
+	void processActiveLine();
+	void processActiveLine(int y);
 
-	void renderBlankLine(int y);
-	void renderActiveLine(int y);
+	void processBottomBorder();
+	void processBottomBorder(int y);
 
-	void renderLeftHorizontalBorder(int y);
-	void renderRightHorizontalBorder(int y);
-	void renderHorizontalBorder(int x, int y, int width = HorizontalRasterBorder);
+	void processVerticalSync();
+	void processVerticalSync(int y);
+
+	void processTopBorder();
+	void processTopBorder(int y);
+
+	void processBorder(int y);
+
+	void renderLeftRasterBorder(int y);
+	void renderRightRasterBorder(int y);
+	void renderRasterBorder(int x, int y, int width);
 
 	void renderVRAM(int y);
 

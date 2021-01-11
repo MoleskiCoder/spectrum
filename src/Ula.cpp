@@ -5,13 +5,13 @@
 #include <cassert>
 
 #include "Board.h"
-#include "ColourPalette.h"
 
 Ula::Ula(const ColourPalette& palette, Board& bus)
 : m_palette(palette),
   m_bus(bus) {
 
 	initialiseKeyboardMapping();
+	initialiseVRAMAddresses();
 
 	BUS().CPU().LoweringRD.connect([this](EightBit::EventArgs) {
 		maybeContend();
@@ -28,16 +28,6 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 	BUS().CPU().WrittenIO.connect([this](EightBit::EventArgs) {
 		maybeWrittenPort(BUS().ADDRESS().low);
 	});
-
-	auto line = 0;
-	for (auto p = 0; p < 4; ++p) {
-		for (auto y = 0; y < 8; ++y) {
-			for (auto o = 0; o < 8; ++o, ++line) {
-				m_scanLineAddresses[line] = (p << 11) + (y << 5) + (o << 8);
-				m_attributeAddresses[line] = AttributeAddress + (((p << 3) + y) << 5);
-			}
-		}
-	}
 
 	RaisedPOWER.connect([this](EightBit::EventArgs) {
 		resetF();
@@ -63,37 +53,47 @@ void Ula::flash() {
 	flashing() = !flashing();
 }
 
-void Ula::renderBlankLine(const int y) {
-	renderHorizontalBorder(0, y, RasterWidth);
+void Ula::renderLeftRasterBorder(const int y) {
+	renderRasterBorder(0, y, LeftRasterBorder);
 }
 
-void Ula::renderLeftHorizontalBorder(const int y) {
-	renderHorizontalBorder(0, y);
+void Ula::renderRightRasterBorder(const int y) {
+	renderRasterBorder(LeftRasterBorder + ActiveRasterWidth, y, RightRasterBorder);
 }
 
-void Ula::renderRightHorizontalBorder(const int y) {
-	renderHorizontalBorder(HorizontalRasterBorder + ActiveRasterWidth, y);
-}
-
-void Ula::renderHorizontalBorder(int x, int y, int width) {
+void Ula::renderRasterBorder(int x, int y, int width) {
 	const size_t begin = y * RasterWidth + x;
 	for (int i = 0; i < width; ++i)
 		setClockedPixel(begin + i, m_borderColour);
 }
 
+void Ula::initialiseVRAMAddresses() {
+	auto line = 0;
+	for (auto p = 0; p < 4; ++p) {
+		for (auto y = 0; y < 8; ++y) {
+			for (auto o = 0; o < 8; ++o, ++line) {
+				m_scanLineAddresses[line] = (p << 11) + (y << 5) + (o << 8);
+				m_attributeAddresses[line] = AttributeAddress + (((p << 3) + y) << 5);
+			}
+		}
+	}
+}
+
 void Ula::renderVRAM(const int y) {
 
 	assert(y >= 0);
-	assert(y < ActiveRasterHeight);
+	assert(y < RasterHeight);
 
 	m_accessingVRAM = true;
 
 	// Position in VRAM
-	const auto bitmapAddressY = m_scanLineAddresses[y];
-	const auto attributeAddressY = m_attributeAddresses[y];
+	const auto addressY = y - TopRasterBorder;
+	assert(addressY < ActiveRasterHeight);
+	const auto bitmapAddressY = m_scanLineAddresses[addressY];
+	const auto attributeAddressY = m_attributeAddresses[addressY];
 
 	// Position in pixel render 
-	const auto pixelBase = HorizontalRasterBorder + (y + VerticalRasterBorder) * RasterWidth;
+	const auto pixelBase = LeftRasterBorder + y * RasterWidth;
 
 	for (int byte = 0; byte < BytesPerLine; ++byte) {
 
@@ -162,40 +162,71 @@ bool Ula::maybeApplyContention() {
 	return apply;
 }
 
-void Ula::renderActiveLine(const int y) {
-	renderLeftHorizontalBorder(y);
-	renderVRAM(y - VerticalRasterBorder);
-	renderRightHorizontalBorder(y);
+void Ula::processActiveLine() {
+	processActiveLine(V() + TopRasterBorder);
+}
+
+void Ula::processActiveLine(const int y) {
+	renderVRAM(y);
+	renderRightRasterBorder(y);
+	tick(HorizontalRetraceClocks);
+	renderLeftRasterBorder(y);
+}
+
+void Ula::processBottomBorder() {
+	processBorder(V() + TopRasterBorder);
+}
+
+void Ula::processVerticalSync() {
+	processVerticalSync(V());
+}
+
+void Ula::processVerticalSync(const int y) {
+	if (y == 248)
+		lower(BUS().CPU().INT());
+	tick(ActiveRasterWidth);
+	tick(RightRasterBorder);
+	tick(HorizontalRetraceClocks);
+	tick(LeftRasterBorder);
+}
+
+void Ula::processTopBorder() {
+	processBorder(V() - VerticalRetraceLines - TopRasterBorder - ActiveRasterHeight);
+}
+
+void Ula::processBorder(int y) {
+	renderRasterBorder(LeftRasterBorder, y, ActiveRasterWidth);
+	renderRightRasterBorder(y);
+	tick(HorizontalRetraceClocks);
+	renderLeftRasterBorder(y);
 }
 
 void Ula::renderLine() {
 
-	tick(HorizontalSyncClocks);
-	tick(HorizontalRetraceRemainingClocks);
+	assert(C() == 0);
 
-	// Vertical retrace?
-	if (withinVerticalRetrace())
-		tick(RasterWidth);
+	if (V() < 192)
+		processActiveLine();
 
-	// Upper border
-	else if (withinUpperBorder())
-		renderBlankLine(V() - VerticalRetraceLines);
+	else if (V() < 248)
+		processBottomBorder();
 
-	// Rendered from Spectrum VRAM
-	else if (withinActiveArea())
-		renderActiveLine(V() - VerticalRetraceLines);
+	else if (V() < 256)
+		processVerticalSync();
 
-	// Lower border
-	else
-		renderBlankLine(V() - VerticalRetraceLines);
+	else if (V() < 312)
+		processTopBorder();
 
+	assert(C() == TotalHorizontalClocks);
 	incrementV();
 }
 
 void Ula::renderLines() {
-	resetV();
-	for (int i = 0; i < Ula::TotalHeight; ++i)
+	assert(V() == 0);
+	for (int i = 0; i < TotalHeight; ++i)
 		renderLine();
+	assert(V() == TotalHeight);
+	resetV();
 }
 
 void Ula::resetF() {
@@ -211,7 +242,6 @@ void Ula::resetV() {
 	BUS().sound().endFrame();
 	m_verticalCounter = 0;
 	incrementF();
-	lower(BUS().CPU().INT());
 }
 
 void Ula::incrementV() {
