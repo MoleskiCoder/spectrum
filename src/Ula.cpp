@@ -61,10 +61,18 @@ void Ula::renderRightRasterBorder(const int y) {
 	renderRasterBorder(LeftRasterBorder + ActiveRasterWidth, y, RightRasterBorder);
 }
 
-void Ula::renderRasterBorder(int x, int y, int width) {
-	const size_t begin = y * RasterWidth + x;
-	for (int i = 0; i < width; ++i)
-		setClockedPixel(begin + i, m_borderColour);
+void Ula::renderRasterBorder(const int x, const int y, const int width) {
+	// The ZX Spectrum ULA, Chris Smith
+	// Chapter 12 (Generating the Display), Border Generation
+	assert(x % 8 == 0);
+	assert(width % 8 == 0);
+	const auto chunks = width / 8;
+	auto offset = static_cast<size_t>(y) * RasterWidth + x;
+	for (int chunk = 0; chunk < chunks; ++chunk) {
+		const auto colour = m_borderColour;
+		for (int pixel = 0; pixel < 8; ++pixel)
+			setClockedPixel(offset++, colour);
+	}
 }
 
 void Ula::initialiseVRAMAddresses() {
