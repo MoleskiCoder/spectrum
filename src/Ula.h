@@ -157,24 +157,24 @@ private:
 	void renderLine();
 
 	// Frame counter, four bits
-	[[nodiscard]] auto F() const { return m_frameCounter; }
+	[[nodiscard]] auto F() const noexcept { return m_frameCounter; }
 
 	void resetF();
 	void incrementF();
 
 	// Vertical line counter, nine bits
-	[[nodiscard]] auto V() const { return m_verticalCounter; }
+	[[nodiscard]] auto V() const noexcept { return m_verticalCounter; }
 
 	void resetV();
 	void incrementV();
 
 	// Horizontal pixel counter, nine bits
-	[[nodiscard]] auto C() const { return m_horizontalCounter; }
+	[[nodiscard]] auto C() const noexcept { return m_horizontalCounter; }
 
 	void resetC();
 	void incrementC();
 
-	[[nodiscard]] auto frameCycles() const { return TotalHorizontalClocks * V() + C(); }
+	[[nodiscard]] auto frameCycles() const noexcept { return TotalHorizontalClocks * V() + C(); }
 
 	void initialiseKeyboardMapping();
 	void initialiseVRAMAddresses();
@@ -190,18 +190,16 @@ private:
 	void maybeFlash();
 	void flash();
 	[[nodiscard]] auto& flashing() { return m_flashing; }
+	[[nodiscard]] auto flashing() const noexcept { return m_flashing; }
 
 	void processActiveLine();
 	void processActiveLine(int y);
 
-	void processBottomBorder();
-	void processBottomBorder(int y);
-
 	void processVerticalSync();
 	void processVerticalSync(int y);
 
+	void processBottomBorder();
 	void processTopBorder();
-	void processTopBorder(int y);
 
 	void processBorder(int y);
 
