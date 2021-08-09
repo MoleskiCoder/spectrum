@@ -28,15 +28,15 @@ void Computer::plug(std::shared_ptr<Expansion> expansion) {
 	BUS().plug(expansion);
 }
 
-void Computer::plug(const std::string& path) {
+void Computer::plug(const std::string path) {
 	BUS().plug(path);
 }
 
-void Computer::loadSna(const std::string& path) {
+void Computer::loadSna(const std::string path) {
 	BUS().loadSna(path);
 }
 
-void Computer::loadZ80(const std::string& path) {
+void Computer::loadZ80(const std::string path) {
 	BUS().loadZ80(path);
 }
 
@@ -81,7 +81,8 @@ bool Computer::handleControllerButtonUp(SDL_ControllerButtonEvent event) {
 void Computer::handleJoyButtonDown(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event) {
 	switch (event.button) {
 	case SDL_CONTROLLER_BUTTON_A:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->pushFire(); });
+		for (auto joystick : joysticks)
+			joystick->pushFire();
 		break;
 	}
 }
@@ -89,7 +90,8 @@ void Computer::handleJoyButtonDown(std::vector<Joystick*> joysticks, SDL_JoyButt
 void Computer::handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event) {
 	switch (event.button) {
 	case SDL_CONTROLLER_BUTTON_A:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->releaseFire(); });
+		for (auto joystick : joysticks)
+			joystick->releaseFire();
 		break;
 	}
 }
@@ -97,16 +99,20 @@ void Computer::handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButton
 void Computer::handleControllerButtonDown(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event) {
 	switch (event.button) {
 	case SDL_CONTROLLER_BUTTON_DPAD_UP:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->pushUp(); });
+		for (auto joystick : joysticks)
+			joystick->pushUp();
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->pushDown(); });
+		for (auto joystick : joysticks)
+			joystick->pushDown();
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->pushLeft(); });
+		for (auto joystick : joysticks)
+			joystick->pushLeft();
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->pushRight(); });
+		for (auto joystick : joysticks)
+			joystick->pushRight();
 		break;
 	}
 }
@@ -114,16 +120,20 @@ void Computer::handleControllerButtonDown(std::vector<Joystick*> joysticks, SDL_
 void Computer::handleControllerButtonUp(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event) {
 	switch (event.button) {
 	case SDL_CONTROLLER_BUTTON_DPAD_UP:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->releaseUp(); });
+		for (auto joystick : joysticks)
+			joystick->releaseUp();
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->releaseDown(); });
+		for (auto joystick : joysticks)
+			joystick->releaseDown();
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->releaseLeft(); });
+		for (auto joystick : joysticks)
+			joystick->releaseLeft();
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-		std::for_each(joysticks.cbegin(), joysticks.cend(), [](Joystick* joystick) { joystick->releaseRight(); });
+		for (auto joystick : joysticks)
+			joystick->releaseRight();
 		break;
 	}
 }

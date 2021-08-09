@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-Z80File::Z80File(const std::string& path)
+Z80File::Z80File(const std::string path)
 : SnapshotFile(path) {
 }
 

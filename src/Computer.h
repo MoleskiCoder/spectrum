@@ -22,16 +22,16 @@ public:
 	void lowerPOWER() override;
 
 	void plug(std::shared_ptr<Expansion> expansion);
-	void plug(const std::string& path);
-	void loadSna(const std::string& path);
-	void loadZ80(const std::string& path);
+	void plug(std::string path);
+	void loadSna(std::string path);
+	void loadZ80(std::string path);
 
 	[[nodiscard]] Board& BUS() { return m_board; }
 	[[nodiscard]] const Board& BUS() const { return m_board; }
 
 protected:
-	[[nodiscard]] float fps() const final { return Ula::FramesPerSecond; }
-	[[nodiscard]] bool useVsync() const final { return true; }
+	[[nodiscard]] float fps() const noexcept final { return Ula::FramesPerSecond; }
+	[[nodiscard]] bool useVsync() const noexcept final { return true; }
 	[[nodiscard]] int displayScale() const noexcept final { return 2; }
 	[[nodiscard]] int rasterWidth() const noexcept final { return Ula::RasterWidth; }
 	[[nodiscard]] int rasterHeight() const noexcept final { return Ula::RasterHeight; }

@@ -37,9 +37,9 @@ Chapter 9 (The Video Display), Figure 9-1, PAL horizontal and vertical screen di
 						|                                            |		^		|
 						|                                            |		|		|
 						|             top vertical border            |	   56px		|
-  horizontal			|                                            |		|		|
-    sync				|                                            |		V		|
-<---28px--->			|          +----------------------+          |				|
+  horizontal				|                                            |		|		|
+    sync					|                                            |		V		|
+<---28px--->				|          +----------------------+          |				|
 						|          |                      |          |		^		|
 						|          |      display         |          |		|		|
 						|          |        area          |          |		|		|
@@ -62,11 +62,11 @@ Chapter 11 (Video Sychronisation), Figure 11-1, Horizontal time points for the 5
 
 	Description			Cycle Start		Cycle End
 	---------------------------------------------
-	Pixel Output		0				255
-	Right Border		256				319
+	Pixel Output			0				255
+	Right Border			256				319
 	Blanking Period		320				415
-	Horzontal Sync		336 (5C)		367 (5C)
-						344 (6C)		375 (6C)
+	Horzontal Sync		336 (5C)			367 (5C)
+						344 (6C)			375 (6C)
 	Left Border			416				447
 	Counter reset		447				448
 

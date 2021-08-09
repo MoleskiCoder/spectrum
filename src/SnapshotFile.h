@@ -12,7 +12,7 @@ private:
 	EightBit::Rom m_rom;
 
 protected:
-	SnapshotFile(const std::string& path);
+	SnapshotFile(std::string path);
 
 	virtual void examineHeaders();
 	virtual void loadRegisters(EightBit::Z80& cpu) const = 0;

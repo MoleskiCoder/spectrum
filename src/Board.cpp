@@ -44,16 +44,16 @@ void Board::plug(std::shared_ptr<Expansion> expansion) {
 	m_expansions.push_back(expansion);
 }
 
-void Board::plug(const std::string& path) {
+void Board::plug(const std::string path) {
 	ROM().load(path);
 }
 
-void Board::loadSna(const std::string& path) {
+void Board::loadSna(const std::string path) {
 	SnaFile sna(path);
 	sna.load(*this);
 }
 
-void Board::loadZ80(const std::string& path) {
+void Board::loadZ80(const std::string path) {
 	Z80File z80(path);
 	z80.load(*this);
 }
@@ -79,19 +79,19 @@ void Board::lowerPOWER() {
 	EightBit::Bus::lowerPOWER();
 }
 
-uint8_t Board::peek(uint16_t address) {
+uint8_t Board::peek(uint16_t address) noexcept {
 	CPU().lower(CPU().MREQ());
 	CPU().raise(CPU().IORQ());
 	return EightBit::Bus::peek(address);
 }
 
-void Board::poke(uint16_t address, uint8_t value) {
+void Board::poke(uint16_t address, uint8_t value) noexcept {
 	CPU().lower(CPU().MREQ());
 	CPU().raise(CPU().IORQ());
 	return EightBit::Bus::poke(address, value);
 }
 
-EightBit::MemoryMapping Board::mapping(const uint16_t address) {
+EightBit::MemoryMapping Board::mapping(const uint16_t address) noexcept {
 
 	if (CPU().requestingMemory()) {
 		if (address < 0x4000)

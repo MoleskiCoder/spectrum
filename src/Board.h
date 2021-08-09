@@ -25,34 +25,34 @@ class Board final : public EightBit::Bus {
 public:
 	Board(const ColourPalette& palette, const Configuration& configuration);
 
-	[[nodiscard]] EightBit::Z80& CPU() { return m_cpu; }
-	[[nodiscard]] Ula& ULA() { return m_ula; }
-	[[nodiscard]] const Ula& ULA() const { return m_ula; }
-	[[nodiscard]] Buzzer& sound() { return m_sound; }
-	[[nodiscard]] EightBit::InputOutput& ports() { return m_ports; }
-	[[nodiscard]] EightBit::Rom& ROM() { return m_basicRom; }
-	[[nodiscard]] EightBit::Ram& VRAM() { return m_contendedRam; }
-	[[nodiscard]] EightBit::Ram& WRAM() { return m_uncontendedRam; }
+	[[nodiscard]] constexpr auto& CPU() noexcept { return m_cpu; }
+	[[nodiscard]] constexpr auto& ULA() noexcept { return m_ula; }
+	[[nodiscard]] constexpr const auto& ULA() const noexcept { return m_ula; }
+	[[nodiscard]] constexpr auto& sound() noexcept { return m_sound; }
+	[[nodiscard]] constexpr auto& ports() noexcept { return m_ports; }
+	[[nodiscard]] constexpr auto& ROM() noexcept { return m_basicRom; }
+	[[nodiscard]] constexpr auto& VRAM() noexcept { return m_contendedRam; }
+	[[nodiscard]] constexpr auto& WRAM() noexcept { return m_uncontendedRam; }
 
 	void plug(std::shared_ptr<Expansion> expansion);
-	[[nodiscard]] size_t numberOfExpansions() const { return m_expansions.size(); }
-	[[nodiscard]] std::shared_ptr<Expansion> expansion(size_t i) { return m_expansions[i]; }
+	[[nodiscard]] size_t numberOfExpansions() const noexcept { return m_expansions.size(); }
+	[[nodiscard]] std::shared_ptr<Expansion> expansion(size_t i) noexcept { return m_expansions[i]; }
 
-	void plug(const std::string& path);
-	void loadSna(const std::string& path);
-	void loadZ80(const std::string& path);
+	void plug(std::string path);
+	void loadSna(std::string path);
+	void loadZ80(std::string path);
 
 	virtual void initialise() final;
 	virtual void raisePOWER() final;
 	virtual void lowerPOWER() final;
 
-	[[nodiscard]] uint8_t peek(uint16_t address) override;
-	void poke(uint16_t address, uint8_t value) override;
+	[[nodiscard]] uint8_t peek(uint16_t address) noexcept override;
+	void poke(uint16_t address, uint8_t value) noexcept override;
 
 	void renderLines();
 
 protected:
-	virtual EightBit::MemoryMapping mapping(uint16_t address) final;
+	virtual EightBit::MemoryMapping mapping(uint16_t address) noexcept final;
 
 private:
 	const Configuration& m_configuration;

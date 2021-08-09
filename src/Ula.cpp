@@ -101,7 +101,7 @@ void Ula::renderVRAM(const int y) {
 	const auto attributeAddressY = m_attributeAddresses[addressY];
 
 	// Position in pixel render 
-	const auto pixelBase = LeftRasterBorder + y * RasterWidth;
+	const auto pixelBase = LeftRasterBorder + static_cast<size_t>(y) * RasterWidth;
 
 	for (int byte = 0; byte < BytesPerLine; ++byte) {
 

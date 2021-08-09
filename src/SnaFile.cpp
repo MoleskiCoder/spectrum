@@ -2,7 +2,7 @@
 #include "SnaFile.h"
 #include "Board.h"
 
-SnaFile::SnaFile(const std::string& path)
+SnaFile::SnaFile(const std::string path)
 : SnapshotFile(path) {
 }
 

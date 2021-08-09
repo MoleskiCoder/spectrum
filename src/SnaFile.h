@@ -34,7 +34,7 @@ protected:
 	virtual void loadMemory(Board& board) const final;
 
 public:
-	SnaFile(const std::string& path);
+	SnaFile(std::string path);
 
 	virtual void load(Board& board) final;
 };

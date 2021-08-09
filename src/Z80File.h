@@ -122,7 +122,7 @@ protected:
 	void loadMemory(Board& board) const final;
 
 public:
-	Z80File(const std::string& path);
+	Z80File(std::string path);
 
 	virtual void load(Board& board) final;
 };

@@ -5,7 +5,7 @@
 
 #include <Register.h>
 
-SnapshotFile::SnapshotFile(const std::string& path)
+SnapshotFile::SnapshotFile(const std::string path)
 : m_path(path) {
 }
 
