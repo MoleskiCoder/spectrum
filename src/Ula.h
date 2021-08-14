@@ -117,13 +117,13 @@ public:
 	void renderLines();
 
 	void pokeKey(SDL_Keycode raw);
-	void pullKey(SDL_Keycode raw);
+	void pullKey(SDL_Keycode raw) noexcept;
 
-	void setBorder(int border) {
+	constexpr void setBorder(int border) noexcept {
 		m_borderColour = m_palette.colour(border, false);
 	}
 
-	[[nodiscard]] const auto& pixels() const { return m_pixels; }
+	[[nodiscard]] constexpr const auto& pixels() const noexcept { return m_pixels; }
 
 private:
 	static const int TotalHeight = VerticalRetraceLines + RasterHeight;
@@ -152,45 +152,45 @@ private:
 
 	int m_frameCycles = 0;	// Needed to generate sound timing
 
-	[[nodiscard]] auto& BUS() { return m_bus; }
+	[[nodiscard]] constexpr auto& BUS() noexcept { return m_bus; }
 
 	void renderLine();
 
 	// Frame counter, four bits
-	[[nodiscard]] auto F() const noexcept { return m_frameCounter; }
+	[[nodiscard]] constexpr auto F() const noexcept { return m_frameCounter; }
 
-	void resetF();
-	void incrementF();
+	void resetF() noexcept;
+	void incrementF() noexcept;
 
 	// Vertical line counter, nine bits
-	[[nodiscard]] auto V() const noexcept { return m_verticalCounter; }
+	[[nodiscard]] constexpr auto V() const noexcept { return m_verticalCounter; }
 
-	void resetV();
-	void incrementV();
+	void resetV() noexcept;
+	void incrementV() noexcept;
 
 	// Horizontal pixel counter, nine bits
-	[[nodiscard]] auto C() const noexcept { return m_horizontalCounter; }
+	[[nodiscard]] constexpr auto C() const noexcept { return m_horizontalCounter; }
 
-	void resetC();
-	void incrementC();
+	void resetC() noexcept;
+	void incrementC() noexcept;
 
-	[[nodiscard]] auto frameCycles() const noexcept { return TotalHorizontalClocks * V() + C(); }
+	[[nodiscard]] constexpr auto frameCycles() const noexcept { return TotalHorizontalClocks * V() + C(); }
 
 	void initialiseKeyboardMapping();
 	void initialiseVRAMAddresses();
 
 	[[nodiscard]] uint8_t findSelectedKeys(uint8_t rows) const;
 
-	[[nodiscard]] bool usedPort(uint8_t port) const;
+	[[nodiscard]] auto constexpr usedPort(uint8_t port) const noexcept { return (port & Bit0) == 0; }
 	void maybeReadingPort(uint8_t port);
 	void readingPort(uint8_t port);
 	void maybeWrittenPort(uint8_t port);
 	void writtenPort(uint8_t port);
 
-	void maybeFlash();
-	void flash();
-	[[nodiscard]] auto& flashing() { return m_flashing; }
-	[[nodiscard]] auto flashing() const noexcept { return m_flashing; }
+	void maybeFlash() noexcept;
+	void flash() noexcept;
+	[[nodiscard]] constexpr auto& flashing() noexcept { return m_flashing; }
+	[[nodiscard]] constexpr auto flashing() const noexcept { return m_flashing; }
 
 	void processActiveLine();
 	void processActiveLine(int y);
@@ -213,14 +213,14 @@ private:
 	void setClockedPixel(size_t offset, uint32_t colour);
 
 	// Paint a pixel
-	void setPixel(size_t offset, uint32_t colour);
+	void setPixel(size_t offset, uint32_t colour) noexcept;
 
 	// Address contention?
 
-	[[nodiscard]] static bool contended(uint16_t address);
-	bool maybeContend(uint16_t address);
-	bool maybeContend();
-	void addContention(int cycles);
-	[[nodiscard]] auto contention() const { return m_contention; }
-	bool maybeApplyContention();
+	[[nodiscard]] static bool contended(uint16_t address) noexcept;
+	bool maybeContend(uint16_t address) noexcept;
+	bool maybeContend() noexcept;
+	void addContention(int cycles) noexcept;
+	[[nodiscard]] constexpr auto contention() const noexcept { return m_contention; }
+	bool maybeApplyContention() noexcept;
 };

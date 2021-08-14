@@ -35,8 +35,8 @@ public:
 	[[nodiscard]] constexpr auto& WRAM() noexcept { return m_uncontendedRam; }
 
 	void plug(std::shared_ptr<Expansion> expansion);
-	[[nodiscard]] size_t numberOfExpansions() const noexcept { return m_expansions.size(); }
-	[[nodiscard]] std::shared_ptr<Expansion> expansion(size_t i) noexcept { return m_expansions[i]; }
+	[[nodiscard]] auto numberOfExpansions() const noexcept { return m_expansions.size(); }
+	[[nodiscard]] auto expansion(size_t i) noexcept { return m_expansions[i]; }
 
 	void plug(std::string path);
 	void loadSna(std::string path);
@@ -60,7 +60,7 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu = *this;
 	Ula m_ula = { m_palette, *this };
-	Buzzer m_sound;
+	Buzzer m_sound = { Ula::FramesPerSecond, Ula::ClockRate };
 	std::vector<std::shared_ptr<Expansion>> m_expansions;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)

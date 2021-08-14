@@ -44,12 +44,12 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 	});
 }
 
-void Ula::maybeFlash() {
+void Ula::maybeFlash() noexcept {
 	if (F() == 0)
 		flash();
 }
 
-void Ula::flash() {
+void Ula::flash() noexcept {
 	flashing() = !flashing();
 }
 
@@ -136,11 +136,11 @@ void Ula::setClockedPixel(const size_t offset, const uint32_t colour) {
 	tick();
 }
 
-void Ula::setPixel(const size_t offset, const uint32_t colour) {
+void Ula::setPixel(const size_t offset, const uint32_t colour) noexcept {
 	m_pixels[offset] = colour;
 }
 
-bool Ula::contended(const uint16_t address) {
+bool Ula::contended(const uint16_t address) noexcept {
 	// Contended area is between 0x4000 (0100000000000000)
 	//						and  0x7fff (0111111111111111)
 	const auto mask = Bit15 | Bit14;
@@ -148,22 +148,22 @@ bool Ula::contended(const uint16_t address) {
 	return masked == 0b0100000000000000;
 }
 
-bool Ula::maybeContend(const uint16_t address) {
+bool Ula::maybeContend(const uint16_t address) noexcept {
 	const bool hit = m_accessingVRAM && contended(address);
 	if (hit)
 		addContention(3);
 	return hit;
 }
 
-bool Ula::maybeContend() {
+bool Ula::maybeContend() noexcept {
 	return maybeContend(BUS().ADDRESS().word);
 }
 
-void Ula::addContention(int cycles) {
+void Ula::addContention(int cycles) noexcept {
 	m_contention += 2 * cycles;
 }
 
-bool Ula::maybeApplyContention() {
+bool Ula::maybeApplyContention() noexcept {
 	const auto apply = contention() > 0;
 	if (apply)
 		--m_contention;
@@ -235,33 +235,33 @@ void Ula::renderLines() {
 		renderLine();
 	assert(V() == TotalHeight);
 	resetV();
+	BUS().sound().endFrame();
 }
 
-void Ula::resetF() {
+void Ula::resetF() noexcept {
 	m_frameCounter = 0;
 }
 
-void Ula::incrementF() {
+void Ula::incrementF() noexcept {
 	++m_frameCounter;
 	maybeFlash();
 }
 
-void Ula::resetV() {
-	BUS().sound().endFrame();
+void Ula::resetV() noexcept {
 	m_verticalCounter = 0;
 	incrementF();
 }
 
-void Ula::incrementV() {
+void Ula::incrementV() noexcept {
 	++m_verticalCounter;
 	resetC();
 }
 
-void Ula::resetC() {
+void Ula::resetC() noexcept {
 	m_horizontalCounter = 0;
 }
 
-void Ula::incrementC() {
+void Ula::incrementC() noexcept {
 	++m_horizontalCounter;
 }
 
@@ -269,7 +269,7 @@ void Ula::pokeKey(SDL_Keycode raw) {
 	m_keyboardRaw.emplace(raw);
 }
 
-void Ula::pullKey(SDL_Keycode raw) {
+void Ula::pullKey(SDL_Keycode raw) noexcept {
 	m_keyboardRaw.erase(raw);
 }
 
@@ -360,8 +360,4 @@ void Ula::readingPort(const uint8_t port) {
 	const auto  selected = findSelectedKeys(~portHigh);
 	const uint8_t value = selected | (raised(m_ear) ? bit(6) : 0);
 	BUS().ports().writeInputPort(port, value);
-}
-
-bool Ula::usedPort(const uint8_t port) const {
-	return (port & Bit0) == 0;
 }

@@ -1,42 +1,48 @@
 #include "stdafx.h"
 #include "Buzzer.h"
-#include "Ula.h"
 
 #include <SDLWrapper.h>
 
 #include <algorithm>
 
-Buzzer::Buzzer() {
+Buzzer::Buzzer(float frameRate, int clockRate)
+: m_clockRate(clockRate),
+  m_sampleLength(static_cast<float>(AudioFrequency) / static_cast<float>(clockRate))
+{
+	const auto samplesPerFrame = static_cast<int>(AudioFrequency / frameRate + 1);
+		
+	SDL_AudioSpec want;
+	SDL_zero(want);
+	want.freq = AudioFrequency;
+	want.format = AUDIO_U8;
+	want.channels = 1;
+	want.samples = samplesPerFrame;
 
 	SDL_zero(m_have);
-	SDL_zero(m_want);
 
-	m_want.freq = 44100;
-	m_want.format = AUDIO_U8;
-	m_want.channels = 1;
-
-	m_device = ::SDL_OpenAudioDevice(nullptr, SDL_FALSE, &m_want, &m_have, 0);
+	m_device = ::SDL_OpenAudioDevice(nullptr, SDL_FALSE, &want, &m_have, 0);
 	if (m_device == 0)
 		Gaming::SDLWrapper::throwSDLException("Unable to open audio device");
 
+	assert(m_have.freq == AudioFrequency);
 	assert(m_have.format == AUDIO_U8);
 	assert(m_have.channels == 1);
 
-	m_buffer.resize(samplesPerFrame());
+	m_buffer.resize(samplesPerFrame);
 	m_bufferLength = static_cast<Uint32>(m_buffer.size() * sizeof(Uint8));
 
 	stop();
 }
 
-Buzzer::~Buzzer() {
+Buzzer::~Buzzer() noexcept {
 	::SDL_CloseAudioDevice(m_device);
 }
 
-void Buzzer::stop() {
+void Buzzer::stop() noexcept {
 	::SDL_PauseAudioDevice(m_device, SDL_TRUE);
 }
 
-void Buzzer::start() {
+void Buzzer::start() noexcept {
 	::SDL_PauseAudioDevice(m_device, SDL_FALSE);
 }
 
@@ -59,12 +65,7 @@ void Buzzer::endFrame() {
 	m_lastSample = 0;
 }
 
-int Buzzer::samplesPerFrame() const {
-	return static_cast<int>(m_have.freq / Ula::FramesPerSecond + 1);
-}
-
-int Buzzer::sample(int cycle) const {
-	const float ratio = static_cast<float>(m_have.freq) / static_cast<float>(Ula::ClockRate);
-	const auto sample = static_cast<float>(cycle) * ratio;
+int Buzzer::sample(int cycle) const noexcept {
+	const auto sample = static_cast<float>(cycle) * sampleLength();
 	return static_cast<int>(sample);
 }
