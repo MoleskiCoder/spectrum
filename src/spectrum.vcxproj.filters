@@ -53,6 +53,12 @@
     <ClInclude Include="Interface2Joystick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TZXFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -95,6 +101,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Interface2Joystick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TZXFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

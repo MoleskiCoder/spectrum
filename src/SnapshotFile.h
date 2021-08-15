@@ -1,14 +1,18 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 #include <Rom.h>
 
-class Board;
+#include "Loader.h"
 
-class SnapshotFile {
+namespace EightBit {
+	class Z80;
+}
+
+class SnapshotFile : public Loader {
 private:
-	std::string m_path;
 	EightBit::Rom m_rom;
 
 protected:
@@ -29,6 +33,6 @@ protected:
 	[[nodiscard]] auto size() const { return m_rom.size(); }
 
 public:
-	virtual void load(Board& board);
+	void load(Board& board) override;
 };
 

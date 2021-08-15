@@ -9,7 +9,7 @@ class Board;
 
 // https://www.worldofspectrum.org/faq/reference/z80format.htm
 
-class Z80File : public SnapshotFile {
+class Z80File final : public SnapshotFile {
 private:
 
 	// V1 Header block

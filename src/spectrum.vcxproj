@@ -124,6 +124,8 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ControlFlowGuard>false</ControlFlowGuard>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,6 +146,8 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ControlFlowGuard>false</ControlFlowGuard>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,9 +167,11 @@
     <ClInclude Include="Interface2Joystick.h" />
     <ClInclude Include="Joystick.h" />
     <ClInclude Include="KempstonJoystick.h" />
+    <ClInclude Include="Loader.h" />
     <ClInclude Include="SnaFile.h" />
     <ClInclude Include="SnapshotFile.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TZXFile.h" />
     <ClInclude Include="Ula.h" />
     <ClInclude Include="Z80File.h" />
   </ItemGroup>
@@ -187,6 +193,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TZXFile.cpp" />
     <ClCompile Include="Ula.cpp" />
     <ClCompile Include="Z80File.cpp" />
   </ItemGroup>

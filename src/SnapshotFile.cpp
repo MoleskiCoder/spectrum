@@ -6,7 +6,7 @@
 #include <Register.h>
 
 SnapshotFile::SnapshotFile(const std::string path)
-: m_path(path) {
+: Loader(path) {
 }
 
 uint8_t SnapshotFile::peek(uint16_t offset) const {
@@ -21,7 +21,7 @@ uint16_t SnapshotFile::peekWord(uint16_t offset) const {
 }
 
 void SnapshotFile::read() {
-	m_rom.load(m_path);
+	m_rom.load(path());
 }
 
 void SnapshotFile::load(Board& board) {

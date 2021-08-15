@@ -40,6 +40,10 @@ void Computer::loadZ80(const std::string path) {
 	BUS().loadZ80(path);
 }
 
+void Computer::loadTZX(const std::string path) {
+	BUS().loadTZX(path);
+}
+
 void Computer::runRasterLines() {
 	BUS().renderLines();
 }

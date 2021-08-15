@@ -3,6 +3,7 @@
 #include "Configuration.h"
 #include "SnaFile.h"
 #include "Z80File.h"
+#include "TZXFile.h"
 #include "Expansion.h"
 
 #include <iostream>
@@ -56,6 +57,11 @@ void Board::loadSna(const std::string path) {
 void Board::loadZ80(const std::string path) {
 	Z80File z80(path);
 	z80.load(*this);
+}
+
+void Board::loadTZX(const std::string path) {
+	TZXFile tzx(path);
+	tzx.load(*this);
 }
 
 void Board::raisePOWER() {

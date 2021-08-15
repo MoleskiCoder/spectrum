@@ -6,7 +6,7 @@
 
 class Board;
 
-class SnaFile : public SnapshotFile {
+class SnaFile final : public SnapshotFile {
 private:
 	const static size_t Offset_I = 0x0;
 	const static size_t Offset_HL_ = 0x1;

@@ -41,6 +41,7 @@ public:
 	void plug(std::string path);
 	void loadSna(std::string path);
 	void loadZ80(std::string path);
+	void loadTZX(std::string path);
 
 	virtual void initialise() final;
 	virtual void raisePOWER() final;
