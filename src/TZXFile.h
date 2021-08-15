@@ -1,34 +1,32 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include <Rom.h>
 #include <Register.h>
 
 #include "Loader.h"
+#include "DataLoader.h"
 
 class TZXFile final : public Loader {
 private:
+	enum BlockFlag { Header = 0, Data = 0xff };
+	enum Type { Program, NumberArray, CharacterArray, CodeFile };
+
 	EightBit::Rom m_contents;
-	int m_position = -1;
+	DataLoader m_loader = { m_contents };
 
-	uint8_t readByte(int position) const;
-	std::vector<uint8_t> readBytes(int position, int amount) const;
+	auto& contents() { return m_contents; }
+	auto& loader() { return m_loader; }
 
-	std::vector<uint8_t> fetchBytes(int amount);
-	uint8_t fetchByte();
-
-	EightBit::register16_t readWord(int position) const;
-	std::vector<EightBit::register16_t> readWords(int position, int amount) const;
-
-	std::vector<EightBit::register16_t> fetchWords(int amount);
-	EightBit::register16_t fetchWord();
-
-	auto remaining() const { return m_contents.size() - m_position; }
-	auto finished() const { return remaining() <= 0; }
+	void processTapHeader(DataLoader& loader);
+	void processTapData(DataLoader& loader);
+	void processTapBlock(const EightBit::Rom& data);
 
 	void readHeader();
 	void readBlock();
+
 	void readStandardSpeedDataBlock();
 
 public:
