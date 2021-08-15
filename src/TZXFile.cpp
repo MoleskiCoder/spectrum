@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "TZXFile.h"
+#include "Board.h"
 
 TZXFile::TZXFile(std::string path)
 : Loader(path) {}
@@ -25,14 +26,14 @@ void TZXFile::readHeader() {
 	std::cout << "TZX Minor: " << (int)tzx_minor << std::endl;
 }
 
-void TZXFile::readBlock() {
+void TZXFile::readBlock(Board& board) {
 
 	const auto id = loader().fetchByte();
-	std::cout << "Block ID: " << std::hex << (int)id << std::endl;
+	std::cout << "** Block ID: " << std::hex << (int)id << std::endl;
 
 	switch (id) {
 	case 0x10:
-		readStandardSpeedDataBlock();
+		readStandardSpeedDataBlock(board);
 		break;
 	default:
 		throw std::runtime_error("Unhandled block ID");
@@ -44,36 +45,29 @@ void TZXFile::processTapHeader(DataLoader& loader) {
 
 	std::cout << "TAP: Header" << std::endl;
 
-	auto type = loader.fetchByte();
+	m_tapBlockType = loader.fetchByte();
 	auto filename_data = loader.fetchBytes(10);
-	auto data_block_length = loader.fetchWord();
-	auto parameter1 = loader.fetchWord();
-	auto parameter2 = loader.fetchWord();
+	m_dataBlockLength = loader.fetchWord();
+	m_tapHeaderParameter1 = loader.fetchWord();
+	m_tapHeaderParameter2 = loader.fetchWord();
 
-	std::cout << "TAP: type " << std::dec << " (" << (int)type << ") : ";
-	switch (type) {
-	case Type::Program:
+	std::cout << "TAP: type " << std::dec << " (" << (int)m_tapBlockType << ") : ";
+	switch (m_tapBlockType) {
+	case Type::ProgramBlock:
 		std::cout << "Program" << std::endl;
-		{
-			auto lineNumber = parameter1.word;
-			if (lineNumber < 32768)
-				std::cout << "TAP: LINE: " << std::dec << (int)lineNumber << std::endl;
-			auto variableArea = parameter2.word;
-			std::cout << "TAP: Variable area: " << std::dec << (int)variableArea << std::endl;
-		}
+		if (lineNumber() < 0x8000)
+			std::cout << "TAP: LINE: " << std::dec << (int)lineNumber() << std::endl;
+		std::cout << "TAP: Variable area: " << std::dec << (int)variableArea() << std::endl;
 		break;
-	case Type::NumberArray:
+	case Type::NumberArrayBlock:
 		std::cout << "Number array" << std::endl;
 		break;
-	case Type::CharacterArray:
+	case Type::CharacterArrayBlock:
 		std::cout << "Character array" << std::endl;
 		break;
-	case Type::CodeFile: {
-			const auto address = parameter1.word;
-			const auto codeLength = data_block_length;
-			const auto screen = (address == 16384) && (codeLength == 6912);
-			//assert(parameter2.word == 32768);
-			if (screen)
+	case Type::CodeFileBlock: {
+			//assert(parameter2.word == 0x8000);
+			if (screenShotBlockType())
 				std::cout << "Screen shot" << std::endl;
 			else
 				std::cout << "Code file" << std::endl;
@@ -81,22 +75,27 @@ void TZXFile::processTapHeader(DataLoader& loader) {
 		break;
 	}
 
-	const std::string filename((const char*)filename_data.data(), 10);
-	std::cout << "TAP: Filename: " << filename << std::endl;
+	m_tapHeaderFilename = std::string((const char*)filename_data.data(), 10);
 
-	//std::cout << "TAP: Length of data block: " << std::dec << (int)data_block_length.word << std::endl;
-
-	//std::cout << "TAP: parameter 1: " << std::dec << (int)parameter1.word << std::endl;
-	//std::cout << "TAP: parameter 2: " << std::dec << (int)parameter2.word << std::endl;
+	std::cout << "TAP: Filename: " << m_tapHeaderFilename << std::endl;
+	std::cout << "TAP: Length of data block: " << std::dec << (int)m_dataBlockLength.word << std::endl;
 }
 
-void TZXFile::processTapData(DataLoader& loader) {
+void TZXFile::processTapData(DataLoader& loader, Board& board) {
 
 	std::cout << "TAP: Data" << std::endl;
 
+	if (screenShotBlockType()) {
+
+		auto screen_data = loader.fetchBytes(ScreenLength);
+
+		for (int i = 0; i < ScreenLength; ++i)
+			board.poke(ScreenAddress + i, screen_data[i]);
+	}
+
 }
 
-void TZXFile::processTapBlock(const EightBit::Rom& data) {
+void TZXFile::processTapBlock(const EightBit::Rom& data, Board& board) {
 	DataLoader loader(data);
 	loader.resetPosition();
 	auto flag = loader.fetchByte();
@@ -105,7 +104,7 @@ void TZXFile::processTapBlock(const EightBit::Rom& data) {
 		processTapHeader(loader);
 		break;
 	case BlockFlag::Data:
-		processTapData(loader);
+		processTapData(loader, board);
 		break;
 	default:
 		assert(false && "Unknown TAP block flag");
@@ -113,7 +112,7 @@ void TZXFile::processTapBlock(const EightBit::Rom& data) {
 	}
 }
 
-void TZXFile::readStandardSpeedDataBlock() {
+void TZXFile::readStandardSpeedDataBlock(Board& board) {
 
 	const auto pause = loader().fetchWord();
 	std::cout << "TZX: Pause (ms): " << std::dec << pause.word << std::endl;
@@ -124,7 +123,7 @@ void TZXFile::readStandardSpeedDataBlock() {
 
 	EightBit::Rom tap_data;
 	tap_data.load(bytes);
-	processTapBlock(tap_data);
+	processTapBlock(tap_data, board);
 }
 
 void TZXFile::load(Board& board) {
@@ -135,5 +134,5 @@ void TZXFile::load(Board& board) {
 	readHeader();
 
 	while (!loader().finished())
-		readBlock();
+		readBlock(board);
 }
