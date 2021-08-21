@@ -7,6 +7,12 @@
 DataLoader::DataLoader(const EightBit::Rom& rom)
 : m_contents(rom) {}
 
+void DataLoader::move(int amount) {
+	if (locked())
+		throw new std::logic_error("Data loader has been locked");
+	position() += amount;
+}
+
 uint8_t DataLoader::readByte(int position) const {
 	if (position < 0)
 		throw std::runtime_error("Negative positions are not allowed");
@@ -28,8 +34,8 @@ std::vector<uint8_t> DataLoader::readBytes(int position, int amount) const {
 }
 
 std::vector<uint8_t> DataLoader::fetchBytes(int amount) {
-	const auto returned = readBytes(m_position, amount);
-	m_position += amount;
+	const auto returned = readBytes(position(), amount);
+	move(amount);
 	return returned;
 }
 
@@ -51,8 +57,8 @@ std::vector<EightBit::register16_t> DataLoader::readWords(int position, int amou
 }
 
 std::vector<EightBit::register16_t> DataLoader::fetchWords(int amount) {
-	const auto returned = readWords(m_position, amount);
-	m_position += amount * 2;
+	const auto returned = readWords(position(), amount);
+	move(amount * sizeof(uint16_t));
 	return returned;
 }
 
