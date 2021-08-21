@@ -73,11 +73,13 @@ void Board::raisePOWER() {
 	CPU().lowerRESET();
 	CPU().raiseINT();
 	CPU().raiseNMI();
-	sound().start();
+	beep().start();
+	mic().start();
 }
 
 void Board::lowerPOWER() {
-	sound().stop();
+	mic().stop();
+	beep().stop();
 	CPU().lowerPOWER();
 	ULA().lowerPOWER();
 	for (auto expansion : m_expansions)

@@ -235,7 +235,8 @@ void Ula::renderLines() {
 		renderLine();
 	assert(V() == TotalHeight);
 	resetV();
-	BUS().sound().endFrame();
+	BUS().beep().endFrame();
+	BUS().mic().endFrame();
 }
 
 void Ula::resetF() noexcept {
@@ -331,10 +332,11 @@ void Ula::writtenPort(const uint8_t port) {
 
 	PinLevel mic = PinLevel::Low;
 	match(mic, value & Bit3);
+	BUS().mic().buzz(mic, frameCycles());
 
 	PinLevel speaker = PinLevel::Low;
 	match(speaker, value & Bit4);
-	BUS().sound().buzz(speaker, frameCycles());
+	BUS().beep().buzz(speaker, frameCycles());
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {

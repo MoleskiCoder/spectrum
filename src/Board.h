@@ -28,7 +28,8 @@ public:
 	[[nodiscard]] constexpr auto& CPU() noexcept { return m_cpu; }
 	[[nodiscard]] constexpr auto& ULA() noexcept { return m_ula; }
 	[[nodiscard]] constexpr const auto& ULA() const noexcept { return m_ula; }
-	[[nodiscard]] constexpr auto& sound() noexcept { return m_sound; }
+	[[nodiscard]] constexpr auto& beep() noexcept { return m_beep; }
+	[[nodiscard]] constexpr auto& mic() noexcept { return m_mic; }
 	[[nodiscard]] constexpr auto& ports() noexcept { return m_ports; }
 	[[nodiscard]] constexpr auto& ROM() noexcept { return m_basicRom; }
 	[[nodiscard]] constexpr auto& VRAM() noexcept { return m_contendedRam; }
@@ -61,7 +62,8 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu = *this;
 	Ula m_ula = { m_palette, *this };
-	Buzzer m_sound = { Ula::FramesPerSecond, Ula::ClockRate };
+	Buzzer m_beep = { Ula::FramesPerSecond, Ula::ClockRate };
+	Buzzer m_mic = { Ula::FramesPerSecond, Ula::ClockRate };
 	std::vector<std::shared_ptr<Expansion>> m_expansions;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)
