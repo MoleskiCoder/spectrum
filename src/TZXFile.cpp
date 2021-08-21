@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include <cassert>
 #include <iostream>
 
 #include "TAPFile.h"
@@ -8,7 +7,7 @@
 #include "Board.h"
 
 TZXFile::TZXFile(std::string path)
-: Loader(path) {}
+: m_path(path) {}
 
 void TZXFile::readHeader() {
 
@@ -27,22 +26,20 @@ void TZXFile::readHeader() {
 	std::cout << "TZX Minor: " << (int)tzx_minor << std::endl;
 }
 
-void TZXFile::readBlock(Board& board) {
+boost::dynamic_bitset<> TZXFile::readBlock() {
 
 	const auto id = loader().fetchByte();
 	std::cout << "** Block ID: " << std::hex << (int)id << std::endl;
 
 	switch (id) {
 	case 0x10:
-		readStandardSpeedDataBlock(board);
-		break;
+		return readStandardSpeedDataBlock();
 	default:
 		throw std::runtime_error("Unhandled block ID");
-		break;
 	}
 }
 
-void TZXFile::readStandardSpeedDataBlock(Board& board) {
+boost::dynamic_bitset<> TZXFile::readStandardSpeedDataBlock() {
 
 	const auto pause = loader().fetchWord();
 	std::cout << "TZX: Pause (ms): " << std::dec << pause.word << std::endl;
@@ -56,36 +53,40 @@ void TZXFile::readStandardSpeedDataBlock(Board& board) {
 
 	if (expectingHeader()) {
 
+		// What's next?
+		m_expecting = TAPFile::BlockFlag::Data;
+
 		DataLoader tap_loader(tap_data);
 		tap_loader.resetPosition();
 
 		m_headerTAP = std::make_unique<TAPFile>(tap_loader);
-		headerTAP().processBlock();
-
-		m_expecting = TAPFile::BlockFlag::Data;
+		return headerTAP().processBlock();
 
 	} else if (expectingData()) {
+
+		// What's next?
+		m_expecting = TAPFile::BlockFlag::Header;
 
 		DataLoader tap_loader(tap_data);
 		tap_loader.resetPosition();
 
 		TAPFile tap(tap_loader);
-		tap.processBlock(headerTAP(), board);
-
-		m_expecting = TAPFile::BlockFlag::Header;
+		return tap.processBlock(headerTAP());
 
 	} else {
 		throw std::logic_error("Invalid block expectation!");
 	}
 }
 
-void TZXFile::load(Board& board) {
+std::vector<boost::dynamic_bitset<>> TZXFile::load() {
 
 	m_contents.load(path());
 	loader().resetPosition();
 
 	readHeader();
 
+	std::vector<boost::dynamic_bitset<>> data;
 	while (!loader().finished())
-		readBlock(board);
+		data.push_back(readBlock());
+	return data;
 }

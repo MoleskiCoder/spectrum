@@ -59,9 +59,9 @@ void Board::loadZ80(const std::string path) {
 	z80.load(*this);
 }
 
-void Board::loadTZX(const std::string path) {
+void Board::attachTZX(const std::string path) {
 	TZXFile tzx(path);
-	tzx.load(*this);
+	m_tape_image = tzx.load();
 }
 
 void Board::raisePOWER() {

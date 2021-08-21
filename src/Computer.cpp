@@ -41,7 +41,7 @@ void Computer::loadZ80(const std::string path) {
 }
 
 void Computer::loadTZX(const std::string path) {
-	BUS().loadTZX(path);
+	BUS().attachTZX(path);
 }
 
 void Computer::runRasterLines() {

@@ -3,10 +3,11 @@
 #include <cstdint>
 #include <string>
 
+#include <boost/dynamic_bitset.hpp>
+
 #include <Register.h>
 
 class DataLoader;
-class Board;
 
 class TAPFile final {
 public:
@@ -29,11 +30,16 @@ private:
 	EightBit::register16_t m_headerParameter1 = 0xffff;
 	EightBit::register16_t m_headerParameter2 = 0xffff;
 
+	[[nodiscard]] constexpr const auto& loader() const noexcept { return m_loader; }
 	[[nodiscard]] constexpr auto& loader() noexcept { return m_loader; }
 
 	void dumpHeaderInformation() const;
-	void processHeader();
-	void processData(Board& board);
+	boost::dynamic_bitset<> processHeader();
+
+	void dumpDataInformation() const;
+	boost::dynamic_bitset<> processData();
+
+	boost::dynamic_bitset<> emit() const;
 
 public:
 	TAPFile(DataLoader& loader);
@@ -76,6 +82,6 @@ public:
 			&& (codeLength() == ScreenLength);
 	}
 
-	void processBlock();	// Expects a header block
-	void processBlock(const TAPFile& header, Board& board);	// Expects a data block
+	[[nodiscard]] boost::dynamic_bitset<> processBlock();	// Expects a header block
+	[[nodiscard]] boost::dynamic_bitset<> processBlock(const TAPFile& header);	// Expects a data block
 };

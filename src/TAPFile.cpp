@@ -2,8 +2,8 @@
 
 #include <cassert>
 #include <iostream>
+#include <bitset>
 
-#include "Board.h"
 #include "TAPFile.h"
 #include "DataLoader.h"
 
@@ -35,53 +35,55 @@ void TAPFile::dumpHeaderInformation() const {
 
 	std::cout << "TAP: Filename: " << headerFilename() << std::endl;
 	std::cout << "TAP: Length of data block: " << std::dec << (int)dataBlockLength() << std::endl;
-
 }
 
-void TAPFile::processHeader() {
+boost::dynamic_bitset<> TAPFile::emit() const {
+	const auto& contents = loader().contents();
+	const auto size = contents.size();
+	boost::dynamic_bitset<> returned(size * 8);
+	for (int i = 0; i < size; ++i) {
+		const auto byte = contents.peek(i);
+		const std::bitset<8> bits(byte);
+		for (int j = 0; j < 8; ++j) {
+			returned.set(i * j, bits.test(j));
+		}
+	}
+	return returned;
+}
+
+boost::dynamic_bitset<> TAPFile::processHeader() {
+
 	m_blockType = loader().fetchByte();
 	auto filename_data = loader().fetchBytes(10);
 	m_headerFilename = std::string((const char*)filename_data.data(), 10);
 	m_dataBlockLength = loader().fetchWord();
 	m_headerParameter1 = loader().fetchWord();
 	m_headerParameter2 = loader().fetchWord();
-	loader().lock();
+
 	dumpHeaderInformation();
+
+	loader().lock();
+	return emit();
 }
 
-void TAPFile::processData(Board& board) {
-
+void TAPFile::dumpDataInformation() const {
 	std::cout << "TAP: Data" << std::endl;
-
-	auto data = loader().fetchBytes(dataBlockLength());
-
-	switch (blockType()) {
-	case Type::ProgramBlock:
-		break;
-	case Type::NumberArrayBlock:
-		throw std::out_of_range("NumberArrayBlock is not handled");
-		break;
-	case Type::CharacterArrayBlock:
-		throw std::out_of_range("CharacterArrayBlock is not handled");
-		break;
-	case Type::CodeFileBlock:
-		for (size_t i = 0; i != data.size(); ++i)
-			board.poke(codeAddress() + i, data[i]);
-		break;
-	default:
-		throw std::out_of_range("Unknown block type");
-		break;
-	}
 }
 
-void TAPFile::processBlock() {
+boost::dynamic_bitset<> TAPFile::processData() {
+	dumpDataInformation();
+	loader().lock();
+	return emit();
+}
+
+boost::dynamic_bitset<> TAPFile::processBlock() {
 	m_flag = loader().fetchByte();
 	if (!isHeaderBlock())
 		throw std::out_of_range("Unexpected block flag (should have been a header block)");
-	processHeader();
+	return processHeader();
 }
 
-void TAPFile::processBlock(const TAPFile& header, Board& board) {
+boost::dynamic_bitset<> TAPFile::processBlock(const TAPFile& header) {
 
 	m_flag = loader().fetchByte();
 	if (!isDataBlock())
@@ -93,7 +95,7 @@ void TAPFile::processBlock(const TAPFile& header, Board& board) {
 	headerParameter1() = header.headerParameter1();
 	headerParameter2() = header.headerParameter2();
 
-	processData(board);
+	return processData();
 }
 
 TAPFile::TAPFile(DataLoader& loader)

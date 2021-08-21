@@ -2,18 +2,23 @@
 
 #include <memory>
 #include <string>
+#include <vector>
+
+#include <boost/dynamic_bitset.hpp>
 
 #include <Rom.h>
 #include <Register.h>
 
-#include "Loader.h"
 #include "DataLoader.h"
 #include "TAPFile.h"
 
-class TZXFile final : public Loader {
+class TZXFile final {
 private:
 	static const uint16_t ScreenAddress = 0x4000;
 	static const int ScreenLength = 0x1b00;
+
+	std::string m_path;
+	[[nodiscard]] auto path() const { return m_path; }
 
 	TAPFile::BlockFlag m_expecting = TAPFile::BlockFlag::Header;
 	[[nodiscard]] constexpr auto expecting() const noexcept { return m_expecting; }
@@ -30,12 +35,12 @@ private:
 	constexpr auto& loader() noexcept { return m_loader; }
 
 	void readHeader();
-	void readBlock(Board& board);
+	boost::dynamic_bitset<> readBlock();
 
-	void readStandardSpeedDataBlock(Board& board);
+	boost::dynamic_bitset<> readStandardSpeedDataBlock();
 
 public:
 	TZXFile(std::string path);
 
-	void load(Board& board) override;
+	std::vector<boost::dynamic_bitset<>> load();
 };

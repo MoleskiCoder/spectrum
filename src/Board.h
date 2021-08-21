@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 
+#include <boost/dynamic_bitset.hpp>
+
 #include <Bus.h>
 #include <InputOutput.h>
 #include <Ram.h>
@@ -42,7 +44,8 @@ public:
 	void plug(std::string path);
 	void loadSna(std::string path);
 	void loadZ80(std::string path);
-	void loadTZX(std::string path);
+
+	void attachTZX(std::string path);
 
 	virtual void initialise() final;
 	virtual void raisePOWER() final;
@@ -65,6 +68,8 @@ private:
 	Buzzer m_beep = { Ula::FramesPerSecond, Ula::ClockRate };
 	Buzzer m_mic = { Ula::FramesPerSecond, Ula::ClockRate };
 	std::vector<std::shared_ptr<Expansion>> m_expansions;
+
+	std::vector<boost::dynamic_bitset<>> m_tape_image;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)
 	EightBit::Ram m_contendedRam = 0x4000;	//4000h - 7FFFh  RAM(Work RAM and VRAM) (with waitstates)
