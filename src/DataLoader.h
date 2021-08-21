@@ -15,32 +15,32 @@ private:
 public:
 	DataLoader(const EightBit::Rom& rom);
 
-	const auto& contents() const { return m_contents; }
+	[[nodiscard]] constexpr const auto& contents() const noexcept { return m_contents; }
 
-	auto& position() { return m_position; }
-	auto position() const { return m_position; }
-	auto remaining() const { return contents().size() - position(); }
-	auto finished() const { return remaining() <= 0; }
+	[[nodiscard]] constexpr auto& position() noexcept { return m_position; }
+	[[nodiscard]] constexpr auto position() const noexcept { return m_position; }
+	[[nodiscard]] auto remaining() const noexcept { return contents().size() - position(); }
+	[[nodiscard]] auto finished() const noexcept { return remaining() <= 0; }
 
-	void resetPosition() { m_position = 0; }
+	constexpr void resetPosition() noexcept { m_position = 0; }
 
-	[[nodiscard]] auto& locked() noexcept { return m_locked; }
-	[[nodiscard]] auto locked() const noexcept { return m_locked; }
-	[[nodiscard]] auto unlocked() const noexcept { return !locked(); }
-	[[nodiscard]] void lock(bool locking = true) noexcept { locked() = locking; }
-	[[nodiscard]] void unlock() noexcept { lock(true); }
+	[[nodiscard]] constexpr auto& locked() noexcept { return m_locked; }
+	[[nodiscard]] constexpr auto locked() const noexcept { return m_locked; }
+	[[nodiscard]] constexpr auto unlocked() const noexcept { return !locked(); }
+	[[nodiscard]] constexpr void lock(bool locking = true) noexcept { locked() = locking; }
+	[[nodiscard]] constexpr void unlock() noexcept { lock(true); }
 
 	void move(int amount = 1);
 
-	uint8_t readByte(int position) const;
-	std::vector<uint8_t> readBytes(int position, int amount) const;
+	[[nodiscard]] uint8_t readByte(int position) const;
+	[[nodiscard]] std::vector<uint8_t> readBytes(int position, int amount) const;
 
-	std::vector<uint8_t> fetchBytes(int amount);
-	uint8_t fetchByte();
+	[[nodiscard]] std::vector<uint8_t> fetchBytes(int amount);
+	[[nodiscard]] uint8_t fetchByte();
 
-	EightBit::register16_t readWord(int position) const;
-	std::vector<EightBit::register16_t> readWords(int position, int amount) const;
+	[[nodiscard]] EightBit::register16_t readWord(int position) const;
+	[[nodiscard]] std::vector<EightBit::register16_t> readWords(int position, int amount) const;
 
-	std::vector<EightBit::register16_t> fetchWords(int amount);
-	EightBit::register16_t fetchWord();
+	[[nodiscard]] std::vector<EightBit::register16_t> fetchWords(int amount);
+	[[nodiscard]] EightBit::register16_t fetchWord();
 };

@@ -5,6 +5,7 @@
 
 #include "Board.h"
 #include "TAPFile.h"
+#include "DataLoader.h"
 
 void TAPFile::dumpHeaderInformation() const {
 

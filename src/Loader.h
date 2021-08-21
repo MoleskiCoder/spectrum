@@ -12,7 +12,7 @@ protected:
 	Loader(std::string path) : m_path(path) {}
 
 public:
-	auto path() const { return m_path; }
+	[[nodiscard]] auto path() const { return m_path; }
 
 	virtual void load(Board& board) = 0;
 };

@@ -5,8 +5,8 @@
 
 #include <Register.h>
 
-#include "Loader.h"
-#include "DataLoader.h"
+class DataLoader;
+class Board;
 
 class TAPFile final {
 public:
@@ -29,7 +29,7 @@ private:
 	EightBit::register16_t m_headerParameter1 = 0xffff;
 	EightBit::register16_t m_headerParameter2 = 0xffff;
 
-	auto& loader() { return m_loader; }
+	[[nodiscard]] constexpr auto& loader() noexcept { return m_loader; }
 
 	void dumpHeaderInformation() const;
 	void processHeader();
@@ -63,14 +63,14 @@ public:
 	[[nodiscard]] constexpr auto headerParameter2() const noexcept { return m_headerParameter2.word; }
 
 	// Program block
-	[[nodiscard]] auto lineNumber() const { return headerParameter1(); }
-	[[nodiscard]] auto variableArea() const { return headerParameter2(); }
+	[[nodiscard]] constexpr auto lineNumber() const noexcept { return headerParameter1(); }
+	[[nodiscard]] constexpr auto variableArea() const noexcept { return headerParameter2(); }
 
 	// code file block
-	[[nodiscard]] auto codeAddress() const { return headerParameter1(); }
-	[[nodiscard]] auto codeLength() const { return dataBlockLength(); }
+	[[nodiscard]] constexpr auto codeAddress() const noexcept { return headerParameter1(); }
+	[[nodiscard]] constexpr auto codeLength() const noexcept { return dataBlockLength(); }
 
-	[[nodiscard]] auto screenShotBlockType() const {
+	[[nodiscard]] constexpr auto screenShotBlockType() const noexcept {
 		return isCodeFileBlock()
 			&& (codeAddress() == ScreenAddress)
 			&& (codeLength() == ScreenLength);

@@ -16,18 +16,18 @@ private:
 	static const int ScreenLength = 0x1b00;
 
 	TAPFile::BlockFlag m_expecting = TAPFile::BlockFlag::Header;
-	[[nodiscard]] auto expecting() const { return m_expecting; }
-	[[nodiscard]] auto expectingHeader() const { return expecting() == TAPFile::BlockFlag::Header; }
-	[[nodiscard]] auto expectingData() const { return !expectingHeader(); }
+	[[nodiscard]] constexpr auto expecting() const noexcept { return m_expecting; }
+	[[nodiscard]] constexpr auto expectingHeader() const noexcept { return expecting() == TAPFile::BlockFlag::Header; }
+	[[nodiscard]] constexpr auto expectingData() const noexcept { return !expectingHeader(); }
 
 	std::unique_ptr<TAPFile> m_headerTAP;
-	[[nodiscard]] auto& headerTAP() { return *m_headerTAP; }
+	[[nodiscard]] auto& headerTAP() noexcept { return *m_headerTAP; }
 
 	EightBit::Rom m_contents;
-	auto& contents() { return m_contents; }
+	constexpr auto& contents() noexcept { return m_contents; }
 
 	DataLoader m_loader = { m_contents };
-	auto& loader() { return m_loader; }
+	constexpr auto& loader() noexcept { return m_loader; }
 
 	void readHeader();
 	void readBlock(Board& board);
