@@ -124,5 +124,5 @@ protected:
 public:
 	Z80File(std::string path);
 
-	virtual void load(Board& board) final;
+	void load(Board& board) final;
 };

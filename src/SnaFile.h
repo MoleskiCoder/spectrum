@@ -30,11 +30,11 @@ private:
 	const static size_t RamSize = (32 + 16) * 1024;
 
 protected:
-	virtual void loadRegisters(EightBit::Z80& cpu) const final;
-	virtual void loadMemory(Board& board) const final;
+	void loadRegisters(EightBit::Z80& cpu) const final;
+	void loadMemory(Board& board) const final;
 
 public:
 	SnaFile(std::string path);
 
-	virtual void load(Board& board) final;
+	void load(Board& board) final;
 };
