@@ -4,8 +4,24 @@
 
 #include "DataLoader.h"
 
+DataLoader::DataLoader() {}
+
 DataLoader::DataLoader(const EightBit::Rom& rom)
 : m_contents(rom) {}
+
+DataLoader::DataLoader(const DataLoader& rhs)
+: m_contents(rhs.m_contents),
+  m_position(rhs.m_position),
+  m_locked(rhs.m_locked) {}
+
+DataLoader& DataLoader::operator=(const DataLoader& rhs) {
+	if (this != &rhs) {
+		m_contents = rhs.m_contents;
+		m_position = rhs.m_position;
+		m_locked = rhs.m_locked;
+	}
+	return *this;
+}
 
 void DataLoader::move(int amount) {
 	if (locked())

@@ -172,7 +172,8 @@
     <ClInclude Include="SnaFile.h" />
     <ClInclude Include="SnapshotFile.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="TAPFile.h" />
+    <ClInclude Include="TAPBlock.h" />
+    <ClInclude Include="ToneSequence.h" />
     <ClInclude Include="TZXFile.h" />
     <ClInclude Include="Ula.h" />
     <ClInclude Include="Z80File.h" />
@@ -196,7 +197,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TAPFile.cpp" />
+    <ClCompile Include="TAPBlock.cpp" />
+    <ClCompile Include="ToneSequence.cpp" />
     <ClCompile Include="TZXFile.cpp" />
     <ClCompile Include="Ula.cpp" />
     <ClCompile Include="Z80File.cpp" />

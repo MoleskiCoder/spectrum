@@ -8,12 +8,15 @@
 
 class DataLoader final {
 private:
-	const EightBit::Rom& m_contents;
+	EightBit::Rom m_contents;
 	int m_position = -1;
 	bool m_locked = false;
 
 public:
+	DataLoader();
 	DataLoader(const EightBit::Rom& rom);
+	DataLoader(const DataLoader& rhs);
+	DataLoader& operator=(const DataLoader& rhs);
 
 	[[nodiscard]] constexpr const auto& contents() const noexcept { return m_contents; }
 

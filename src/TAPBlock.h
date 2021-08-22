@@ -3,13 +3,12 @@
 #include <cstdint>
 #include <string>
 
-#include <boost/dynamic_bitset.hpp>
-
+#include <Rom.h>
 #include <Register.h>
 
-class DataLoader;
+#include "DataLoader.h"
 
-class TAPFile final {
+class TAPBlock final {
 public:
 	enum BlockFlag { Header = 0, Data = 0xff };
 
@@ -19,7 +18,8 @@ private:
 	static const uint16_t ScreenAddress = 0x4000;
 	static const int ScreenLength = 0x1b00;
 
-	DataLoader& m_loader;
+	DataLoader m_loader;
+	EightBit::Rom m_block;	// Taken from loader
 
 	uint8_t m_flag = 128;	// Not a BlockFlag!
 
@@ -34,15 +34,18 @@ private:
 	[[nodiscard]] constexpr auto& loader() noexcept { return m_loader; }
 
 	void dumpHeaderInformation() const;
-	boost::dynamic_bitset<> processHeader();
+	void processHeader();
 
 	void dumpDataInformation() const;
-	boost::dynamic_bitset<> processData();
-
-	boost::dynamic_bitset<> emit() const;
+	void processData();
 
 public:
-	TAPFile(DataLoader& loader);
+	TAPBlock();
+	TAPBlock(const DataLoader& loader);
+	TAPBlock(const TAPBlock& rhs);
+	TAPBlock& operator=(const TAPBlock& rhs);
+
+	[[nodiscard]] auto block() const { return m_block;  }
 
 	// Block interpretation
 
@@ -82,6 +85,5 @@ public:
 			&& (codeLength() == ScreenLength);
 	}
 
-	[[nodiscard]] boost::dynamic_bitset<> processBlock();	// Expects a header block
-	[[nodiscard]] boost::dynamic_bitset<> processBlock(const TAPFile& header);	// Expects a data block
+	void process();
 };

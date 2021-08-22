@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "TAPFile.h"
+#include "TAPBlock.h"
 #include "TZXFile.h"
 #include "Board.h"
 
@@ -26,7 +26,7 @@ void TZXFile::readHeader() {
 	std::cout << "TZX Minor: " << (int)tzx_minor << std::endl;
 }
 
-boost::dynamic_bitset<> TZXFile::readBlock() {
+TAPBlock TZXFile::readBlock() {
 
 	const auto id = loader().fetchByte();
 	std::cout << "** Block ID: " << std::hex << (int)id << std::endl;
@@ -39,7 +39,7 @@ boost::dynamic_bitset<> TZXFile::readBlock() {
 	}
 }
 
-boost::dynamic_bitset<> TZXFile::readStandardSpeedDataBlock() {
+TAPBlock TZXFile::readStandardSpeedDataBlock() {
 
 	const auto pause = loader().fetchWord();
 	std::cout << "TZX: Pause (ms): " << std::dec << pause.word << std::endl;
@@ -51,41 +51,24 @@ boost::dynamic_bitset<> TZXFile::readStandardSpeedDataBlock() {
 	EightBit::Rom tap_data;
 	tap_data.load(bytes);
 
-	if (expectingHeader()) {
+	DataLoader tap_loader(tap_data);
+	tap_loader.resetPosition();
 
-		// What's next?
-		m_expecting = TAPFile::BlockFlag::Data;
+	TAPBlock tap(tap_loader);
+	tap.process();
 
-		DataLoader tap_loader(tap_data);
-		tap_loader.resetPosition();
-
-		m_headerTAP = std::make_unique<TAPFile>(tap_loader);
-		return headerTAP().processBlock();
-
-	} else if (expectingData()) {
-
-		// What's next?
-		m_expecting = TAPFile::BlockFlag::Header;
-
-		DataLoader tap_loader(tap_data);
-		tap_loader.resetPosition();
-
-		TAPFile tap(tap_loader);
-		return tap.processBlock(headerTAP());
-
-	} else {
-		throw std::logic_error("Invalid block expectation!");
-	}
+	return tap;
 }
 
-std::vector<boost::dynamic_bitset<>> TZXFile::load() {
+std::vector<TAPBlock> TZXFile::load() {
 
-	m_contents.load(path());
+	contents().load(path());
+	loader() = DataLoader(contents());
 	loader().resetPosition();
 
 	readHeader();
 
-	std::vector<boost::dynamic_bitset<>> data;
+	std::vector<TAPBlock> data;
 	while (!loader().finished())
 		data.push_back(readBlock());
 	return data;
