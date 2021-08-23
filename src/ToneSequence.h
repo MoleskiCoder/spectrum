@@ -1,10 +1,10 @@
 #pragma once
 
+#include <cstdint>
 #include <vector>
 
-#include <boost/dynamic_bitset.hpp>
-
 #include <Device.h>
+#include <Rom.h>
 
 #include "TAPBlock.h"
 
@@ -31,14 +31,14 @@ private:
 	std::vector<EightBit::Device::PinLevel> m_states;
 	EightBit::Device::PinLevel m_last = EightBit::Device::PinLevel::Low;
 
-	[[nodiscard]] static boost::dynamic_bitset<> emit(const EightBit::Rom& contents);
+	void generatePulse(EightBit::Device::PinLevel level, int length);
+	void generatePulse(int length);
 
 	void generatePause(int length);
 	void generatePause();
-	void generatePulse(int length);
 
 	void generate(bool bit);
-	void generate(boost::dynamic_bitset<> bits);
+	void generate(uint8_t byte);
 	void generate(const EightBit::Rom& contents);
 
 	void generatePilotTone(int pulses);
