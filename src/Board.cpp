@@ -60,9 +60,11 @@ void Board::loadZ80(const std::string path) {
 }
 
 void Board::attachTZX(const std::string path) {
-	TZXFile tzx(path);
-	auto blocks = tzx.load();
-	m_tapeImage.generate(blocks);
+	ULA().attachTZX(path);
+}
+
+void Board::playTape() {
+	ULA().playTape();
 }
 
 void Board::raisePOWER() {

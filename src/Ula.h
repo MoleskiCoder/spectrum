@@ -11,6 +11,7 @@
 #include <Signal.h>
 
 #include "ColourPalette.h"
+#include "ToneSequence.h"
 
 class Board;
 
@@ -102,6 +103,9 @@ private:
 	static const int BytesPerLine = ActiveRasterWidth / 8;
 	static const int AttributeAddress = 0x1800;
 
+	ToneSequence m_tape;
+	std::queue<EightBit::Device::PinLevel> m_tones;
+
 public:
 	static constexpr float FramesPerSecond = 50.08f;
 	static const int ClockRate = 7000000; // 7Mhz
@@ -118,6 +122,9 @@ public:
 
 	void pokeKey(SDL_Keycode raw);
 	void pullKey(SDL_Keycode raw) noexcept;
+
+	void attachTZX(const std::string path);
+	void playTape();
 
 	constexpr void setBorder(int border) noexcept {
 		m_borderColour = m_palette.colour(border, false);
@@ -223,4 +230,12 @@ private:
 	void addContention(int cycles) noexcept;
 	[[nodiscard]] constexpr auto contention() const noexcept { return m_contention; }
 	bool maybeApplyContention() noexcept;
+
+	[[nodiscard]] constexpr const auto& tape() const noexcept { return m_tape; }
+	[[nodiscard]] constexpr auto& tape() noexcept { return m_tape; }
+	[[nodiscard]] constexpr const auto& tones() const noexcept { return m_tones; }
+	[[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
+
+	[[nodiscard]] auto stoppedTape() const noexcept { return tones().empty(); }
+	[[nodiscard]] auto playingTape() const noexcept { return !stoppedTape(); }
 };

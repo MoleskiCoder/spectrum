@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <utility>
 #include <vector>
+#include <queue>
 
 #include <Device.h>
 #include <Rom.h>
@@ -44,6 +45,8 @@ private:
 
 	void generatePilotTone(int pulses);
 
+	static void expand(std::queue<EightBit::Device::PinLevel>& queue, EightBit::Device::PinLevel level, int length);
+
 public:
 	[[nodiscard]] constexpr const auto& states() const noexcept { return m_states; }
 
@@ -51,5 +54,7 @@ public:
 	void generate(const std::vector<TAPBlock>& blocks);
 
 	void reset();
+
+	std::queue<EightBit::Device::PinLevel> expand() const;
 };
 

@@ -5,6 +5,7 @@
 #include <cassert>
 
 #include "Board.h"
+#include "TZXFile.h"
 
 Ula::Ula(const ColourPalette& palette, Board& bus)
 : m_palette(palette),
@@ -39,8 +40,18 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 
 	Ticked.connect([this](EightBit::EventArgs) {
 		incrementC();
-		if (((cycles() % 2) == 0) && !maybeApplyContention())
-			Proceed.fire();
+		if ((cycles() % 2) == 0) {
+
+			// Nothing stops the music!
+			if (playingTape()) {
+				m_ear = tones().front();
+				tones().pop();
+			}
+
+			// Is the CPU able to proceed?
+			if (!maybeApplyContention())
+				Proceed.fire();
+		}
 	});
 }
 
@@ -362,4 +373,14 @@ void Ula::readingPort(const uint8_t port) {
 	const auto  selected = findSelectedKeys(~portHigh);
 	const uint8_t value = selected | (raised(m_ear) ? bit(6) : 0);
 	BUS().ports().writeInputPort(port, value);
+}
+
+void Ula::attachTZX(const std::string path) {
+	TZXFile tzx(path);
+	auto blocks = tzx.load();
+	tape().generate(blocks);
+}
+
+void Ula::playTape() {
+	tones() = tape().expand();
 }

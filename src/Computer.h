@@ -62,4 +62,6 @@ private:
 	void handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event);
 	void handleControllerButtonDown(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
 	void handleControllerButtonUp(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
+
+	void playTape();
 };

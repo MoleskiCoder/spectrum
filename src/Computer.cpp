@@ -44,21 +44,33 @@ void Computer::loadTZX(const std::string path) {
 	BUS().attachTZX(path);
 }
 
+void Computer::playTape() {
+	BUS().playTape();
+}
+
 void Computer::runRasterLines() {
 	BUS().renderLines();
 }
 
 bool Computer::handleKeyDown(SDL_Keycode key) {
 	const auto handled = Game::handleKeyDown(key);
-	if (!handled)
+	if (!handled) {
+		if (key == SDLK_F11)
+			return true;
 		BUS().ULA().pokeKey(key);
+	}
 	return true;
 }
 
 bool Computer::handleKeyUp(SDL_Keycode key) {
 	const auto handled = Game::handleKeyUp(key);
-	if (!handled)
+	if (!handled) {
+		if (key == SDLK_F11) {
+			playTape();
+			return true;
+		}
 		BUS().ULA().pullKey(key);
+	}
 	return true;
 }
 
