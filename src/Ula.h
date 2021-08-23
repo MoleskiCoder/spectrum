@@ -157,8 +157,6 @@ private:
 	std::unordered_map<uint8_t, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;
 
-	int m_frameCycles = 0;	// Needed to generate sound timing
-
 	[[nodiscard]] constexpr auto& BUS() noexcept { return m_bus; }
 
 	void renderLine();
