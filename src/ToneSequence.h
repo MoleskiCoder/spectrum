@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <utility>
 #include <vector>
 
 #include <Device.h>
@@ -28,7 +29,7 @@ private:
 
 	static const int PostBlockPause = 1000;	// ms
 
-	std::vector<EightBit::Device::PinLevel> m_states;
+	std::vector<std::pair<EightBit::Device::PinLevel, int>> m_states;
 	EightBit::Device::PinLevel m_last = EightBit::Device::PinLevel::Low;
 
 	void generatePulse(EightBit::Device::PinLevel level, int length);

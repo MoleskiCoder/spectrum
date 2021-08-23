@@ -5,8 +5,7 @@
 // ----____ is one full period
 // a half period(whether high or low) is a pulse
 void ToneSequence::generatePulse(EightBit::Device::PinLevel level, int length) {
-	for (int i = 0; i < length; ++i)
-		m_states.push_back(level);
+	m_states.push_back({ level, length });
 }
 
 void ToneSequence::generatePulse(int length) {
