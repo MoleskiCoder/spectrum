@@ -28,7 +28,7 @@ void ToneSequence::generate(bool bit) {
 
 void ToneSequence::generate(uint8_t byte) {
 	const std::bitset<8> bits(byte);
-	for (int i = 0; i < 8; ++i)
+	for (int i = 7; i >= 0; --i)
 		generate(bits[i]);
 }
 
