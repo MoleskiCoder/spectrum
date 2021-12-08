@@ -65,8 +65,8 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu = *this;
 	Ula m_ula = { m_palette, *this };
-	Buzzer m_beep = { Ula::FramesPerSecond, Ula::ClockRate };
-	Buzzer m_mic = { Ula::FramesPerSecond, Ula::ClockRate };
+	Buzzer m_beep = { Ula::FramesPerSecond, Ula::CpuClockRate };
+	Buzzer m_mic = { Ula::FramesPerSecond, Ula::CpuClockRate };
 	std::vector<std::shared_ptr<Expansion>> m_expansions;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)

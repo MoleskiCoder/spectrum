@@ -68,6 +68,12 @@
     <ClInclude Include="ToneSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StandardToneSequence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WavWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -122,6 +128,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ToneSequence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StandardToneSequence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

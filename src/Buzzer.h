@@ -6,6 +6,8 @@
 
 #include <Device.h>
 
+#include "WavWriter.h"
+
 class Buzzer final {
 public:
 	Buzzer(float frameRate, int clockRate);
@@ -14,11 +16,16 @@ public:
 	void stop() noexcept;
 	void start() noexcept;
 
+	bool maybeStartRecording();
+	bool maybeStopRecording();
+
 	void buzz(EightBit::Device::PinLevel state, int cycle);
 	void endFrame();
 
 private:
 	static const int AudioFrequency = 44100;
+
+	WavWriter<Uint8> m_wav = { "spectrum.wav", 1, AudioFrequency };
 
 	SDL_AudioSpec m_have;
 	SDL_AudioDeviceID m_device = 0;

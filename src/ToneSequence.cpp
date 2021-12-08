@@ -19,11 +19,11 @@ void ToneSequence::generatePause(int length) {
 }
 
 void ToneSequence::generatePause() {
-	generatePause(Ula::ClockRate / 2);	// Giving CPU clock at 1/2 ULA clock
+	generatePause(pauseTime());
 }
 
 void ToneSequence::generate(bool bit) {
-	generatePulse(bit ? OneBitTonePulseLength : ZeroBitTonePulseLength);
+	generatePulse(bit ? oneBitTonePulseLength() : zeroBitTonePulseLength());
 }
 
 void ToneSequence::generate(uint8_t byte) {
@@ -40,13 +40,13 @@ void ToneSequence::generate(const EightBit::Rom& contents) {
 
 void ToneSequence::generatePilotTone(int pulses) {
 	for (int i = 0; i < pulses; ++i)
-		generatePulse(PilotTonePulseLength);
+		generatePulse(pilotTonePulseLength());
 }
 
 void ToneSequence::generate(const TAPBlock& block) {
-	generatePilotTone(block.isHeaderBlock() ? HeaderPilotTonePulses : DataPilotTonePulses);
-	generatePulse(FirstSyncTonePulseLength);
-	generatePulse(SecondSyncTonePulseLength);
+	generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());
+	generatePulse(firstSyncTonePulseLength());
+	generatePulse(secondSyncTonePulseLength());
 	generate(block.block());
 	generatePause();
 }
@@ -69,7 +69,7 @@ void ToneSequence::expand(std::queue<EightBit::Device::PinLevel>& queue, EightBi
 std::queue<EightBit::Device::PinLevel> ToneSequence::expand() const {
 	std::queue<EightBit::Device::PinLevel> returned;
 	for (const auto& rle : states()) {
-		const auto [level, length] = rle;
+		const auto& [level, length] = rle;
 		expand(returned, level, length);
 	}
 	return returned;

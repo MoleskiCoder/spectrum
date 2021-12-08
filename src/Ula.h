@@ -11,7 +11,7 @@
 #include <Signal.h>
 
 #include "ColourPalette.h"
-#include "ToneSequence.h"
+#include "StandardToneSequence.h"
 
 class Board;
 
@@ -38,9 +38,9 @@ Chapter 9 (The Video Display), Figure 9-1, PAL horizontal and vertical screen di
 						|                                            |		^		|
 						|                                            |		|		|
 						|             top vertical border            |	   56px		|
-  horizontal				|                                            |		|		|
-    sync					|                                            |		V		|
-<---28px--->				|          +----------------------+          |				|
+  horizontal			|                                            |		|		|
+    sync				|                                            |		V		|
+<---28px--->			|          +----------------------+          |				|
 						|          |                      |          |		^		|
 						|          |      display         |          |		|		|
 						|          |        area          |          |		|		|
@@ -65,11 +65,11 @@ Chapter 11 (Video Sychronisation), Figure 11-1, Horizontal time points for the 5
 	---------------------------------------------
 	Pixel Output			0				255
 	Right Border			256				319
-	Blanking Period		320				415
-	Horzontal Sync		336 (5C)			367 (5C)
-						344 (6C)			375 (6C)
-	Left Border			416				447
-	Counter reset		447				448
+	Blanking Period			320				415
+	Horzontal Sync			336 (5C)		367 (5C)
+							344 (6C)		375 (6C)
+	Left Border				416				447
+	Counter reset			447				448
 
 The ZX Spectrum ULA, Chris Smith
 Chapter 11 (Video Sychronisation), Figure 11-2, PAL horizontal vertical counter states and associated screen regions
@@ -103,12 +103,13 @@ private:
 	static const int BytesPerLine = ActiveRasterWidth / 8;
 	static const int AttributeAddress = 0x1800;
 
-	ToneSequence m_tape;
+	StandardToneSequence m_tape;
 	std::queue<EightBit::Device::PinLevel> m_tones;
 
 public:
 	static constexpr float FramesPerSecond = 50.08f;
-	static const int ClockRate = 7000000; // 7Mhz
+	static const int UlaClockRate = 7'000'000; // 7Mhz
+	static const int CpuClockRate = UlaClockRate / 2;
 
 	static const int RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder;
 	static const int RasterHeight = TopRasterBorder + ActiveRasterHeight + BottomRasterBorder;
@@ -157,8 +158,6 @@ private:
 	std::unordered_map<uint8_t, std::array<int, 5>> m_keyboardMapping;
 	std::unordered_set<SDL_Keycode> m_keyboardRaw;
 
-	int m_frameCycles = 0;	// Needed to generate sound timing
-
 	[[nodiscard]] constexpr auto& BUS() noexcept { return m_bus; }
 
 	void renderLine();
@@ -181,7 +180,8 @@ private:
 	void resetC() noexcept;
 	void incrementC() noexcept;
 
-	[[nodiscard]] constexpr auto frameCycles() const noexcept { return TotalHorizontalClocks * V() + C(); }
+	[[nodiscard]] constexpr auto frameUlaCycles() const noexcept { return TotalHorizontalClocks * V() + C(); }
+	[[nodiscard]] constexpr auto frameCpuCycles() const noexcept { return frameUlaCycles() / 2; }
 
 	void initialiseKeyboardMapping();
 	void initialiseVRAMAddresses();
