@@ -104,7 +104,7 @@ private:
 	static const int AttributeAddress = 0x1800;
 
 	StandardToneSequence m_tape;
-	std::queue<EightBit::Device::PinLevel> m_tones;
+	EightBit::co_generator_t<EightBit::Device::PinLevel> m_tones = m_tape.expand();
 
 public:
 	static constexpr float FramesPerSecond = 50.08f;
@@ -125,7 +125,6 @@ public:
 	void pullKey(SDL_Keycode raw) noexcept;
 
 	void attachTZX(const std::string path);
-	void playTape();
 
 	constexpr void setBorder(int border) noexcept {
 		m_borderColour = m_palette.colour(border, false);
@@ -236,6 +235,7 @@ private:
 	[[nodiscard]] constexpr const auto& tones() const noexcept { return m_tones; }
 	[[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
 
-	[[nodiscard]] auto stoppedTape() const noexcept { return tones().empty(); }
-	[[nodiscard]] auto playingTape() const noexcept { return !stoppedTape(); }
+public:
+	constexpr void playTape() noexcept { tape().play(); }
+	constexpr void stopTape() noexcept { tape().stop(); }
 };

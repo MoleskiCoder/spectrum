@@ -61,16 +61,13 @@ void ToneSequence::reset() {
 	m_states.clear();
 }
 
-void ToneSequence::expand(std::queue<EightBit::Device::PinLevel>& queue, EightBit::Device::PinLevel level, int length) {
-	for (int i = 0; i < length; ++i)
-		queue.push(level);
-}
-
-std::queue<EightBit::Device::PinLevel> ToneSequence::expand() const {
-	std::queue<EightBit::Device::PinLevel> returned;
-	for (const auto& rle : states()) {
+EightBit::co_generator_t<EightBit::Device::PinLevel> ToneSequence::expand() {
+	if (!playing())
+		throw std::logic_error("Cannot expand tones, if tape is not playing.");
+	const auto& compressed = states();
+	for (const auto& rle : compressed) {
 		const auto& [level, length] = rle;
-		expand(returned, level, length);
+		for (int i = 0; i < length; ++i)
+			co_yield level;
 	}
-	return returned;
 }

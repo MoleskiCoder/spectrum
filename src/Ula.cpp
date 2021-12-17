@@ -42,14 +42,16 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 		incrementC();
 		if ((cycles() % 2) == 0) {
 
-			// Nothing stops the music!
-			if (playingTape()) {
-				m_ear = tones().front();
-				tones().pop();
+			// Tape handling
+			if (tape().playing()) {
 				BUS().beep().maybeStartRecording();
-				BUS().beep().buzz(m_ear, frameCpuCycles());
+				if (m_tones) {
+					m_ear = m_tones();
+					BUS().beep().buzz(m_ear, frameCpuCycles());
+				}
 			} else {
 				BUS().beep().maybeStopRecording();
+				tape().stop(); // auto-stop the tape
 			}
 
 			// Is the CPU able to proceed?
@@ -382,9 +384,5 @@ void Ula::readingPort(const uint8_t port) {
 void Ula::attachTZX(const std::string path) {
 	TZXFile tzx(path);
 	auto blocks = tzx.load();
-	tape().generate(blocks);
-}
-
-void Ula::playTape() {
-	tones() = tape().expand();
+	tape().insert(blocks);
 }
