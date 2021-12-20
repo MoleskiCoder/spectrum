@@ -45,13 +45,12 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 			// Tape handling
 			if (tape().playing()) {
 				BUS().beep().maybeStartRecording();
-				if (m_tones) {
-					m_ear = m_tones();
+				if (tones()) {
+					m_ear = tones()();
 					BUS().beep().buzz(m_ear, frameCpuCycles());
 				}
 			} else {
 				BUS().beep().maybeStopRecording();
-				tape().stop(); // auto-stop the tape
 			}
 
 			// Is the CPU able to proceed?
