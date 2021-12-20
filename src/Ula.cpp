@@ -42,10 +42,16 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 		incrementC();
 		if ((cycles() % 2) == 0) {
 
-			// Nothing stops the music!
-			if (playingTape()) {
-				m_ear = tones().front();
-				tones().pop();
+			// Tape handling
+			if (tape().playing()) {
+				BUS().beep().maybeStartRecording();
+				if (m_tones) {
+					m_ear = m_tones();
+					BUS().beep().buzz(m_ear, frameCpuCycles());
+				}
+			} else {
+				BUS().beep().maybeStopRecording();
+				tape().stop(); // auto-stop the tape
 			}
 
 			// Is the CPU able to proceed?
@@ -224,16 +230,16 @@ void Ula::renderLine() {
 
 	assert(C() == 0);
 
-	if (V() < 192)
+	if (V() < ActiveRasterHeight)
 		processActiveLine();
 
-	else if (V() < 248)
+	else if (V() < (ActiveRasterHeight + BottomRasterBorder))
 		processBottomBorder();
 
-	else if (V() < 256)
+	else if (V() < (ActiveRasterHeight + BottomRasterBorder + VerticalRetraceLines))
 		processVerticalSync();
 
-	else if (V() < 312)
+	else if (V() < (RasterHeight + VerticalRetraceLines))
 		processTopBorder();
 
 	assert(C() == TotalHorizontalClocks);
@@ -331,7 +337,7 @@ void Ula::maybeWrittenPort(const uint8_t port) {
 // 128 64 32 16  8  4  2  U
 //   7  6  5  4  3  2  1  0
 //                  <----->	Border colour
-//               -		    Mic output
+//               -			Mic output
 //            -				Beep output
 //   <----->				Not used
 
@@ -343,11 +349,11 @@ void Ula::writtenPort(const uint8_t port) {
 
 	PinLevel mic = PinLevel::Low;
 	match(mic, value & Bit3);
-	BUS().mic().buzz(mic, frameCycles());
+	BUS().mic().buzz(mic, frameCpuCycles());
 
 	PinLevel speaker = PinLevel::Low;
 	match(speaker, value & Bit4);
-	BUS().beep().buzz(speaker, frameCycles());
+	BUS().beep().buzz(speaker, frameCpuCycles());
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {
@@ -378,9 +384,5 @@ void Ula::readingPort(const uint8_t port) {
 void Ula::attachTZX(const std::string path) {
 	TZXFile tzx(path);
 	auto blocks = tzx.load();
-	tape().generate(blocks);
-}
-
-void Ula::playTape() {
-	tones() = tape().expand();
+	tape().insert(blocks);
 }

@@ -69,7 +69,7 @@ void Board::playTape() {
 
 void Board::raisePOWER() {
 	EightBit::Bus::raisePOWER();
-	for (auto expansion : m_expansions)
+	for (auto& expansion : m_expansions)
 		expansion->raisePOWER();
 	ULA().raisePOWER();
 	CPU().raisePOWER();
@@ -85,7 +85,7 @@ void Board::lowerPOWER() {
 	beep().stop();
 	CPU().lowerPOWER();
 	ULA().lowerPOWER();
-	for (auto expansion : m_expansions)
+	for (auto& expansion : m_expansions)
 		expansion->lowerPOWER();
 	EightBit::Bus::lowerPOWER();
 }
