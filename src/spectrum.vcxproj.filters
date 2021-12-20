@@ -71,7 +71,7 @@
     <ClInclude Include="StandardToneSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WavWriter.h">
+    <ClInclude Include="AudioFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,9 +92,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ColourPalette.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Buzzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SnaFile.cpp">
