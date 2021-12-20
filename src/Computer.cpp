@@ -48,6 +48,10 @@ void Computer::playTape() {
 	BUS().playTape();
 }
 
+void Computer::stopTape() {
+	BUS().stopTape();
+}
+
 void Computer::runRasterLines() {
 	BUS().renderLines();
 }
@@ -65,8 +69,12 @@ bool Computer::handleKeyDown(SDL_Keycode key) {
 bool Computer::handleKeyUp(SDL_Keycode key) {
 	const auto handled = Game::handleKeyUp(key);
 	if (!handled) {
-		if (key == SDLK_F11) {
+		if (key == SDLK_F10) {
 			playTape();
+			return true;
+		}
+		if (key == SDLK_F11) {
+			stopTape();
 			return true;
 		}
 		BUS().ULA().pullKey(key);

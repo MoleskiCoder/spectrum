@@ -46,6 +46,7 @@ public:
 
 	void attachTZX(std::string path);
 	void playTape();
+	void stopTape();
 
 	void initialise() final;
 	void raisePOWER() final;

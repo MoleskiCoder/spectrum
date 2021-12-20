@@ -20,19 +20,19 @@ class TAPBlock;
 
 class ToneSequence {
 private:
-	int m_pauseTime = -1;
-	int m_oneBitTonePulseLength = -1;
-	int m_zeroBitTonePulseLength = -1;
-	int m_pilotTonePulseLength = -1;
-	int m_headerPilotTonePulses = -1;
-	int m_dataPilotTonePulses = -1;
-	int m_firstSyncTonePulseLength = -1;
-	int m_secondSyncTonePulseLength = -1;
+	int m_pauseTime = -1;					// ms
+	int m_oneBitTonePulseLength = -1;		// T states
+	int m_zeroBitTonePulseLength = -1;		// T states
+	int m_pilotTonePulseLength = -1;		// T states
+	int m_headerPilotTonePulses = -1;		// Pulses
+	int m_dataPilotTonePulses = -1;			// Pulses
+	int m_firstSyncTonePulseLength = -1;	// T states
+	int m_secondSyncTonePulseLength = -1;	// T states
 
 	bool m_playing = false;
 
 	std::vector<std::pair<EightBit::Device::PinLevel, int>> m_states;
-	EightBit::Device::PinLevel m_last = EightBit::Device::PinLevel::Low;
+	EightBit::Device::PinLevel m_last = EightBit::Device::PinLevel::High;	// Meaning the first pulse will be low
 
 	void generatePulse(EightBit::Device::PinLevel level, int length);
 	void generatePulse(int length);
