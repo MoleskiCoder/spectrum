@@ -24,7 +24,6 @@ private:
 	SDL_AudioSpec m_have;
 	SDL_AudioDeviceID m_device = 0;
 
-	const int m_clockRate;
 	const float m_sampleLength;
 
 	std::vector<T> m_buffer;
@@ -32,7 +31,6 @@ private:
 	int m_lastSample = 0;
 	T m_lastLevel = LowLevel;
 
-	[[nodiscard]] constexpr auto clockRate() const noexcept { return m_clockRate; }
 	[[nodiscard]] constexpr auto sampleLength() const noexcept { return m_sampleLength; }
 
 	[[nodiscard]] constexpr auto sample(int cycle) const noexcept {
@@ -49,8 +47,7 @@ private:
 
 public:
 	Buzzer(float frameRate, int clockRate, SDL_AudioFormat format)
-	: m_clockRate(clockRate),
-	  m_sampleLength(static_cast<float>(AudioFrequency) / static_cast<float>(clockRate)) {
+	: m_sampleLength(static_cast<float>(AudioFrequency) / static_cast<float>(clockRate)) {
 	
 		const auto samplesPerFrame = static_cast<float>(AudioFrequency) / frameRate + 1.0f;
 
