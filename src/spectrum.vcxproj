@@ -179,6 +179,7 @@
     <ClInclude Include="ToneSequence.h" />
     <ClInclude Include="TZXFile.h" />
     <ClInclude Include="Ula.h" />
+    <ClInclude Include="WavWriter.h" />
     <ClInclude Include="Z80File.h" />
   </ItemGroup>
   <ItemGroup>

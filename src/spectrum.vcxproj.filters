@@ -74,6 +74,9 @@
     <ClInclude Include="AudioFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WavWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

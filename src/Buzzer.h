@@ -10,7 +10,7 @@
 #include <Device.h>
 #include <SDLWrapper.h>
 
-#include "AudioFile.h"
+#include "WavWriter.h"
 
 // Monophonic ZX Spectrum buzzer emulation
 template<typename T>
@@ -20,7 +20,7 @@ private:
 	static const T LowLevel = std::numeric_limits<T>::min();
 	static const T HighLevel = std::numeric_limits<T>::max();
 
-	AudioFile<float> m_wav;
+	WavWriter<T, float> m_wav = { "spectrum.wav", 1, AudioFrequency, LowLevel, HighLevel, -.1f, .1f };
 
 	SDL_AudioSpec m_have;
 	SDL_AudioDeviceID m_device = 0;
@@ -31,10 +31,8 @@ private:
 	Uint32 m_bufferLength = 0;
 	int m_lastSample = 0;
 	T m_lastLevel = LowLevel;
-	bool m_recording = false;
 
 	[[nodiscard]] constexpr auto sampleLength() const noexcept { return m_sampleLength; }
-	[[nodiscard]] constexpr auto recording() const noexcept { return m_recording; }
 
 	[[nodiscard]] constexpr auto sample(int cycle) const noexcept {
 		const auto sample = static_cast<float>(cycle) * sampleLength();
@@ -46,22 +44,6 @@ private:
 		std::fill(m_buffer.begin() + m_lastSample, m_buffer.begin() + sample, m_lastLevel);
 		m_lastSample = sample;
 		m_lastLevel = level;
-	}
-
-	void recordSamples() {
-		for (auto sample : m_buffer) {
-			const auto low = sample == LowLevel;
-			const auto high = sample == HighLevel;
-			assert(low || high);
-			for (int channel = 0; channel < m_have.channels; ++channel)
-				m_wav.samples[channel].push_back(low ? -.1f : .1f);
-		}
-	}
-
-	auto maybeRecordSamples() {
-		if (recording())
-			recordSamples();
-		return recording();
 	}
 
 public:
@@ -106,33 +88,12 @@ public:
 	void stop() noexcept { ::SDL_PauseAudioDevice(m_device, SDL_TRUE); }
 	void start() noexcept {	::SDL_PauseAudioDevice(m_device, SDL_FALSE); }
 
-	void startRecording() {
-		assert(!recording());
-		m_wav.samples.clear();
-		m_wav.setNumChannels(m_have.channels);
-		m_wav.setNumSamplesPerChannel(AudioFrequency);
-		m_recording = true;
-	}
-
-	void stopRecording() {
-		assert(recording());
-		m_wav.save("spectrum.wav", AudioFileFormat::Wave);
-		m_wav.samples.clear();
-		m_recording = false;
-	}
-
 	auto maybeStartRecording() {
-		const auto starting = !recording();
-		if (starting)
-			startRecording();
-		return starting;
+		return m_wav.maybeStartRecording();
 	}
-	
+
 	auto maybeStopRecording() {
-		const auto stopping = recording();
-		if (stopping)
-			stopRecording();
-		return stopping;
+		return m_wav.maybeStopRecording();
 	}
 
 	constexpr void buzz(EightBit::Device::PinLevel state, int cycle) {
@@ -144,7 +105,7 @@ public:
 		std::fill(m_buffer.begin() + m_lastSample, m_buffer.end(), m_lastLevel);
 		const int returned = ::SDL_QueueAudio(m_device, m_buffer.data(), m_bufferLength);
 		Gaming::SDLWrapper::verifySDLCall(returned, "Unable to queue buzzer audio: ");
-		maybeRecordSamples();
+		m_wav.maybeRecordSamples(m_buffer.begin(), m_buffer.end());
 		m_lastSample = 0;
 	}
 };
