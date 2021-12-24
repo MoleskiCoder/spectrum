@@ -6,8 +6,7 @@
 #include "TZXFile.h"
 #include "Board.h"
 
-TZXFile::TZXFile(std::string path)
-: m_path(path) {}
+TZXFile::TZXFile() {}
 
 void TZXFile::readHeader() {
 
@@ -60,16 +59,26 @@ TAPBlock TZXFile::readStandardSpeedDataBlock() {
 	return tap;
 }
 
-std::vector<TAPBlock> TZXFile::load() {
+void TZXFile::load(std::string path) {
 
-	contents().load(path());
+	contents().load(path);
 	loader() = DataLoader(contents());
 	loader().resetPosition();
 
 	readHeader();
 
-	std::vector<TAPBlock> data;
+	blocks().clear();
 	while (!loader().finished())
-		data.push_back(readBlock());
-	return data;
+		blocks().push_back(readBlock());
+}
+
+EightBit::co_generator_t<ToneSequence::amplitude_t> TZXFile::generate() {
+	for (const auto& block : blocks()) {
+		auto generator = block.generate();
+		while (generator) {
+			const auto [ level, length ] = generator();
+			for (int i = 0; i < length; ++i)
+				co_yield level;
+		}
+	}
 }

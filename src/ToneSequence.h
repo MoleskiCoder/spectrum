@@ -2,15 +2,11 @@
 
 #include <cstdint>
 #include <utility>
-#include <vector>
 #include <queue>
 
 #include <Device.h>
-#include <Rom.h>
 
 #include <co_generator_t.h>
-
-#include "TAPBlock.h"
 
 namespace EightBit {
 	class Rom;
@@ -19,32 +15,9 @@ namespace EightBit {
 class TAPBlock;
 
 class ToneSequence {
-private:
-	int m_pauseTime = -1;					// ms
-	int m_oneBitTonePulseLength = -1;		// T states
-	int m_zeroBitTonePulseLength = -1;		// T states
-	int m_pilotTonePulseLength = -1;		// T states
-	int m_headerPilotTonePulses = -1;		// Pulses
-	int m_dataPilotTonePulses = -1;			// Pulses
-	int m_firstSyncTonePulseLength = -1;	// T states
-	int m_secondSyncTonePulseLength = -1;	// T states
-
-	bool m_playing = false;
-
-	std::vector<std::pair<EightBit::Device::PinLevel, int>> m_states;
-	EightBit::Device::PinLevel m_last = EightBit::Device::PinLevel::High;	// Meaning the first pulse will be low
-
-	void generatePulse(EightBit::Device::PinLevel level, int length);
-	void generatePulse(int length);
-
-	void generatePause(int length);
-	void generatePause();
-
-	void generate(bool bit);
-	void generate(uint8_t byte);
-	void generate(const EightBit::Rom& contents);
-
-	void generatePilotTone(int pulses);
+public:
+	typedef EightBit::Device::PinLevel amplitude_t;
+	typedef std::pair<amplitude_t, int> pulse_t;
 
 protected:
 	[[nodiscard]] constexpr auto pauseTime() const noexcept { return m_pauseTime; }
@@ -71,19 +44,47 @@ protected:
 	[[nodiscard]] constexpr auto secondSyncTonePulseLength() const noexcept { return m_secondSyncTonePulseLength; }
 	[[nodiscard]] constexpr auto& secondSyncTonePulseLength() noexcept { return m_secondSyncTonePulseLength; }
 
-	[[nodiscard]] constexpr const auto& states() const noexcept { return m_states; }
+private:
+	int m_pauseTime = -1;					// ms
+	int m_oneBitTonePulseLength = -1;		// T states
+	int m_zeroBitTonePulseLength = -1;		// T states
+	int m_pilotTonePulseLength = -1;		// T states
+	int m_headerPilotTonePulses = -1;		// Pulses
+	int m_dataPilotTonePulses = -1;			// Pulses
+	int m_firstSyncTonePulseLength = -1;	// T states
+	int m_secondSyncTonePulseLength = -1;	// T states
 
-	void generate(const TAPBlock& block);
-	void generate(const std::vector<TAPBlock>& blocks);
+	amplitude_t m_last = amplitude_t::High;	// Meaning the first pulse will be low
 
-	void reset();
+	// ----____ is one full period
+	// a half period(whether high or low) is a pulse
+	[[nodiscard]] static constexpr pulse_t generatePulse(amplitude_t level, int length) noexcept {
+		return { level, length };
+	}
+
+	[[nodiscard]] constexpr auto generatePulse(int length) noexcept {
+		// Doesn't matter what the value is, as long as it's flipped
+		EightBit::Device::flip(m_last);
+		return generatePulse(m_last, length);
+	}
+
+	[[nodiscard]] static constexpr auto generatePause(int length) noexcept {
+		return generatePulse(amplitude_t::Low, length);
+	}
+
+	[[nodiscard]] constexpr auto generatePause() const noexcept {
+		return generatePause(pauseTime());
+	}
+
+	[[nodiscard]] pulse_t generate(bool bit) noexcept {
+		return generatePulse(bit ? oneBitTonePulseLength() : zeroBitTonePulseLength());
+	}
+
+	[[nodiscard]] std::queue<pulse_t> generate(uint8_t byte);
+	[[nodiscard]] std::queue<pulse_t> generate(const EightBit::Rom& contents);
+
+	[[nodiscard]] std::queue<pulse_t> generatePilotTone(int pulses);
 
 public:
-	[[nodiscard]] EightBit::co_generator_t<EightBit::Device::PinLevel> expand();
-
-	[[nodiscard]] constexpr auto playing() const noexcept { return m_playing; }
-
-	void insert(const std::vector<TAPBlock>& blocks) { generate(blocks); }
-	constexpr void play(bool playing = true) noexcept { m_playing = playing; }
-	constexpr void stop() noexcept { play(false); }
+	[[nodiscard]] EightBit::co_generator_t<pulse_t> generate(const TAPBlock& block);
 };

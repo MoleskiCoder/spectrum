@@ -11,7 +11,7 @@
 #include <Signal.h>
 
 #include "ColourPalette.h"
-#include "StandardToneSequence.h"
+#include "TZXFile.h"
 
 class Board;
 
@@ -103,8 +103,8 @@ private:
     static const int BytesPerLine = ActiveRasterWidth / 8;
     static const int AttributeAddress = 0x1800;
 
-    StandardToneSequence m_tape;
-    EightBit::co_generator_t<EightBit::Device::PinLevel> m_tones = m_tape.expand();
+    TZXFile m_tape;
+    EightBit::co_generator_t<ToneSequence::amplitude_t> m_tones = m_tape.generate();
 
 public:
     static constexpr float FramesPerSecond = 50.08f;

@@ -7,6 +7,7 @@
 #include <Register.h>
 
 #include "DataLoader.h"
+#include "StandardToneSequence.h"
 
 class TAPBlock final {
 public:
@@ -86,4 +87,6 @@ public:
 	}
 
 	void process();
+
+	[[nodiscard]] auto generate() const { return StandardToneSequence().generate(*this); }
 };

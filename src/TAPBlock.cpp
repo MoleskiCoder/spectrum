@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <iostream>
-//#include <bitset>
 
 #include "TAPBlock.h"
 #include "DataLoader.h"
@@ -36,20 +35,6 @@ void TAPBlock::dumpHeaderInformation() const {
 	std::cout << "TAP: Filename: " << headerFilename() << std::endl;
 	std::cout << "TAP: Length of data block: " << std::dec << (int)dataBlockLength() << std::endl;
 }
-
-//boost::dynamic_bitset<> TAPFile::emit() const {
-//	const auto& contents = loader().contents();
-//	const auto size = contents.size();
-//	boost::dynamic_bitset<> returned(size * 8);
-//	for (int i = 0; i < size; ++i) {
-//		const auto byte = contents.peek(i);
-//		const std::bitset<8> bits(byte);
-//		for (int j = 0; j < 8; ++j) {
-//			returned.set(i * j, bits.test(j));
-//		}
-//	}
-//	return returned;
-//}
 
 void TAPBlock::processHeader() {
 

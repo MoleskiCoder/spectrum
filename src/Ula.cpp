@@ -381,7 +381,5 @@ void Ula::readingPort(const uint8_t port) {
 }
 
 void Ula::attachTZX(const std::string path) {
-	TZXFile tzx(path);
-	auto blocks = tzx.load();
-	tape().insert(blocks);
+	m_tape.load(path);
 }
