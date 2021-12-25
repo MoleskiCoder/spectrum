@@ -4,52 +4,48 @@
 #include "TAPBlock.h"
 #include <Rom.h>
 
-std::queue<ToneSequence::pulse_t> ToneSequence::generate(uint8_t byte) {
-	std::queue<pulse_t> returned;
+std::vector<ToneSequence::pulse_t> ToneSequence::generate(uint8_t byte) {
+	std::vector<pulse_t> returned;
+	returned.reserve(8);
 	const std::bitset<8> bits(byte);
 	for (int i = 7; i >= 0; --i)
-		returned.push(generate(bits[i]));
+		returned.push_back(generate(bits[i]));
 	return returned;
 }
 
-std::queue<ToneSequence::pulse_t> ToneSequence::generate(const EightBit::Rom& contents) {
-	std::queue<pulse_t> returned;
+std::vector<ToneSequence::pulse_t> ToneSequence::generate(const EightBit::Rom& contents) {
+	std::vector<pulse_t> returned;
+	returned.reserve(contents.size() * 8 ); // bytes * bits-per-byte
 	for (int i = 0; i < contents.size(); ++i) {
-		auto generated = generate(contents.peek(i));
-		while (!generated.empty()) {
-			returned.push(generated.front());
-			generated.pop();
-		}
+		auto tones = generate(contents.peek(i));
+		for (const auto& tone : tones)
+			returned.push_back(tone);
 	}
 	return returned;
 }
 
-std::queue<ToneSequence::pulse_t> ToneSequence::generatePilotTone(int pulses) {
-	std::queue<pulse_t> returned;
+std::vector<ToneSequence::pulse_t> ToneSequence::generatePilotTone(int pulses) {
+	std::vector<pulse_t> returned(pulses);
 	for (int i = 0; i < pulses; ++i)
-		returned.push(generatePulse(pilotTonePulseLength()));
+		returned[i] = generatePulse(pilotTonePulseLength());
 	return returned;
 }
 
 EightBit::co_generator_t<ToneSequence::pulse_t> ToneSequence::generate(const TAPBlock& block) {
 
 	{
-		auto generated = generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());
-		while (!generated.empty()) {
-			co_yield generated.front();
-			generated.pop();
-		}
+		const auto pulses = generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());
+		for (const auto& pulse : pulses)
+			co_yield pulse;
 	}
 
 	co_yield generatePulse(firstSyncTonePulseLength());
 	co_yield generatePulse(secondSyncTonePulseLength());
 
 	{
-		auto generated = generate(block.block());
-		while (!generated.empty()) {
-			co_yield generated.front();
-			generated.pop();
-		}
+		const auto pulses = generate(block.block());
+		for (const auto& pulse : pulses)
+			co_yield pulse;
 	}
 
 	co_yield generatePause();

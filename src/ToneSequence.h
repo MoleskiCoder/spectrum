@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <utility>
-#include <queue>
+#include <vector>
 
 #include <Device.h>
 
@@ -80,10 +80,10 @@ private:
 		return generatePulse(bit ? oneBitTonePulseLength() : zeroBitTonePulseLength());
 	}
 
-	[[nodiscard]] std::queue<pulse_t> generate(uint8_t byte);
-	[[nodiscard]] std::queue<pulse_t> generate(const EightBit::Rom& contents);
+	[[nodiscard]] std::vector<pulse_t> generate(uint8_t byte);
+	[[nodiscard]] std::vector<pulse_t> generate(const EightBit::Rom& contents);
 
-	[[nodiscard]] std::queue<pulse_t> generatePilotTone(int pulses);
+	[[nodiscard]] std::vector<pulse_t> generatePilotTone(int pulses);
 
 public:
 	[[nodiscard]] EightBit::co_generator_t<pulse_t> generate(const TAPBlock& block);
