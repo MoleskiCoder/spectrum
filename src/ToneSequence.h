@@ -54,7 +54,7 @@ private:
 	int m_firstSyncTonePulseLength = -1;	// T states
 	int m_secondSyncTonePulseLength = -1;	// T states
 
-	amplitude_t m_last = amplitude_t::High;	// Meaning the first pulse will be low
+	mutable amplitude_t m_last = amplitude_t::High;	// Meaning the first pulse will be low
 
 	// ----____ is one full period
 	// a half period(whether high or low) is a pulse
@@ -62,7 +62,7 @@ private:
 		return { level, length };
 	}
 
-	[[nodiscard]] constexpr auto generatePulse(int length) noexcept {
+	[[nodiscard]] constexpr auto generatePulse(int length) const noexcept {
 		// Doesn't matter what the value is, as long as it's flipped
 		EightBit::Device::flip(m_last);
 		return generatePulse(m_last, length);
@@ -76,15 +76,15 @@ private:
 		return generatePause(pauseTime());
 	}
 
-	[[nodiscard]] pulse_t generate(bool bit) noexcept {
+	[[nodiscard]] pulse_t generate(bool bit) const noexcept {
 		return generatePulse(bit ? oneBitTonePulseLength() : zeroBitTonePulseLength());
 	}
 
-	[[nodiscard]] std::vector<pulse_t> generate(uint8_t byte);
-	[[nodiscard]] std::vector<pulse_t> generate(const EightBit::Rom& contents);
+	[[nodiscard]] std::vector<pulse_t> generate(uint8_t byte) const;
+	[[nodiscard]] std::vector<pulse_t> generate(const EightBit::Rom& contents) const;
 
-	[[nodiscard]] std::vector<pulse_t> generatePilotTone(int pulses);
+	[[nodiscard]] std::vector<pulse_t> generatePilotTone(int pulses) const;
 
 public:
-	[[nodiscard]] EightBit::co_generator_t<pulse_t> generate(const TAPBlock& block);
+	[[nodiscard]] EightBit::co_generator_t<pulse_t> generate(const TAPBlock& block) const;
 };

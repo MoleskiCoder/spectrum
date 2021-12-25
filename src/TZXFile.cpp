@@ -72,7 +72,7 @@ void TZXFile::load(std::string path) {
 		blocks().push_back(readBlock());
 }
 
-EightBit::co_generator_t<ToneSequence::amplitude_t> TZXFile::generate() {
+EightBit::co_generator_t<ToneSequence::amplitude_t> TZXFile::generate() const {
 	for (const auto& block : blocks()) {
 		auto generator = block.generate();
 		while (generator) {

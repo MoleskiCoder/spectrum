@@ -47,7 +47,7 @@ public:
 	[[nodiscard]] constexpr auto unloaded() const noexcept { return blocks().empty(); }
 	[[nodiscard]] constexpr auto loaded() const noexcept { return !unloaded(); }
 
-	[[nodiscard]] EightBit::co_generator_t<ToneSequence::amplitude_t> generate();
+	[[nodiscard]] EightBit::co_generator_t<ToneSequence::amplitude_t> generate() const;
 
 	[[nodiscard]] constexpr auto playing() const noexcept { return m_playing; }
 	[[nodiscard]] constexpr auto stopped() const noexcept { return !playing(); }

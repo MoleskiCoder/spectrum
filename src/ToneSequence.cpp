@@ -1,10 +1,8 @@
 #include "stdafx.h"
 #include "ToneSequence.h"
-#include "Ula.h"
 #include "TAPBlock.h"
-#include <Rom.h>
 
-std::vector<ToneSequence::pulse_t> ToneSequence::generate(uint8_t byte) {
+std::vector<ToneSequence::pulse_t> ToneSequence::generate(uint8_t byte) const {
 	std::vector<pulse_t> returned;
 	returned.reserve(8);
 	const std::bitset<8> bits(byte);
@@ -13,7 +11,7 @@ std::vector<ToneSequence::pulse_t> ToneSequence::generate(uint8_t byte) {
 	return returned;
 }
 
-std::vector<ToneSequence::pulse_t> ToneSequence::generate(const EightBit::Rom& contents) {
+std::vector<ToneSequence::pulse_t> ToneSequence::generate(const EightBit::Rom& contents) const {
 	std::vector<pulse_t> returned;
 	returned.reserve(contents.size() * 8 ); // bytes * bits-per-byte
 	for (int i = 0; i < contents.size(); ++i) {
@@ -24,14 +22,14 @@ std::vector<ToneSequence::pulse_t> ToneSequence::generate(const EightBit::Rom& c
 	return returned;
 }
 
-std::vector<ToneSequence::pulse_t> ToneSequence::generatePilotTone(int pulses) {
+std::vector<ToneSequence::pulse_t> ToneSequence::generatePilotTone(int pulses) const {
 	std::vector<pulse_t> returned(pulses);
 	for (int i = 0; i < pulses; ++i)
 		returned[i] = generatePulse(pilotTonePulseLength());
 	return returned;
 }
 
-EightBit::co_generator_t<ToneSequence::pulse_t> ToneSequence::generate(const TAPBlock& block) {
+EightBit::co_generator_t<ToneSequence::pulse_t> ToneSequence::generate(const TAPBlock& block) const {
 
 	{
 		const auto pulses = generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());
