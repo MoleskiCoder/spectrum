@@ -78,7 +78,7 @@ public:
 
 	void recordSample(OutputT sample) {
 		for (int channel = 0; channel < channels(); ++channel)
-			m_audio.samples[channel].push_back(sample);
+			recordSample(channel, sample);
 	}
 
 	template<typename IteratorT>
