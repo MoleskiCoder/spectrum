@@ -6,7 +6,7 @@
 
 #include <Register.h>
 
-#include "Content.h"
+#include "LittleEndianContent.h"
 #include "TAPBlock.h"
 
 #include <co_generator_t.h>
@@ -20,7 +20,7 @@ private:
 	static const int ScreenLength = 0x1b00;
 
 	std::string m_path;
-	Content m_content;
+	LittleEndianContent m_content;
 	blocks_t m_blocks;
 	bool m_playing = false;
 

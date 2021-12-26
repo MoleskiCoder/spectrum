@@ -72,7 +72,7 @@ void TAPBlock::process() {
 
 TAPBlock::TAPBlock() {}
 
-TAPBlock::TAPBlock(const Content& content)
+TAPBlock::TAPBlock(const LittleEndianContent& content)
 : m_content(content) {}
 
 TAPBlock::TAPBlock(const TAPBlock& rhs)

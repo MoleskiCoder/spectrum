@@ -6,7 +6,7 @@
 #include <Rom.h>
 #include <Register.h>
 
-class Content final : public EightBit::Rom {
+class Content : public EightBit::Rom {
 private:
 	int m_position = -1;
 	bool m_locked = false;
@@ -37,7 +37,7 @@ public:
 	[[nodiscard]] std::vector<uint8_t> fetchBytes(int amount);
 	[[nodiscard]] uint8_t fetchByte();
 
-	[[nodiscard]] EightBit::register16_t readWord(int position) const;
+	[[nodiscard]] virtual EightBit::register16_t readWord(int position) const = 0;
 	[[nodiscard]] std::vector<EightBit::register16_t> readWords(int position, int amount) const;
 
 	[[nodiscard]] std::vector<EightBit::register16_t> fetchWords(int amount);

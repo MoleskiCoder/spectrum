@@ -6,7 +6,7 @@
 #include <Rom.h>
 #include <Register.h>
 
-#include "Content.h"
+#include "LittleEndianContent.h"
 #include "StandardToneSequence.h"
 
 class TAPBlock final {
@@ -19,7 +19,7 @@ private:
 	static const uint16_t ScreenAddress = 0x4000;
 	static const int ScreenLength = 0x1b00;
 
-	Content m_content;
+	LittleEndianContent m_content;
 
 	uint8_t m_flag = 128;	// Not a BlockFlag!
 
@@ -40,7 +40,7 @@ private:
 
 public:
 	TAPBlock();
-	TAPBlock(const Content& content);
+	TAPBlock(const LittleEndianContent& content);
 	TAPBlock(const TAPBlock& rhs);
 	TAPBlock& operator=(const TAPBlock& rhs);
 

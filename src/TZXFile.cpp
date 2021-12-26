@@ -47,7 +47,7 @@ TAPBlock TZXFile::readStandardSpeedDataBlock() {
 	auto bytes = content().fetchBytes(length.word);
 	std::cout << "TZX: (Remaining (bytes): " << std::dec << (int)content().remaining() << ")" << std::endl;
 
-	Content block;
+	LittleEndianContent block;
 	block.load(bytes);
 	block.resetPosition();
 

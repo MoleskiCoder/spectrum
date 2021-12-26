@@ -57,11 +57,6 @@ uint8_t Content::fetchByte() {
 	return bytes[0];
 }
 
-EightBit::register16_t Content::readWord(int position) const {
-	const auto bytes = readBytes(position, 2);
-	return { bytes[0], bytes[1] };	// Little endian: low, high
-}
-
 std::vector<EightBit::register16_t> Content::readWords(int position, int amount) const {
 	std::vector<EightBit::register16_t> returned(amount);
 	for (int i = 0; i < amount; ++i)

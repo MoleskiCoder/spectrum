@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 
-#include "Content.h"
+#include "LittleEndianContent.h"
 #include "Loader.h"
 
 namespace EightBit {
@@ -12,7 +12,7 @@ namespace EightBit {
 
 class SnapshotFile : public Loader {
 private:
-	Content m_content;
+	LittleEndianContent m_content;
 
 protected:
 	SnapshotFile(std::string path);
@@ -21,8 +21,8 @@ protected:
 	virtual void loadRegisters(EightBit::Z80& cpu) const = 0;
 	virtual void loadMemory(Board& board) const = 0;
 
-	[[nodiscard]] const Content& content() const { return m_content; }
-	[[nodiscard]] Content& content() { return m_content; }
+	[[nodiscard]] const LittleEndianContent& content() const { return m_content; }
+	[[nodiscard]] LittleEndianContent& content() { return m_content; }
 
 	void read();
 
