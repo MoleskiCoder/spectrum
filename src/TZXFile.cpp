@@ -48,7 +48,7 @@ TAPBlock TZXFile::readStandardSpeedDataBlock() {
 	std::cout << "TZX: (Remaining (bytes): " << std::dec << (int)content().remaining() << ")" << std::endl;
 
 	LittleEndianContent block;
-	block.load(bytes);
+	block.load(bytes.begin(), bytes.end());
 	block.resetPosition();
 
 	TAPBlock tap(block);

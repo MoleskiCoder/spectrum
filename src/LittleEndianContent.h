@@ -4,5 +4,5 @@
 
 class LittleEndianContent final : public Content {
 public:
-	[[nodiscard]] EightBit::register16_t readWord(int position) const final;
+	[[nodiscard]] EightBit::register16_t readWord(int position) final;
 };

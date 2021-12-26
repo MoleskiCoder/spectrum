@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include <iostream>
+//#include <iostream>
 
 #include "Content.h"
 
@@ -26,30 +26,21 @@ void Content::move(int amount) {
 	position() += amount;
 }
 
-uint8_t Content::readByte(int position) const {
-	if (position < 0)
-		throw std::runtime_error("Negative positions are not allowed");
-	return peek(position);
+uint8_t Content::readByte(int position) {
+	const auto bytes = readBytes(position, 1);
+	return bytes[0];
 }
 
-std::vector<uint8_t> Content::readBytes(int position, int amount) const {
-
-	if (amount <= 0)
-		throw std::runtime_error("Amount to be read must be greater than zero");
-	if ((position + amount) > size())
-		throw std::runtime_error("Not enough bytes in content remaining");
-
-	std::vector<uint8_t> returned(amount);
-	for (int i = 0; i < amount; ++i)
-		returned[i] = readByte(position + i);
-
-	return returned;
+std::span<uint8_t> Content::readBytes(int position, int amount) {
+	assert(position >= 0);
+	assert(amount > 0);
+	return std::span<uint8_t>(BYTES().data() + position, amount);
 }
 
-std::vector<uint8_t> Content::fetchBytes(int amount) {
-	const auto returned = readBytes(position(), amount);
+std::span<uint8_t> Content::fetchBytes(int amount) {
+	const auto bytes = readBytes(position(), amount);
 	move(amount);
-	return returned;
+	return bytes;
 }
 
 uint8_t Content::fetchByte() {
@@ -57,7 +48,7 @@ uint8_t Content::fetchByte() {
 	return bytes[0];
 }
 
-std::vector<EightBit::register16_t> Content::readWords(int position, int amount) const {
+std::vector<EightBit::register16_t> Content::readWords(int position, int amount) {
 	std::vector<EightBit::register16_t> returned(amount);
 	for (int i = 0; i < amount; ++i)
 		returned[i] = readWord(position + i * 2);

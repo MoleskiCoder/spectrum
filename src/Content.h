@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <span>
 
 #include <Rom.h>
 #include <Register.h>
@@ -21,7 +22,7 @@ public:
 	[[nodiscard]] auto remaining() const noexcept { return size() - position(); }
 	[[nodiscard]] auto finished() const noexcept { return remaining() <= 0; }
 
-	constexpr void resetPosition() noexcept { m_position = 0; }
+	constexpr void resetPosition() noexcept { position() = 0; }
 
 	[[nodiscard]] constexpr auto& locked() noexcept { return m_locked; }
 	[[nodiscard]] constexpr auto locked() const noexcept { return m_locked; }
@@ -31,14 +32,14 @@ public:
 
 	void move(int amount = 1);
 
-	[[nodiscard]] uint8_t readByte(int position) const;
-	[[nodiscard]] std::vector<uint8_t> readBytes(int position, int amount) const;
+	[[nodiscard]] uint8_t readByte(int position);
+	[[nodiscard]] std::span<uint8_t> readBytes(int position, int amount);
 
-	[[nodiscard]] std::vector<uint8_t> fetchBytes(int amount);
+	[[nodiscard]] std::span<uint8_t> fetchBytes(int amount);
 	[[nodiscard]] uint8_t fetchByte();
 
-	[[nodiscard]] virtual EightBit::register16_t readWord(int position) const = 0;
-	[[nodiscard]] std::vector<EightBit::register16_t> readWords(int position, int amount) const;
+	[[nodiscard]] virtual EightBit::register16_t readWord(int position) = 0;
+	[[nodiscard]] std::vector<EightBit::register16_t> readWords(int position, int amount);
 
 	[[nodiscard]] std::vector<EightBit::register16_t> fetchWords(int amount);
 	[[nodiscard]] EightBit::register16_t fetchWord();
