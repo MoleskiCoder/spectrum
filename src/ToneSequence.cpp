@@ -11,11 +11,11 @@ std::vector<ToneSequence::pulse_t> ToneSequence::generate(uint8_t byte) const {
 	return returned;
 }
 
-std::vector<ToneSequence::pulse_t> ToneSequence::generate(const EightBit::Rom& contents) const {
+std::vector<ToneSequence::pulse_t> ToneSequence::generate(const Content& content) const {
 	std::vector<pulse_t> returned;
-	returned.reserve(contents.size() * 8 ); // bytes * bits-per-byte
-	for (int i = 0; i < contents.size(); ++i) {
-		auto tones = generate(contents.peek(i));
+	returned.reserve(content.size() * 8 ); // bytes * bits-per-byte
+	for (int i = 0; i < content.size(); ++i) {
+		auto tones = generate(content.peek(i));
 		for (const auto& tone : tones)
 			returned.push_back(tone);
 	}
@@ -41,7 +41,7 @@ EightBit::co_generator_t<ToneSequence::pulse_t> ToneSequence::generate(const TAP
 	co_yield generatePulse(secondSyncTonePulseLength());
 
 	{
-		const auto pulses = generate(block.block());
+		const auto pulses = generate(block.content());
 		for (const auto& pulse : pulses)
 			co_yield pulse;
 	}

@@ -4,10 +4,9 @@
 #include <string>
 #include <vector>
 
-#include <Rom.h>
 #include <Register.h>
 
-#include "DataLoader.h"
+#include "Content.h"
 #include "TAPBlock.h"
 
 #include <co_generator_t.h>
@@ -21,14 +20,12 @@ private:
 	static const int ScreenLength = 0x1b00;
 
 	std::string m_path;
-	EightBit::Rom m_contents;
-	DataLoader m_loader;
+	Content m_content;
 	blocks_t m_blocks;
 	bool m_playing = false;
 
 	[[nodiscard]] auto path() const { return m_path; }
-	[[nodiscard]] constexpr auto& contents() noexcept { return m_contents; }
-	[[nodiscard]] constexpr auto& loader() noexcept { return m_loader; }
+	[[nodiscard]] constexpr auto& content() noexcept { return m_content; }
 
 	[[nodiscard]] constexpr auto& blocks() noexcept { return m_blocks; }
 

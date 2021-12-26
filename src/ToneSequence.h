@@ -8,11 +8,8 @@
 
 #include <co_generator_t.h>
 
-namespace EightBit {
-	class Rom;
-}
-
 class TAPBlock;
+class Content;
 
 class ToneSequence {
 public:
@@ -81,7 +78,7 @@ private:
 	}
 
 	[[nodiscard]] std::vector<pulse_t> generate(uint8_t byte) const;
-	[[nodiscard]] std::vector<pulse_t> generate(const EightBit::Rom& contents) const;
+	[[nodiscard]] std::vector<pulse_t> generate(const Content& content) const;
 
 	[[nodiscard]] std::vector<pulse_t> generatePilotTone(int pulses) const;
 

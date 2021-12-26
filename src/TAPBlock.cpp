@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "TAPBlock.h"
-#include "DataLoader.h"
+#include "Content.h"
 
 void TAPBlock::dumpHeaderInformation() const {
 
@@ -38,12 +38,12 @@ void TAPBlock::dumpHeaderInformation() const {
 
 void TAPBlock::processHeader() {
 
-	m_blockType = loader().fetchByte();
-	auto filename_data = loader().fetchBytes(10);
+	m_blockType = content().fetchByte();
+	auto filename_data = content().fetchBytes(10);
 	m_headerFilename = std::string((const char*)filename_data.data(), 10);
-	m_dataBlockLength = loader().fetchWord();
-	m_headerParameter1 = loader().fetchWord();
-	m_headerParameter2 = loader().fetchWord();
+	m_dataBlockLength = content().fetchWord();
+	m_headerParameter1 = content().fetchWord();
+	m_headerParameter2 = content().fetchWord();
 
 	dumpHeaderInformation();
 }
@@ -58,7 +58,7 @@ void TAPBlock::processData() {
 
 void TAPBlock::process() {
 
-	m_flag = loader().fetchByte();
+	m_flag = content().fetchByte();
 
 	if (isDataBlock())
 		processData();
@@ -67,18 +67,16 @@ void TAPBlock::process() {
 	else
 		throw std::out_of_range("Unexpected block flag");
 
-	loader().lock();
-	m_block = loader().contents();
+	content().lock();
 }
 
 TAPBlock::TAPBlock() {}
 
-TAPBlock::TAPBlock(const DataLoader& loader)
-: m_loader(loader) {}
+TAPBlock::TAPBlock(const Content& content)
+: m_content(content) {}
 
 TAPBlock::TAPBlock(const TAPBlock& rhs)
-: m_loader(rhs.m_loader),
-  m_block(rhs.m_block),
+: m_content(rhs.m_content),
   m_flag(rhs.m_flag),
   m_blockType(rhs.m_blockType),
   m_headerFilename(rhs.m_headerFilename),
@@ -88,8 +86,7 @@ TAPBlock::TAPBlock(const TAPBlock& rhs)
 
 TAPBlock& TAPBlock::operator=(const TAPBlock& rhs) {
 	if (this != &rhs) {
-		m_loader = rhs.m_loader;
-		m_block = rhs.m_block;
+		m_content = rhs.m_content;
 		m_flag = rhs.m_flag;
 		m_blockType = rhs.m_blockType;
 		m_headerFilename = rhs.m_headerFilename;

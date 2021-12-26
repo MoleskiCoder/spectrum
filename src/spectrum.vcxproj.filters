@@ -59,7 +59,7 @@
     <ClInclude Include="Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DataLoader.h">
+    <ClInclude Include="Content.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TAPBlock.h">
@@ -121,7 +121,7 @@
     <ClCompile Include="TZXFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DataLoader.cpp">
+    <ClCompile Include="Content.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TAPBlock.cpp">

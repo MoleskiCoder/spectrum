@@ -5,8 +5,7 @@
 #include <stdexcept>
 
 Z80File::Z80File(const std::string path)
-: SnapshotFile(path) {
-}
+: SnapshotFile(path) {}
 
 uint8_t Z80File::misc1() const {
 	const auto misc1 = peek(Offset_misc_1);
@@ -84,7 +83,7 @@ uint16_t Z80File::loadCompressedBlock(Board& board, uint16_t source) const {
 void Z80File::loadCompressedBlock(Board& board, uint16_t source, uint16_t destination, uint16_t length) const {
 	int previous = 0x100;
 	for (size_t i = source; i != length; ++i) {
-		const auto current = ROM().peek(i);
+		const auto current = peek(i);
 		if (current == 0xed && previous == 0xed) {
 			const uint8_t repeats = peek(++i);
 			const uint8_t value = peek(++i);
@@ -92,8 +91,7 @@ void Z80File::loadCompressedBlock(Board& board, uint16_t source, uint16_t destin
 			for (int j = 0; j < repeats; ++j)
 				board.poke(destination++, value);
 			previous = 0x100;
-		}
-		else {
+		} else {
 			board.poke(destination++, current);
 			previous = current;
 		}

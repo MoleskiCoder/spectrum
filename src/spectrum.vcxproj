@@ -165,7 +165,7 @@
     <ClInclude Include="ColourPalette.h" />
     <ClInclude Include="Computer.h" />
     <ClInclude Include="Configuration.h" />
-    <ClInclude Include="DataLoader.h" />
+    <ClInclude Include="Content.h" />
     <ClInclude Include="Expansion.h" />
     <ClInclude Include="Interface2Joystick.h" />
     <ClInclude Include="Joystick.h" />
@@ -186,7 +186,7 @@
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="ColourPalette.cpp" />
     <ClCompile Include="Computer.cpp" />
-    <ClCompile Include="DataLoader.cpp" />
+    <ClCompile Include="Content.cpp" />
     <ClCompile Include="Expansion.cpp" />
     <ClCompile Include="Interface2Joystick.cpp" />
     <ClCompile Include="Joystick.cpp" />

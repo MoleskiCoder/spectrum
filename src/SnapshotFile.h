@@ -3,8 +3,7 @@
 #include <cstdint>
 #include <string>
 
-#include <Rom.h>
-
+#include "Content.h"
 #include "Loader.h"
 
 namespace EightBit {
@@ -13,7 +12,7 @@ namespace EightBit {
 
 class SnapshotFile : public Loader {
 private:
-	EightBit::Rom m_rom;
+	Content m_content;
 
 protected:
 	SnapshotFile(std::string path);
@@ -22,15 +21,15 @@ protected:
 	virtual void loadRegisters(EightBit::Z80& cpu) const = 0;
 	virtual void loadMemory(Board& board) const = 0;
 
-	[[nodiscard]] const EightBit::Rom& ROM() const { return m_rom; }
-	[[nodiscard]] EightBit::Rom& ROM() { return m_rom; }
+	[[nodiscard]] const Content& content() const { return m_content; }
+	[[nodiscard]] Content& content() { return m_content; }
 
 	void read();
 
 	[[nodiscard]] uint8_t peek(uint16_t offset) const;
 	[[nodiscard]] uint16_t peekWord(uint16_t offset) const;
 
-	[[nodiscard]] auto size() const { return m_rom.size(); }
+	[[nodiscard]] auto size() const { return m_content.size(); }
 
 public:
 	void load(Board& board) override;
