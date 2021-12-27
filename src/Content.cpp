@@ -1,7 +1,4 @@
 #include "stdafx.h"
-
-//#include <iostream>
-
 #include "Content.h"
 
 Content::Content() {}
