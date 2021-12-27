@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <algorithm>
 #include <limits>
 #include <vector>
@@ -19,12 +20,11 @@ private:
 	static const T LowLevel = std::numeric_limits<T>::min();
 	static const T HighLevel = std::numeric_limits<T>::max();
 
-	WavWriter<T> m_wav = { "spectrum.wav", 1, AudioFrequency };
+	WavWriter<T, float> m_wav = { "spectrum.wav", 1, AudioFrequency, LowLevel, HighLevel, -.1f, .1f };
 
 	SDL_AudioSpec m_have;
 	SDL_AudioDeviceID m_device = 0;
 
-	const int m_clockRate;
 	const float m_sampleLength;
 
 	std::vector<T> m_buffer;
@@ -32,7 +32,6 @@ private:
 	int m_lastSample = 0;
 	T m_lastLevel = LowLevel;
 
-	[[nodiscard]] constexpr auto clockRate() const noexcept { return m_clockRate; }
 	[[nodiscard]] constexpr auto sampleLength() const noexcept { return m_sampleLength; }
 
 	[[nodiscard]] constexpr auto sample(int cycle) const noexcept {
@@ -49,8 +48,7 @@ private:
 
 public:
 	Buzzer(float frameRate, int clockRate, SDL_AudioFormat format)
-	: m_clockRate(clockRate),
-	  m_sampleLength(static_cast<float>(AudioFrequency) / static_cast<float>(clockRate)) {
+	: m_sampleLength(static_cast<float>(AudioFrequency) / static_cast<float>(clockRate)) {
 	
 		const auto samplesPerFrame = static_cast<float>(AudioFrequency) / frameRate + 1.0f;
 
@@ -90,8 +88,13 @@ public:
 	void stop() noexcept { ::SDL_PauseAudioDevice(m_device, SDL_TRUE); }
 	void start() noexcept {	::SDL_PauseAudioDevice(m_device, SDL_FALSE); }
 
-	auto maybeStartRecording() { return m_wav.maybeOpen(); }
-	auto maybeStopRecording() {	return m_wav.maybeClose(); }
+	auto maybeStartRecording() {
+		return m_wav.maybeStartRecording();
+	}
+
+	auto maybeStopRecording() {
+		return m_wav.maybeStopRecording();
+	}
 
 	constexpr void buzz(EightBit::Device::PinLevel state, int cycle) {
 		const T level = EightBit::Device::raised(state) ? HighLevel : LowLevel;
@@ -102,9 +105,7 @@ public:
 		std::fill(m_buffer.begin() + m_lastSample, m_buffer.end(), m_lastLevel);
 		const int returned = ::SDL_QueueAudio(m_device, m_buffer.data(), m_bufferLength);
 		Gaming::SDLWrapper::verifySDLCall(returned, "Unable to queue buzzer audio: ");
-		if (m_wav.started())
-			m_wav.write(m_buffer.begin(), m_buffer.end());
+		m_wav.maybeRecordSamples(m_buffer.begin(), m_buffer.end());
 		m_lastSample = 0;
 	}
 };
-

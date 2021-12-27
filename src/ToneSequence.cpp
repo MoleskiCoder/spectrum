@@ -1,73 +1,50 @@
 #include "stdafx.h"
 #include "ToneSequence.h"
-#include "Ula.h"
+#include "TAPBlock.h"
 
-// ----____ is one full period
-// a half period(whether high or low) is a pulse
-void ToneSequence::generatePulse(EightBit::Device::PinLevel level, int length) {
-	m_states.push_back({ level, length });
-}
-
-void ToneSequence::generatePulse(int length) {
-	// Doesn't matter what the value is, as long as it's flipped
-	EightBit::Device::flip(m_last);
-	generatePulse(m_last, length);
-}
-
-void ToneSequence::generatePause(int length) {
-	generatePulse(EightBit::Device::PinLevel::Low, length);
-}
-
-void ToneSequence::generatePause() {
-	generatePause(pauseTime());
-}
-
-void ToneSequence::generate(bool bit) {
-	generatePulse(bit ? oneBitTonePulseLength() : zeroBitTonePulseLength());
-}
-
-void ToneSequence::generate(uint8_t byte) {
+std::vector<ToneSequence::pulse_t> ToneSequence::generate(uint8_t byte) const {
+	std::vector<pulse_t> returned;
+	returned.reserve(8);
 	const std::bitset<8> bits(byte);
 	for (int i = 7; i >= 0; --i)
-		generate(bits[i]);
+		returned.push_back(generate(bits[i]));
+	return returned;
 }
 
-void ToneSequence::generate(const EightBit::Rom& contents) {
-	const auto size = contents.size();
-	for (int i = 0; i < size; ++i)
-		generate(contents.peek(i));
-}
-
-void ToneSequence::generatePilotTone(int pulses) {
-	for (int i = 0; i < pulses; ++i)
-		generatePulse(pilotTonePulseLength());
-}
-
-void ToneSequence::generate(const TAPBlock& block) {
-	generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());
-	generatePulse(firstSyncTonePulseLength());
-	generatePulse(secondSyncTonePulseLength());
-	generate(block.block());
-	generatePause();
-}
-
-void ToneSequence::generate(const std::vector<TAPBlock>& blocks) {
-	reset();
-	for (const auto& block : blocks)
-		generate(block);
-}
-
-void ToneSequence::reset() {
-	m_states.clear();
-}
-
-EightBit::co_generator_t<EightBit::Device::PinLevel> ToneSequence::expand() {
-	if (!playing())
-		throw std::logic_error("Cannot expand tones, if tape is not playing.");
-	const auto& compressed = states();
-	for (const auto& rle : compressed) {
-		const auto& [level, length] = rle;
-		for (int i = 0; i < length; ++i)
-			co_yield level;
+std::vector<ToneSequence::pulse_t> ToneSequence::generate(const Content& content) const {
+	std::vector<pulse_t> returned;
+	returned.reserve(content.size() * 8 ); // bytes * bits-per-byte
+	for (int i = 0; i < content.size(); ++i) {
+		auto tones = generate(content.peek(i));
+		for (const auto& tone : tones)
+			returned.push_back(tone);
 	}
+	return returned;
+}
+
+std::vector<ToneSequence::pulse_t> ToneSequence::generatePilotTone(int pulses) const {
+	std::vector<pulse_t> returned(pulses);
+	for (int i = 0; i < pulses; ++i)
+		returned[i] = generatePulse(pilotTonePulseLength());
+	return returned;
+}
+
+EightBit::co_generator_t<ToneSequence::pulse_t> ToneSequence::generate(const TAPBlock& block) const {
+
+	{
+		const auto pulses = generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());
+		for (const auto& pulse : pulses)
+			co_yield pulse;
+	}
+
+	co_yield generatePulse(firstSyncTonePulseLength());
+	co_yield generatePulse(secondSyncTonePulseLength());
+
+	{
+		const auto pulses = generate(block.content());
+		for (const auto& pulse : pulses)
+			co_yield pulse;
+	}
+
+	co_yield generatePause();
 }

@@ -67,6 +67,10 @@ void Board::playTape() {
 	ULA().playTape();
 }
 
+void Board::stopTape() {
+	ULA().stopTape();
+}
+
 void Board::raisePOWER() {
 	EightBit::Bus::raisePOWER();
 	for (auto& expansion : m_expansions)

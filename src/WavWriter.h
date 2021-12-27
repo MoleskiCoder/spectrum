@@ -1,125 +1,100 @@
 #pragma once
 
-// lifted from https://github.com/philippegorley/wavfile
-// wavfile was GPLv3
-// TODO sort out spectrum project licensing!!
+#include <string>
 
-#include <fstream>
-#include <locale>
-#include <stdexcept>
-#include <type_traits>
+#include "AudioFile.h"
 
-template<typename SampleFormat>
+// Simple multi-channel, single amplitude level wrapper to the "AudioFile" class.
+template<typename InputT, typename OutputT>
 class WavWriter final {
 private:
-    std::ofstream m_os;
-    size_t m_fact_position = 0;
-    size_t m_data_position = 0;
+	AudioFile<OutputT> m_audio;
 
-    const std::string m_filename;
-    const int m_channels = 0;
-    const int m_sampling_rate = 0;
+	const std::string m_path;
+	const int m_channels;
+	const int m_samples;
 
-    bool m_started = false;
+	const InputT m_lowLevelInput;
+	const InputT m_highLevelInput;
+	const OutputT m_lowLevelOutput;
+	const OutputT m_highLevelOutput;
 
-    [[nodiscard]] constexpr const auto& filename() const noexcept { return m_filename; }
-    [[nodiscard]] constexpr const auto& channels() const noexcept { return m_channels; }
-    [[nodiscard]] constexpr const auto& sampling_rate() const noexcept { return m_sampling_rate; }
-
-    [[nodiscard]] constexpr const auto& os() const noexcept { return m_os; }
-    [[nodiscard]] constexpr auto& os() noexcept { return m_os; }
-
-    void writeHeader() {
-        
-        os() << "RIFF----WAVEfmt ";
-
-        if (std::is_integral<SampleFormat>::value) {
-            write<int32_t>(16);
-            write<int16_t>(1);
-        } else if (std::is_floating_point<SampleFormat>::value) {
-            write<int32_t>(18);
-            write<int16_t>(3);
-        }
-
-        write<int16_t>(channels());
-        write<int32_t>(sampling_rate());
-        write<int32_t>(sampling_rate() * sizeof(SampleFormat) * channels());
-        write<int16_t>(sizeof(SampleFormat) * channels());
-        write<int16_t>(8 * sizeof(SampleFormat));
-
-        if (std::is_floating_point<SampleFormat>::value) {
-            write<int16_t>(0);
-            os() << "fact";
-            write<int32_t>(4);
-            m_fact_position = os().tellp();
-            os() << "----"; // fact holder
-        }
-
-        os() << "data";
-        m_data_position = os().tellp();
-        os() << "----"; // data holder
-    }
-
-    void writeTrailer() {
-        const int64_t length = os().tellp();
-        os().seekp(m_data_position);
-        write<int32_t>(length - m_data_position + 4); // bytes_per_sample * channels * nb_samples
-        os().seekp(4);
-        write<int32_t>(length - 8);
-        if (m_fact_position > 0) {
-            os().seekp(m_fact_position);
-            write<int32_t>((length - m_data_position + 4) / sizeof(SampleFormat)); // channels * nb_samples
-        }
-    }
+	bool m_recording = false;
 
 public:
-    WavWriter(std::string filename, int channels, int sampling_rate)
-    : m_filename(filename),
-      m_channels(channels),
-      m_sampling_rate(sampling_rate) {
-        static_assert(std::is_arithmetic<SampleFormat>::value, "Sample type must be integral or floating point");
-    }
+	WavWriter(
+		std::string path,
+		int channels, int samples,
+		InputT lowLevelInput, InputT highLevelInput,
+		OutputT lowLevelOutput, OutputT highLevelOutput)
+		: m_path(path),
+		  m_channels(channels), m_samples(samples),
+		  m_lowLevelInput(lowLevelInput), m_highLevelInput(highLevelInput),
+		  m_lowLevelOutput(lowLevelOutput), m_highLevelOutput(highLevelOutput)
+	{}
 
-    [[nodiscard]] constexpr auto started() const noexcept { return m_started; }
-    [[nodiscard]] constexpr auto& started() noexcept { return m_started; }
+	[[nodiscard]] constexpr auto recording() const noexcept { return m_recording; }
+	[[nodiscard]] constexpr const auto& path() const noexcept { return m_path; }
+	[[nodiscard]] constexpr auto channels() const noexcept { return m_channels; }
+	[[nodiscard]] constexpr auto samples() const noexcept { return m_samples; }
 
-    auto maybeOpen() {
-        auto opening = !started();
-        if (opening)
-            open();
-        return opening;
-    }
+	[[nodiscard]] constexpr auto lowLevelInput() const noexcept { return m_lowLevelInput; }
+	[[nodiscard]] constexpr auto highLevelInput() const noexcept { return m_highLevelInput; }
+	[[nodiscard]] constexpr auto lowLevelOutput() const noexcept { return m_lowLevelOutput; }
+	[[nodiscard]] constexpr auto highLevelOutput() const noexcept { return m_highLevelOutput; }
 
-    auto maybeClose() {
-        auto closing = started();
-        if (closing)
-            close();
-        return closing;
-    }
+	void startRecording() {
+		assert(!recording());
+		m_audio.samples.clear();
+		m_audio.setNumChannels(channels());
+		m_audio.setNumSamplesPerChannel(samples());
+		m_recording = true;
+	}
 
-    void open() {
-        os() = std::ofstream(filename(), std::ios_base::out | std::ios_base::binary);
-        os().imbue(std::locale::classic());
-        writeHeader();
-        started() = true;
-    }
+	void stopRecording() {
+		assert(recording());
+		m_audio.save(path(), AudioFileFormat::Wave);
+		m_audio.samples.clear();
+		m_recording = false;
+	}
 
-    void close() {
-        writeTrailer();
-        started() = false;
-    }
+	auto maybeStartRecording() {
+		const auto starting = !recording();
+		if (starting)
+			startRecording();
+		return starting;
+	}
 
-    template<typename Word>
-    void write(Word datum) {
-        auto p = reinterpret_cast<const uint8_t*>(&datum);
-        auto size = sizeof(Word);
-        for (int i = 0; size != 0; --size, ++i)
-            os().put(p[i]);
-    }
+	auto maybeStopRecording() {
+		const auto stopping = recording();
+		if (stopping)
+			stopRecording();
+		return stopping;
+	}
 
-    template <typename Iter>
-    void write(Iter it, Iter end) {
-        for (; it != end; ++it)
-            write(*it);
-    }
+	void recordSample(int channel, OutputT sample) {
+		m_audio.samples[channel].push_back(sample);
+	}
+
+	void recordSample(OutputT sample) {
+		for (int channel = 0; channel < channels(); ++channel)
+			recordSample(channel, sample);
+	}
+
+	template<typename IteratorT>
+	void recordSamples(IteratorT begin, IteratorT end) {
+		for (auto sample = begin; sample != end; ++sample) {
+			const auto low = *sample == lowLevelInput();
+			const auto high = *sample == highLevelInput();
+			assert(low || high);
+			recordSample(low ? lowLevelOutput() : highLevelOutput());
+		}
+	}
+
+	template<typename IteratorT>
+	auto maybeRecordSamples(IteratorT begin, IteratorT end) {
+		if (recording())
+			recordSamples(begin, end);
+		return recording();
+	}
 };

@@ -6,7 +6,8 @@
 #include <Rom.h>
 #include <Register.h>
 
-#include "DataLoader.h"
+#include "LittleEndianContent.h"
+#include "StandardToneSequence.h"
 
 class TAPBlock final {
 public:
@@ -18,8 +19,7 @@ private:
 	static const uint16_t ScreenAddress = 0x4000;
 	static const int ScreenLength = 0x1b00;
 
-	DataLoader m_loader;
-	EightBit::Rom m_block;	// Taken from loader
+	LittleEndianContent m_content;
 
 	uint8_t m_flag = 128;	// Not a BlockFlag!
 
@@ -30,8 +30,7 @@ private:
 	EightBit::register16_t m_headerParameter1 = 0xffff;
 	EightBit::register16_t m_headerParameter2 = 0xffff;
 
-	[[nodiscard]] constexpr const auto& loader() const noexcept { return m_loader; }
-	[[nodiscard]] constexpr auto& loader() noexcept { return m_loader; }
+	[[nodiscard]] constexpr auto& content() noexcept { return m_content; }
 
 	void dumpHeaderInformation() const;
 	void processHeader();
@@ -41,11 +40,11 @@ private:
 
 public:
 	TAPBlock();
-	TAPBlock(const DataLoader& loader);
+	TAPBlock(const LittleEndianContent& content);
 	TAPBlock(const TAPBlock& rhs);
 	TAPBlock& operator=(const TAPBlock& rhs);
 
-	[[nodiscard]] auto block() const { return m_block;  }
+	[[nodiscard]] constexpr const auto& content() const noexcept { return m_content; }
 
 	// Block interpretation
 
@@ -86,4 +85,6 @@ public:
 	}
 
 	void process();
+
+	[[nodiscard]] auto generate() const { return StandardToneSequence().generate(*this); }
 };

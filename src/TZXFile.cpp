@@ -6,12 +6,11 @@
 #include "TZXFile.h"
 #include "Board.h"
 
-TZXFile::TZXFile(std::string path)
-: m_path(path) {}
+TZXFile::TZXFile() {}
 
 void TZXFile::readHeader() {
 
-	const auto header = loader().fetchBytes(10);
+	const auto header = content().fetchBytes(10);
 	const std::string signature((const char*)header.data(), 7);
 	const auto eof = header[7];
 	const auto tzx_major = header[8];
@@ -28,7 +27,7 @@ void TZXFile::readHeader() {
 
 TAPBlock TZXFile::readBlock() {
 
-	const auto id = loader().fetchByte();
+	const auto id = content().fetchByte();
 	std::cout << "** Block ID: " << std::hex << (int)id << std::endl;
 
 	switch (id) {
@@ -41,35 +40,42 @@ TAPBlock TZXFile::readBlock() {
 
 TAPBlock TZXFile::readStandardSpeedDataBlock() {
 
-	const auto pause = loader().fetchWord();
+	const auto pause = content().fetchWord();
 	std::cout << "TZX: Pause (ms): " << std::dec << pause.word << std::endl;
-	const auto length = loader().fetchWord();
+	const auto length = content().fetchWord();
 	std::cout << "TZX: Length (bytes): " << std::dec << length.word << std::endl;
-	auto bytes = loader().fetchBytes(length.word);
-	std::cout << "TZX: (Remaining (bytes): " << std::dec << (int)loader().remaining() << ")" << std::endl;
+	auto bytes = content().fetchBytes(length.word);
+	std::cout << "TZX: (Remaining (bytes): " << std::dec << (int)content().remaining() << ")" << std::endl;
 
-	EightBit::Rom tap_data;
-	tap_data.load(bytes);
+	LittleEndianContent block;
+	block.load(bytes);
+	block.resetPosition();
 
-	DataLoader tap_loader(tap_data);
-	tap_loader.resetPosition();
-
-	TAPBlock tap(tap_loader);
+	TAPBlock tap(block);
 	tap.process();
 
 	return tap;
 }
 
-std::vector<TAPBlock> TZXFile::load() {
+void TZXFile::load(std::string path) {
 
-	contents().load(path());
-	loader() = DataLoader(contents());
-	loader().resetPosition();
+	content().load(path);
+	content().resetPosition();
 
 	readHeader();
 
-	std::vector<TAPBlock> data;
-	while (!loader().finished())
-		data.push_back(readBlock());
-	return data;
+	blocks().clear();
+	while (!content().finished())
+		blocks().push_back(readBlock());
+}
+
+EightBit::co_generator_t<ToneSequence::amplitude_t> TZXFile::generate() const {
+	for (const auto& block : blocks()) {
+		auto generator = block.generate();
+		while (generator) {
+			const auto [ level, length ] = generator();
+			for (int i = 0; i < length; ++i)
+				co_yield level;
+		}
+	}
 }

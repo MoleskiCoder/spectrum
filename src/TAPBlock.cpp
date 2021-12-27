@@ -2,10 +2,9 @@
 
 #include <cassert>
 #include <iostream>
-//#include <bitset>
 
 #include "TAPBlock.h"
-#include "DataLoader.h"
+#include "Content.h"
 
 void TAPBlock::dumpHeaderInformation() const {
 
@@ -37,28 +36,14 @@ void TAPBlock::dumpHeaderInformation() const {
 	std::cout << "TAP: Length of data block: " << std::dec << (int)dataBlockLength() << std::endl;
 }
 
-//boost::dynamic_bitset<> TAPFile::emit() const {
-//	const auto& contents = loader().contents();
-//	const auto size = contents.size();
-//	boost::dynamic_bitset<> returned(size * 8);
-//	for (int i = 0; i < size; ++i) {
-//		const auto byte = contents.peek(i);
-//		const std::bitset<8> bits(byte);
-//		for (int j = 0; j < 8; ++j) {
-//			returned.set(i * j, bits.test(j));
-//		}
-//	}
-//	return returned;
-//}
-
 void TAPBlock::processHeader() {
 
-	m_blockType = loader().fetchByte();
-	auto filename_data = loader().fetchBytes(10);
+	m_blockType = content().fetchByte();
+	auto filename_data = content().fetchBytes(10);
 	m_headerFilename = std::string((const char*)filename_data.data(), 10);
-	m_dataBlockLength = loader().fetchWord();
-	m_headerParameter1 = loader().fetchWord();
-	m_headerParameter2 = loader().fetchWord();
+	m_dataBlockLength = content().fetchWord();
+	m_headerParameter1 = content().fetchWord();
+	m_headerParameter2 = content().fetchWord();
 
 	dumpHeaderInformation();
 }
@@ -73,7 +58,7 @@ void TAPBlock::processData() {
 
 void TAPBlock::process() {
 
-	m_flag = loader().fetchByte();
+	m_flag = content().fetchByte();
 
 	if (isDataBlock())
 		processData();
@@ -82,18 +67,16 @@ void TAPBlock::process() {
 	else
 		throw std::out_of_range("Unexpected block flag");
 
-	loader().lock();
-	m_block = loader().contents();
+	content().lock();
 }
 
 TAPBlock::TAPBlock() {}
 
-TAPBlock::TAPBlock(const DataLoader& loader)
-: m_loader(loader) {}
+TAPBlock::TAPBlock(const LittleEndianContent& content)
+: m_content(content) {}
 
 TAPBlock::TAPBlock(const TAPBlock& rhs)
-: m_loader(rhs.m_loader),
-  m_block(rhs.m_block),
+: m_content(rhs.m_content),
   m_flag(rhs.m_flag),
   m_blockType(rhs.m_blockType),
   m_headerFilename(rhs.m_headerFilename),
@@ -103,8 +86,7 @@ TAPBlock::TAPBlock(const TAPBlock& rhs)
 
 TAPBlock& TAPBlock::operator=(const TAPBlock& rhs) {
 	if (this != &rhs) {
-		m_loader = rhs.m_loader;
-		m_block = rhs.m_block;
+		m_content = rhs.m_content;
 		m_flag = rhs.m_flag;
 		m_blockType = rhs.m_blockType;
 		m_headerFilename = rhs.m_headerFilename;

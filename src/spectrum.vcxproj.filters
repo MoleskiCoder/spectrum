@@ -59,7 +59,7 @@
     <ClInclude Include="Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DataLoader.h">
+    <ClInclude Include="Content.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TAPBlock.h">
@@ -71,7 +71,13 @@
     <ClInclude Include="StandardToneSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AudioFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="WavWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LittleEndianContent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,9 +98,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ColourPalette.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Buzzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SnaFile.cpp">
@@ -121,7 +124,7 @@
     <ClCompile Include="TZXFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DataLoader.cpp">
+    <ClCompile Include="Content.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TAPBlock.cpp">
@@ -131,6 +134,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StandardToneSequence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LittleEndianContent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,23 +6,19 @@
 #include <Rom.h>
 #include <Register.h>
 
-class DataLoader final {
+class Content : public EightBit::Rom {
 private:
-	EightBit::Rom m_contents;
 	int m_position = -1;
 	bool m_locked = false;
 
 public:
-	DataLoader();
-	DataLoader(const EightBit::Rom& rom);
-	DataLoader(const DataLoader& rhs);
-	DataLoader& operator=(const DataLoader& rhs);
-
-	[[nodiscard]] constexpr const auto& contents() const noexcept { return m_contents; }
+	Content();
+	Content(const Content& rhs);
+	Content& operator=(const Content& rhs);
 
 	[[nodiscard]] constexpr auto& position() noexcept { return m_position; }
 	[[nodiscard]] constexpr auto position() const noexcept { return m_position; }
-	[[nodiscard]] auto remaining() const noexcept { return contents().size() - position(); }
+	[[nodiscard]] auto remaining() const noexcept { return size() - position(); }
 	[[nodiscard]] auto finished() const noexcept { return remaining() <= 0; }
 
 	constexpr void resetPosition() noexcept { m_position = 0; }
@@ -41,7 +37,7 @@ public:
 	[[nodiscard]] std::vector<uint8_t> fetchBytes(int amount);
 	[[nodiscard]] uint8_t fetchByte();
 
-	[[nodiscard]] EightBit::register16_t readWord(int position) const;
+	[[nodiscard]] virtual EightBit::register16_t readWord(int position) const = 0;
 	[[nodiscard]] std::vector<EightBit::register16_t> readWords(int position, int amount) const;
 
 	[[nodiscard]] std::vector<EightBit::register16_t> fetchWords(int amount);

@@ -6,11 +6,10 @@
 #include <Register.h>
 
 SnapshotFile::SnapshotFile(const std::string path)
-: Loader(path) {
-}
+: Loader(path) {}
 
 uint8_t SnapshotFile::peek(uint16_t offset) const {
-	return m_rom.peek(offset);
+	return content().peek(offset);
 }
 
 // Assumed to be little-endian!
@@ -21,7 +20,7 @@ uint16_t SnapshotFile::peekWord(uint16_t offset) const {
 }
 
 void SnapshotFile::read() {
-	m_rom.load(path());
+	content().load(path());
 }
 
 void SnapshotFile::load(Board& board) {
