@@ -16,6 +16,7 @@ public:
 	Content();
 	Content(const Content& rhs);
 	Content& operator=(const Content& rhs);
+	bool operator==(const Content& rhs) const;
 
 	[[nodiscard]] constexpr auto& position() noexcept { return m_position; }
 	[[nodiscard]] constexpr auto position() const noexcept { return m_position; }

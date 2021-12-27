@@ -17,6 +17,13 @@ Content& Content::operator=(const Content& rhs) {
 	return *this;
 }
 
+bool Content::operator==(const Content& rhs) const {
+	return
+		Rom::operator==(rhs)
+		&& locked() == rhs.locked()
+		&& position() == rhs.position();
+}
+
 void Content::move(int amount) {
 	if (locked())
 		throw new std::logic_error("Content has been locked");
