@@ -12,7 +12,6 @@ class Board;
 
 class Z80File final : public SnapshotFile {
 private:
-	const static size_t RamSize = (32 + 16) * 1024;
 	const static int Impossible = 0x100; // impossible value for a byte
 
 	int m_version = 0;	// Illegal, by default!

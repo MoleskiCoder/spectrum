@@ -14,8 +14,6 @@ namespace EightBit {
 
 class SnaFile final : public SnapshotFile {
 private:
-	const static size_t RamSize = (32 + 16) * 1024;
-
 	uint8_t m_border = 0xff;
 
 	[[nodiscard]] constexpr auto border() const noexcept { return m_border; }
