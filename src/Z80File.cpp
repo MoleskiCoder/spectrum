@@ -7,134 +7,103 @@
 Z80File::Z80File(const std::string path)
 : SnapshotFile(path) {}
 
-uint8_t Z80File::misc1() const {
-	const auto misc1 = peek(Offset_misc_1);
-	return misc1 == 0xff ? 1 : misc1;
-}
+void Z80File::loadRegisters(EightBit::Z80& cpu) {
 
-void Z80File::examineHeaders() {
-	switch (peekWord(Offset_PC)) {
-	case 0:
-		m_version = 2;
-		break;
-	default:
-		m_version = 1;
-		break;
-	}
-}
-
-void Z80File::loadRegisters(EightBit::Z80& cpu) const {
+	resetPosition();
 
 	cpu.raiseRESET();
 
-	cpu.A() = peek(Offset_A);
-	cpu.F() = peek(Offset_F);
+	// V1
 
-	cpu.BC().word = peekWord(Offset_BC);
-	cpu.HL().word = peekWord(Offset_HL);
-	cpu.PC().word = m_version == 1 ? peekWord(Offset_PC) : peekWord(Offset_additional_PC);
-	cpu.SP().word = peekWord(Offset_SP);
+	cpu.A() = fetchByte();
+	cpu.F() = fetchByte();
 
-	cpu.IV() = peek(Offset_I);
+	cpu.BC() = fetchWord();
+	cpu.HL() = fetchWord();
+	cpu.PC() = fetchWord();
+	m_version = cpu.PC() == 0 ? 2 : 1;
 
-	cpu.REFRESH().variable = peek(Offset_R);
+	cpu.SP() = fetchWord();
 
-	cpu.REFRESH().high = misc1() & EightBit::Chip::Mask1;
+	cpu.IV() = fetchByte();
 
-	cpu.DE().word = peekWord(Offset_DE);
+	cpu.REFRESH().variable = fetchByte();
+	m_misc1 = fetchByte();
+	m_misc1 = m_misc1 == 0xff ? 1 : m_misc1;
+	cpu.REFRESH().high = refresh_high();
+
+	cpu.DE() = fetchWord();
 
 	cpu.exx();
 
-	cpu.BC().word = peekWord(Offset_BC_);
-	cpu.DE().word = peekWord(Offset_DE_);
-	cpu.HL().word = peekWord(Offset_HL_);
+	cpu.BC() = fetchWord();
+	cpu.DE() = fetchWord();
+	cpu.HL() = fetchWord();
 
 	cpu.exxAF();
 
-	cpu.A() = peek(Offset_A_);
-	cpu.F() = peek(Offset_F_);
+	cpu.A() = fetchByte();
+	cpu.F() = fetchByte();
 
-	cpu.IY().word = peekWord(Offset_IY);
-	cpu.IX().word = peekWord(Offset_IX);
+	cpu.IY() = fetchWord();
+	cpu.IX() = fetchWord();
 
-	cpu.IFF1() = peek(Offset_IFF1);
-	cpu.IFF2() = peek(Offset_IFF2);
+	cpu.IFF1() = fetchByte();
+	cpu.IFF2() = fetchByte();
 
-	const auto misc2 = peek(Offset_misc_2);
-	cpu.IM() = misc2 & EightBit::Chip::Mask2;
+	m_misc2 = fetchByte();
+	cpu.IM() = im();
 
 	cpu.exx();
 	cpu.exxAF();
+
+	assert(version() >= 1);
+	assert(version() == 1);
 }
 
-void Z80File::loadMemoryCompressedV1(Board& board, size_t offset) const {
-	const size_t position = board.ROM().size();
-	const auto fileSize = size() - 4;
-	loadCompressedBlock(board, offset, position, fileSize);
-}
-
-uint16_t Z80File::loadCompressedBlock(Board& board, uint16_t source) const {
-	const auto length = peekWord(source);
-	const auto block = peek(source + 2);
-	loadCompressedBlock(board, source + 3, block * 0x4000, length);
-	return length;
-}
-
-void Z80File::loadCompressedBlock(Board& board, uint16_t source, uint16_t destination, uint16_t length) const {
-	int previous = 0x100;
-	for (size_t i = source; i != length; ++i) {
-		const auto current = peek(i);
-		if (current == 0xed && previous == 0xed) {
-			const uint8_t repeats = peek(++i);
-			const uint8_t value = peek(++i);
-			--destination;
+void Z80File::loadMemoryCompressedV1(Board& board) {
+	reset_window();
+	auto destination = board.ROM().size();
+	while (true) {
+		const auto current = fetchByteWindowed();
+		if (compressed_window()) {
+			const uint8_t repeats = fetchByteWindowed();
+			if (finished_window()) break;
+			const uint8_t value = fetchByteWindowed();
+			--destination;	// Overwrite the initial ED of the compressed marker
 			for (int j = 0; j < repeats; ++j)
 				board.poke(destination++, value);
-			previous = 0x100;
 		} else {
 			board.poke(destination++, current);
-			previous = current;
 		}
 	}
 }
 
-void Z80File::loadMemoryUncompressed(Board& board, size_t offset) const {
-	for (int i = 0; i < RamSize; ++i)
-		board.poke(board.ROM().size() + i, peek(offset + i));
+void Z80File::loadMemoryUncompressed(Board& board) {
+	auto destination = board.ROM().size();
+	while (!finished())
+		board.poke(destination++, fetchByte());
 }
 
-void Z80File::loadMemoryV1(Board& board) const {
-	const bool compressed = (misc1() & EightBit::Chip::Bit5) != 0;
-	if (compressed)
-		loadMemoryCompressedV1(board, HeaderSizeV1);
+void Z80File::loadMemoryV1(Board& board) {
+	if (compressed())
+		loadMemoryCompressedV1(board);
 	else
-		loadMemoryUncompressed(board, HeaderSizeV1);
+		loadMemoryUncompressed(board);
 }
 
-void Z80File::loadMemoryV2(Board& board) const {
-	const auto extra = peekWord(Offset_additional_header_block_length) + 2;
-	auto position = HeaderSizeV1 + extra + 2;
-	while (position < size()) {
-		const auto size = loadCompressedBlock(board, position);
-		position += size;
-	}
-}
-
-void Z80File::loadMemory(Board& board) const {
-	switch (m_version) {
+void Z80File::loadMemory(Board& board) {
+	switch (version()) {
 	case 1:
 		loadMemoryV1(board);
 		break;
-	case 2:
-		loadMemoryV2(board);
-		break;
 	default:
-		throw std::runtime_error("Only V1 or V2 Z80 files are handled.");
+		throw std::runtime_error("Only V1 Z80 files are handled.");
 		break;
 	}
 }
 
 void Z80File::load(Board& board) {
 	SnapshotFile::load(board);
-	board.ULA().setBorder((misc1() >> 1) & EightBit::Chip::Mask3);
+	board.ULA().setBorder(border());
 }

@@ -6,32 +6,23 @@
 
 class Board;
 
+namespace EightBit {
+	class Z80;
+}
+
+// https://worldofspectrum.org/faq/reference/formats.htm#File
+
 class SnaFile final : public SnapshotFile {
 private:
-	const static size_t Offset_I = 0x0;
-	const static size_t Offset_HL_ = 0x1;
-	const static size_t Offset_DE_ = 0x3;
-	const static size_t Offset_BC_ = 0x5;
-	const static size_t Offset_AF_ = 0x7;
-	const static size_t Offset_HL = 0x9;
-	const static size_t Offset_DE = 0xb;
-	const static size_t Offset_BC = 0xd;
-	const static size_t Offset_IY = 0xf;
-	const static size_t Offset_IX = 0x11;
-	const static size_t Offset_IFF2 = 0x13;
-	const static size_t Offset_R = 0x14;
-	const static size_t Offset_AF = 0x15;
-	const static size_t Offset_SP = 0x17;
-	const static size_t Offset_IM = 0x19;
-	const static size_t Offset_BorderColour = 0x1a;
-
-	const static size_t HeaderSize = Offset_BorderColour + 1;
-
 	const static size_t RamSize = (32 + 16) * 1024;
 
+	uint8_t m_border = 0xff;
+
+	[[nodiscard]] constexpr auto border() const noexcept { return m_border; }
+
 protected:
-	void loadRegisters(EightBit::Z80& cpu) const final;
-	void loadMemory(Board& board) const final;
+	void loadRegisters(EightBit::Z80& cpu) final;
+	void loadMemory(Board& board) final;
 
 public:
 	SnaFile(std::string path);

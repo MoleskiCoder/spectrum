@@ -6,21 +6,10 @@
 #include <Register.h>
 
 SnapshotFile::SnapshotFile(const std::string path)
-: Loader(path) {}
-
-uint8_t SnapshotFile::peek(uint16_t offset) const {
-	return content().peek(offset);
-}
-
-// Assumed to be little-endian!
-uint16_t SnapshotFile::peekWord(uint16_t offset) const {
-	const auto low = peek(offset++);
-	const auto high = peek(offset);
-	return EightBit::register16_t(low, high).word;
-}
+: m_path(path) {}
 
 void SnapshotFile::read() {
-	content().load(path());
+	LittleEndianContent::load(path());
 }
 
 void SnapshotFile::load(Board& board) {
@@ -33,11 +22,6 @@ void SnapshotFile::load(Board& board) {
 	if (!board.CPU().powered())
 		throw std::runtime_error("Whoops: CPU has not been powered on.");
 
-	examineHeaders();
 	loadRegisters(board.CPU());
 	loadMemory(board);
-}
-
-void SnapshotFile::examineHeaders() {
-
 }

@@ -3,49 +3,55 @@
 #include "Board.h"
 
 SnaFile::SnaFile(const std::string path)
-: SnapshotFile(path) {
-}
+: SnapshotFile(path) {}
 
-void SnaFile::loadRegisters(EightBit::Z80& cpu) const {
+void SnaFile::loadRegisters(EightBit::Z80& cpu) {
+
+	resetPosition();
 
 	cpu.raiseRESET();
 
-	cpu.IV() = peek(Offset_I);
+	cpu.IV() = fetchByte();
 
-	cpu.HL().word = peekWord(Offset_HL_);
-	cpu.DE().word = peekWord(Offset_DE_);
-	cpu.BC().word = peekWord(Offset_BC_);
-	cpu.AF().word = peekWord(Offset_AF_);
+	// Alternate set first
+	cpu.HL() = fetchWord();
+	cpu.DE() = fetchWord();
+	cpu.BC() = fetchWord();
+	cpu.AF() = fetchWord();
 
 	cpu.exx();
 
-	cpu.HL().word = peekWord(Offset_HL);
-	cpu.DE().word = peekWord(Offset_DE);
-	cpu.BC().word = peekWord(Offset_BC);
+	// Current set
+	cpu.HL() = fetchWord();
+	cpu.DE() = fetchWord();
+	cpu.BC() = fetchWord();
 
-	cpu.IY().word = peekWord(Offset_IY);
-	cpu.IX().word = peekWord(Offset_IX);
+	cpu.IY() = fetchWord();
+	cpu.IX() = fetchWord();
 
-	cpu.IFF2() = (peek(Offset_IFF2) >> 2) != 0;
-	cpu.REFRESH() = peek(Offset_R);
+	cpu.IFF2() = (fetchByte() >> 2) != 0;
+	cpu.REFRESH() = fetchByte();
 
 	cpu.exxAF();
 
-	cpu.AF().word = peekWord(Offset_AF);
-	cpu.SP().word = peekWord(Offset_SP);
-	cpu.IM() = peek(Offset_IM);
+	cpu.AF() = fetchWord();	// Current
+	cpu.SP() = fetchWord();
+	cpu.IM() = fetchByte();
+
+	m_border = fetchByte();
 }
 
-void SnaFile::loadMemory(Board& board) const {
-	for (int i = 0; i < RamSize; ++i)
-		board.poke(board.ROM().size() + i, peek(HeaderSize + i));
+void SnaFile::loadMemory(Board& board) {
+	auto destination = board.ROM().size();
+	while (!finished())
+		board.poke(destination++, fetchByte());
 }
 
 void SnaFile::load(Board& board) {
 
 	SnapshotFile::load(board);
 
-	board.ULA().setBorder(peek(Offset_BorderColour));
+	board.ULA().setBorder(border());
 
 	// XXXX HACK, HACK, HACK!!
 	const auto original = board.CPU().peekWord(0xfffe);
