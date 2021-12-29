@@ -70,14 +70,15 @@ void Z80File::loadRegisters(EightBit::Z80& cpu) {
 	if (hardwareMode() != HardwareMode::k48)
 		throw std::runtime_error("Only 48K ZX Spectrum is supported");
 
-	fetchByte(); // offset 35
-	fetchByte(); // offset 36
+	auto state_35 = fetchByte(); // offset 35
+	auto state_36 = fetchByte(); // offset 36
 
-	m_emulationMode = fetchByte();
+	m_emulationMode = fetchByte(); // offset 37
 
-	fetchByte(); // offset 38, soundchip register number
+	auto last_soundchip_register_number = fetchByte(); // offset 38, soundchip register number
+	std::array<uint8_t, 16> soundchip_registers;
 	for (int i = 0; i < 16; ++i)
-		fetchByte(); // offset 39 - 54, sound chip registers
+		soundchip_registers[i] = fetchByte(); // offset 39 - 54, sound chip registers
 
 	assert(version() == 2);
 }
