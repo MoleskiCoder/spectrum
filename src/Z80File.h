@@ -12,15 +12,38 @@ class Board;
 
 class Z80File final : public SnapshotFile {
 private:
-	const static int Impossible = 0x100; // impossible value for a byte
+	enum HardwareMode { k48, k48_if1, kSamRam, k128, k128_if1 };
+
+	const static int Impossible8 = 0x100; // impossible value for a byte
+	const static int Impossible16 = 0x10000; // impossible value for a word
 
 	int m_version = 0;	// Illegal, by default!
 	uint8_t m_misc1 = 0;
 	uint8_t m_misc2 = 0;
-	std::array<int, 4> m_window = { Impossible, Impossible, Impossible, Impossible };
+	EightBit::register16_t m_additionalHeaderLength = { 0 };
+	uint8_t m_hardwareMode = 0;
+	uint8_t m_emulationMode = 0;
+
+	std::array<int, 4> m_window = { Impossible8, Impossible8, Impossible8, Impossible8 };
+
+	const std::array<int, 12> m_block_addresses_48k = {
+		0,				// 0	(48K ROM)
+		Impossible16,	// 1	(Interface I, Disciple or Plus D ROM)
+		Impossible16,	// 2
+		Impossible16,	// 3
+		0x8000,			// 4
+		0xc000,			// 5
+		Impossible16,	// 6
+		Impossible16,	// 7
+		0x4000,			// 8
+		Impossible16,	// 9
+		Impossible16,	// 10
+		Impossible16,	// 11	(Multiface ROM)
+	};
+
 
 	constexpr void reset_window() noexcept {
-		m_window = { Impossible, Impossible, Impossible, Impossible };
+		m_window = { Impossible8, Impossible8, Impossible8, Impossible8 };
 	}
 
 	[[nodiscard]] constexpr static bool compressed_window(const std::array<int, 4>& window) noexcept {
@@ -60,6 +83,9 @@ private:
 	void loadMemoryCompressedV1(Board& board);
 	void loadMemoryUncompressed(Board& board);
 
+	void loadMemoryV2(Board& board);
+	void loadMemoryCompressedV2(Board& board);
+
 	[[nodiscard]] constexpr auto version() const noexcept { return m_version; }
 
 	[[nodiscard]] constexpr auto misc1() const noexcept { return m_misc1; }
@@ -69,6 +95,10 @@ private:
 
 	[[nodiscard]] constexpr auto misc2() const noexcept { return m_misc2; }
 	[[nodiscard]] constexpr auto im() const noexcept { return misc2() & EightBit::Chip::Mask2; }
+
+	[[nodiscard]] constexpr auto additionalHeaderLength() const noexcept { return m_additionalHeaderLength; }
+
+	[[nodiscard]] constexpr auto hardwareMode() const noexcept { return m_hardwareMode; }
 
 protected:
 	void loadRegisters(EightBit::Z80& cpu) final;

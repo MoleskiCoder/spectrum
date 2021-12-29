@@ -58,7 +58,28 @@ void Z80File::loadRegisters(EightBit::Z80& cpu) {
 	cpu.exxAF();
 
 	assert(version() >= 1);
-	assert(version() == 1);
+
+	if (version() == 1) return;
+
+	m_additionalHeaderLength = fetchWord();
+	m_version = additionalHeaderLength() == 23 ? 2 : 3;
+
+	cpu.PC() = fetchWord();
+
+	m_hardwareMode = fetchByte();
+	if (hardwareMode() != HardwareMode::k48)
+		throw std::runtime_error("Only 48K ZX Spectrum is supported");
+
+	fetchByte(); // offset 35
+	fetchByte(); // offset 36
+
+	m_emulationMode = fetchByte();
+
+	fetchByte(); // offset 38, soundchip register number
+	for (int i = 0; i < 16; ++i)
+		fetchByte(); // offset 39 - 54, sound chip registers
+
+	assert(version() == 2);
 }
 
 void Z80File::loadMemoryCompressedV1(Board& board) {
@@ -92,13 +113,47 @@ void Z80File::loadMemoryV1(Board& board) {
 		loadMemoryUncompressed(board);
 }
 
+void Z80File::loadMemoryCompressedV2(Board& board) {
+	assert(hardwareMode() == HardwareMode::k48);
+	const auto length = fetchWord();
+	const auto page = fetchByte();
+	reset_window();
+	auto destination = m_block_addresses_48k[page];
+	assert(destination != Impossible16);
+	auto remaining = length;
+	while (remaining > 0) {
+		const auto current = fetchByteWindowed();
+		--remaining;
+		if (compressed_window()) {
+			const uint8_t repeats = fetchByteWindowed();
+			--remaining;
+			const uint8_t value = fetchByteWindowed();
+			--remaining;
+			--destination;	// Overwrite the initial ED of the compressed marker
+			for (int j = 0; j < repeats; ++j)
+				board.poke(destination++, value);
+		}
+		else {
+			board.poke(destination++, current);
+		}
+	}
+}
+
+void Z80File::loadMemoryV2(Board& board) {
+	while (!finished())
+		loadMemoryCompressedV2(board);
+}
+
 void Z80File::loadMemory(Board& board) {
 	switch (version()) {
 	case 1:
 		loadMemoryV1(board);
 		break;
+	case 2:
+		loadMemoryV2(board);
+		break;
 	default:
-		throw std::runtime_error("Only V1 Z80 files are handled.");
+		throw std::runtime_error("Only V1 or V2 Z80 files are handled.");
 		break;
 	}
 }
