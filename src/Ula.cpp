@@ -376,7 +376,7 @@ void Ula::maybeReadingPort(const uint8_t port) {
 void Ula::readingPort(const uint8_t port) {
 	const auto portHigh = BUS().ADDRESS().high;
 	const auto  selected = findSelectedKeys(~portHigh);
-	const uint8_t value = selected | (raised(m_ear) ? bit(6) : 0);
+	const uint8_t value = (selected & Mask5) | (raised(m_ear) ? bit(6) : 0);
 	BUS().ports().writeInputPort(port, value);
 }
 
