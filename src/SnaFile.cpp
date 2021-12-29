@@ -3,7 +3,7 @@
 #include "Board.h"
 
 SnaFile::SnaFile(const std::string path)
-: SnapshotFile(path) {}
+: m_path(path) {}
 
 void SnaFile::loadRegisters(EightBit::Z80& cpu) {
 
@@ -49,7 +49,16 @@ void SnaFile::loadMemory(Board& board) {
 
 void SnaFile::load(Board& board) {
 
-	SnapshotFile::load(board);
+	LittleEndianContent::load(path());
+
+	// N.B. Power must be raised prior to loading
+	// registers, otherwise power on defaults will override
+	// loaded values.
+	if (!board.CPU().powered())
+		throw std::runtime_error("Whoops: CPU has not been powered on.");
+
+	loadRegisters(board.CPU());
+	loadMemory(board);
 
 	board.ULA().setBorder(border());
 

@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 Z80File::Z80File(const std::string path)
-: SnapshotFile(path) {}
+: m_path(path) {}
 
 void Z80File::loadRegisters(EightBit::Z80& cpu) {
 
@@ -76,7 +76,7 @@ void Z80File::loadRegisters(EightBit::Z80& cpu) {
 	m_emulationMode = fetchByte(); // offset 37
 
 	auto last_soundchip_register_number = fetchByte(); // offset 38, soundchip register number
-	std::array<uint8_t, 16> soundchip_registers;
+	std::array<uint8_t, 16> soundchip_registers = {};
 	for (int i = 0; i < 16; ++i)
 		soundchip_registers[i] = fetchByte(); // offset 39 - 54, sound chip registers
 
@@ -160,6 +160,17 @@ void Z80File::loadMemory(Board& board) {
 }
 
 void Z80File::load(Board& board) {
-	SnapshotFile::load(board);
+
+	LittleEndianContent::load(path());
+
+	// N.B. Power must be raised prior to loading
+	// registers, otherwise power on defaults will override
+	// loaded values.
+	if (!board.CPU().powered())
+		throw std::runtime_error("Whoops: CPU has not been powered on.");
+
+	loadRegisters(board.CPU());
+	loadMemory(board);
+
 	board.ULA().setBorder(border());
 }

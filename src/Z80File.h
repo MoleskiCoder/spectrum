@@ -4,19 +4,20 @@
 #include <string>
 #include <cstdint>
 
-#include "SnapshotFile.h"
+#include "LittleEndianContent.h"
 
 class Board;
 
 // https://www.worldofspectrum.org/faq/reference/z80format.htm
 
-class Z80File final : public SnapshotFile {
+class Z80File final : public LittleEndianContent {
 private:
 	enum HardwareMode { k48, k48_if1, kSamRam, k128, k128_if1 };
 
 	const static int Impossible8 = 0x100; // impossible value for a byte
 	const static int Impossible16 = 0x10000; // impossible value for a word
 
+	const std::string m_path;
 	int m_version = 0;	// Illegal, by default!
 	uint8_t m_misc1 = 0;
 	uint8_t m_misc2 = 0;
@@ -100,12 +101,13 @@ private:
 
 	[[nodiscard]] constexpr auto hardwareMode() const noexcept { return m_hardwareMode; }
 
-protected:
-	void loadRegisters(EightBit::Z80& cpu) final;
-	void loadMemory(Board& board) final;
+	[[nodiscard]] auto path() const { return m_path; }
+
+	void loadRegisters(EightBit::Z80& cpu);
+	void loadMemory(Board& board);
 
 public:
 	Z80File(std::string path);
 
-	void load(Board& board) final;
+	void load(Board& board);
 };

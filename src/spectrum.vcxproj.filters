@@ -38,9 +38,6 @@
     <ClInclude Include="Z80File.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SnapshotFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="KempstonJoystick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -104,9 +101,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Z80File.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SnapshotFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="KempstonJoystick.cpp">

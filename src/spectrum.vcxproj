@@ -173,7 +173,6 @@
     <ClInclude Include="LittleEndianContent.h" />
     <ClInclude Include="Loader.h" />
     <ClInclude Include="SnaFile.h" />
-    <ClInclude Include="SnapshotFile.h" />
     <ClInclude Include="StandardToneSequence.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TAPBlock.h" />
@@ -194,7 +193,6 @@
     <ClCompile Include="KempstonJoystick.cpp" />
     <ClCompile Include="LittleEndianContent.cpp" />
     <ClCompile Include="SnaFile.cpp" />
-    <ClCompile Include="SnapshotFile.cpp" />
     <ClCompile Include="spectrum.cpp" />
     <ClCompile Include="StandardToneSequence.cpp" />
     <ClCompile Include="stdafx.cpp">
