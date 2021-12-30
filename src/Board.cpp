@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-Board::Board(const ColourPalette& palette, const Configuration& configuration)
+Board::Board(const ColourPalette& palette, Configuration& configuration)
 : m_configuration(configuration),
   m_palette(palette) {
 }
@@ -18,23 +18,23 @@ void Board::initialise() {
 	auto romDirectory = m_configuration.getRomDirectory();
 	plug(romDirectory + "\\48.rom");	// ZX Spectrum Basic
 
-	if (m_configuration.isProfileMode()) {
-		CPU().ExecutingInstruction.connect([this](const EightBit::Z80&) {
+	CPU().ExecutingInstruction.connect([this](const EightBit::Z80&) {
+		if (m_configuration.isProfileMode()) {
 			const auto pc = CPU().PC().word;
 			m_profiler.addAddress(pc);
 			m_profiler.addInstruction(peek(pc));
-		});
-	}
+		}
+	});
 
-	if (m_configuration.isDebugMode()) {
-		CPU().ExecutingInstruction.connect([this](const EightBit::Z80&) {
+	CPU().ExecutingInstruction.connect([this](const EightBit::Z80&) {
+		if (m_configuration.isDebugMode()) {
 			std::cerr
 				<< EightBit::Disassembler::state(CPU())
 				<< " "
 				<< m_disassembler.disassemble(CPU())
 				<< '\n';
-		});
-	}
+		}
+	});
 
 	ULA().Proceed.connect([this](EightBit::EventArgs) {
 		runCycle();
@@ -71,6 +71,16 @@ void Board::stopTape() {
 	ULA().stopTape();
 }
 
+void Board::toggleDebugMode() {
+	const auto current = m_configuration.isDebugMode();
+	m_configuration.setDebugMode(!current);
+}
+
+void Board::toggleProfileMode() {
+	const auto current = m_configuration.isProfileMode();
+	m_configuration.setProfileMode(!current);
+}
+
 void Board::raisePOWER() {
 	EightBit::Bus::raisePOWER();
 	for (auto& expansion : m_expansions)
@@ -92,6 +102,7 @@ void Board::lowerPOWER() {
 	for (auto& expansion : m_expansions)
 		expansion->lowerPOWER();
 	EightBit::Bus::lowerPOWER();
+	m_profiler.dump();
 }
 
 uint8_t Board::peek(uint16_t address) noexcept {

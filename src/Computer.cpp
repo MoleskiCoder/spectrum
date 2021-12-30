@@ -3,7 +3,7 @@
 #include "Configuration.h"
 #include "Joystick.h"
 
-Computer::Computer(const Configuration& configuration)
+Computer::Computer(Configuration& configuration)
 : m_configuration(configuration),
   m_board(m_colours, configuration) {
 }
@@ -45,11 +45,23 @@ void Computer::loadTZX(const std::string path) {
 }
 
 void Computer::playTape() {
+	std::cout << "Playing tape." << std::endl;
 	BUS().playTape();
 }
 
 void Computer::stopTape() {
+	std::cout << "Stopping tape." << std::endl;
 	BUS().stopTape();
+}
+
+void Computer::toggleDebugMode() {
+	std::cout << "Toggling debug mode." << std::endl;
+	BUS().toggleDebugMode();
+}
+
+void Computer::toggleProfileMode() {
+	std::cout << "Toggling profile mode." << std::endl;
+	BUS().toggleProfileMode();
 }
 
 void Computer::runRasterLines() {
@@ -57,29 +69,45 @@ void Computer::runRasterLines() {
 }
 
 bool Computer::handleKeyDown(SDL_Keycode key) {
-	const auto handled = Game::handleKeyDown(key);
+	auto handled = Game::handleKeyDown(key);
 	if (!handled) {
-		if (key == SDLK_F11)
-			return true;
+		switch (key) {
+		case SDLK_F7:
+		case SDLK_F8:
+		case SDLK_F10:
+		case SDLK_F11:
+			handled = true;
+			break;
+		}
 		BUS().ULA().pokeKey(key);
 	}
-	return true;
+	return handled;
 }
 
 bool Computer::handleKeyUp(SDL_Keycode key) {
-	const auto handled = Game::handleKeyUp(key);
+	auto handled = Game::handleKeyUp(key);
 	if (!handled) {
-		if (key == SDLK_F10) {
+		switch (key) {
+		case SDLK_F7:
+			toggleProfileMode();
+			handled = true;
+			break;
+		case SDLK_F8:
+			toggleDebugMode();
+			handled = true;
+			break;
+		case SDLK_F10:
 			playTape();
-			return true;
-		}
-		if (key == SDLK_F11) {
+			handled = true;
+			break;
+		case SDLK_F11:
 			stopTape();
-			return true;
+			handled = true;
+			break;
 		}
 		BUS().ULA().pullKey(key);
 	}
-	return true;
+	return handled;
 }
 
 bool Computer::handleJoyButtonDown(const SDL_JoyButtonEvent event) {

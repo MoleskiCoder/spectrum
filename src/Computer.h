@@ -16,7 +16,7 @@ class Expansion;
 
 class Computer final : public Gaming::Game {
 public:
-	Computer(const Configuration& configuration);
+	Computer(Configuration& configuration);
 
 	void raisePOWER() override;
 	void lowerPOWER() override;
@@ -52,7 +52,7 @@ protected:
 	bool handleControllerButtonUp(SDL_ControllerButtonEvent event) final;
 
 private:
-	const Configuration& m_configuration;
+	Configuration& m_configuration;
 	ColourPalette m_colours;
 	Board m_board;
 
@@ -65,4 +65,7 @@ private:
 
 	void playTape();
 	void stopTape();
+
+	void toggleDebugMode();
+	void toggleProfileMode();
 };

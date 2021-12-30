@@ -24,7 +24,7 @@ class Expansion;
 
 class Board final : public EightBit::Bus {
 public:
-	Board(const ColourPalette& palette, const Configuration& configuration);
+	Board(const ColourPalette& palette, Configuration& configuration);
 
 	[[nodiscard]] constexpr auto& CPU() noexcept { return m_cpu; }
 	[[nodiscard]] constexpr auto& ULA() noexcept { return m_ula; }
@@ -48,6 +48,9 @@ public:
 	void playTape();
 	void stopTape();
 
+	void toggleDebugMode();
+	void toggleProfileMode();
+
 	void initialise() final;
 	void raisePOWER() final;
 	void lowerPOWER() final;
@@ -61,7 +64,7 @@ protected:
 	EightBit::MemoryMapping mapping(uint16_t address) noexcept final;
 
 private:
-	const Configuration& m_configuration;
+	Configuration& m_configuration;
 	const ColourPalette& m_palette;
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu = *this;
