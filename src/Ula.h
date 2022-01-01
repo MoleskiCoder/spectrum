@@ -28,41 +28,41 @@ standard, which apparently accounts for ZX Spectrum 16/48K pixel jitter in real 
 The ZX Spectrum ULA, Chris Smith
 Chapter 9 (The Video Display), Figure 9-1, PAL horizontal and vertical screen dimensions
 
-                        +--------------------------------------------+
-                        +............................................+        ^        ^
-                        +............................................+        |        |
-                        +..............vertical blank................+       8px       |
-                        +............................................+        |        |
-                        +............................................+        V        |
-                        +--------------------------------------------+                 |
-                        |                                            |        ^        |
-                        |                                            |        |        |
-                        |             top vertical border            |       56px      |
-  horizontal            |                                            |        |        |
-    sync                |                                            |        V        |
-<---28px--->            |          +----------------------+          |                 |
-                        |          |                      |          |        ^        |
-                        |          |      display         |          |        |        |
-                        |          |        area          |          |        |        |
-     horizontal blank   |          |                      |          |        |        |
-<---------96px--------->|<--32px-->|<-------256px-------->|<--64px-->|      192px     312px
-                        |          |                      |          |        |        |
-                        |          |                      |          |        |        |
-                        |          |                      |          |        |        |
-                        |          |                      |          |        V        |
-                        |          +----------------------+          |                 |
-                        |                                            |        ^        |
-                        |                                            |        |        |
-                        |           bottom vertical border           |       56px      |
-                        |                                            |        |        |
-                        |                                            |        V        V
+                        +--------------------------------------------+                     -------------
+       ^                +............................................+        ^            ^    V = 248 (Vertical Sync interrupt, 32 T-states duration)
+ vertical sync          +............................................+        |            |
+    4 lines             +..............vertical blank................+       8 lines       |
+       V                +............................................+        |            |
+                        +............................................+        V            |
+                        +--------------------------------------------+                     |------------
+                        |                                            |        ^            |    V = 256
+                        |                                            |        |            |
+                        |             top vertical border            |       56 lines      |
+  horizontal            |                                            |        |            |
+    sync                |                                            |        V            |
+<---28px--->            |          +----------------------+          |                     |------------
+                        |          |                      |          |        ^            |    V = 0
+                        |          |      display         |          |        |            |
+                        |          |        area          |          |        |            |
+     horizontal blank   |          |                      |          |        |            |
+<---------96px--------->|<--32px-->|<-------256px-------->|<--64px-->|      192 lines     312 lines
+                        |          |                      |          |        |            |
+                        |          |                      |          |        |            |
+                        |          |                      |          |        |            |
+                        |          |                      |          |        V            |
+                        |          +----------------------+          |                     |------------
+                        |                                            |        ^            |    V = 192
+                        |                                            |        |            |
+                        |           bottom vertical border           |       56 lines      |
+                        |                                            |        |            |
+                        |                                            |        V            V    
                         +--------------------------------------------+
 
 The ZX Spectrum ULA, Chris Smith
 Chapter 11 (Video Sychronisation), Figure 11-1, Horizontal time points for the 5C and 6C ULA
 
     Description            Cycle Start        Cycle End
-    ---------------------------------------------
+    ---------------------------------------------------
     Pixel Output            0                 255
     Right Border            256               319
     Blanking Period         320               415
@@ -75,7 +75,7 @@ The ZX Spectrum ULA, Chris Smith
 Chapter 11 (Video Sychronisation), Figure 11-2, PAL horizontal vertical counter states and associated screen regions
 
     Block description    Lines            Length
-    ------------------------------------------
+    --------------------------------------------
     Display              0 - 191          192
     Bottom border        192 - 247        56
     Sync period          248 - 255        8
@@ -109,7 +109,7 @@ private:
 public:
     static constexpr float FramesPerSecond = 50.08f;
     static const int UlaClockRate = 7'000'000; // 7Mhz
-    static const int CpuClockRate = UlaClockRate / 2;
+    static const int CpuClockRate = UlaClockRate / 2;   // 3.5Mhz
 
     static const int RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder;
     static const int RasterHeight = TopRasterBorder + ActiveRasterHeight + BottomRasterBorder;
@@ -156,6 +156,18 @@ private:
 
     std::unordered_map<uint8_t, std::array<int, 5>> m_keyboardMapping;
     std::unordered_set<SDL_Keycode> m_keyboardRaw;
+
+    [[nodiscard]] constexpr auto& keyboardMapping() noexcept { return m_keyboardMapping; }
+    [[nodiscard]] constexpr const auto& keyboardMapping() const noexcept { return m_keyboardMapping; }
+    [[nodiscard]] constexpr auto& keyboardRaw() noexcept { return m_keyboardRaw; }
+    [[nodiscard]] constexpr const auto& keyboardRaw() const noexcept { return m_keyboardRaw; }
+
+    [[nodiscard]] constexpr const auto& palette() const noexcept { return m_palette; }
+
+    [[nodiscard]] constexpr auto& scanLineAddresses() noexcept { return m_scanLineAddresses; }
+    [[nodiscard]] constexpr const auto& scanLineAddresses() const noexcept { return m_scanLineAddresses; }
+    [[nodiscard]] constexpr auto& attributeAddresses() noexcept { return m_attributeAddresses; }
+    [[nodiscard]] constexpr const auto& attributeAddresses() const noexcept { return m_attributeAddresses; }
 
     [[nodiscard]] constexpr auto& BUS() noexcept { return m_bus; }
 
@@ -232,8 +244,8 @@ private:
 
     [[nodiscard]] constexpr const auto& tape() const noexcept { return m_tape; }
     [[nodiscard]] constexpr auto& tape() noexcept { return m_tape; }
-    [[nodiscard]] constexpr const auto& tones() const noexcept { return m_tones; }
-    [[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
+    //[[nodiscard]] constexpr const auto& tones() const noexcept { return m_tones; }
+    //[[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
 
 public:
     constexpr void playTape() noexcept { tape().play(); }

@@ -96,8 +96,8 @@ void Ula::initialiseVRAMAddresses() {
 	for (auto p = 0; p < 4; ++p) {
 		for (auto y = 0; y < 8; ++y) {
 			for (auto o = 0; o < 8; ++o, ++line) {
-				m_scanLineAddresses[line] = (p << 11) + (y << 5) + (o << 8);
-				m_attributeAddresses[line] = AttributeAddress + (((p << 3) + y) << 5);
+				scanLineAddresses()[line] = (p << 11) + (y << 5) + (o << 8);
+				attributeAddresses()[line] = AttributeAddress + (((p << 3) + y) << 5);
 			}
 		}
 	}
@@ -113,8 +113,8 @@ void Ula::renderVRAM(const int y) {
 	// Position in VRAM
 	const auto addressY = y - TopRasterBorder;
 	assert(addressY < ActiveRasterHeight);
-	const auto bitmapAddressY = m_scanLineAddresses[addressY];
-	const auto attributeAddressY = m_attributeAddresses[addressY];
+	const auto bitmapAddressY = scanLineAddresses()[addressY];
+	const auto attributeAddressY = attributeAddresses()[addressY];
 
 	// Position in pixel render 
 	const auto pixelBase = LeftRasterBorder + static_cast<size_t>(y) * RasterWidth;
@@ -132,13 +132,14 @@ void Ula::renderVRAM(const int y) {
 		const auto bright = !!(attribute & Bit6);
 		const auto flash = !!(attribute & Bit7);
 
-		const auto background = m_palette.colour(flash && flashing() ? ink : paper, bright);
-		const auto foreground = m_palette.colour(flash && flashing() ? paper : ink, bright);
+		const auto background = palette().colour(flash && flashing() ? ink : paper, bright);
+		const auto foreground = palette().colour(flash && flashing() ? paper : ink, bright);
 
+		const auto byteX = byte << 3;
 		for (int bit = 0; bit < 8; ++bit) {
 
 			const auto pixel = bitmap & Chip::bit(bit);
-			const auto x = (~bit & Mask3) | (byte << 3);
+			const auto x = (~bit & Mask3) | byteX;
 
 			setClockedPixel(pixelBase + x, pixel ? foreground : background);
 		}
@@ -206,7 +207,7 @@ void Ula::processVerticalSync() {
 }
 
 void Ula::processVerticalSync(const int y) {
-	if (y == 248)
+	if (y == (ActiveRasterHeight + BottomRasterBorder))
 		lower(BUS().CPU().INT());
 	tick(ActiveRasterWidth);
 	tick(RightRasterBorder);
@@ -283,39 +284,41 @@ void Ula::incrementC() noexcept {
 }
 
 void Ula::pokeKey(SDL_Keycode raw) {
-	m_keyboardRaw.emplace(raw);
+	keyboardRaw().emplace(raw);
 }
 
 void Ula::pullKey(SDL_Keycode raw) noexcept {
-	m_keyboardRaw.erase(raw);
+	keyboardRaw().erase(raw);
 }
 
 void Ula::initialiseKeyboardMapping() {
 
 	// Left side
-	m_keyboardMapping[bit(0)] = { SDLK_LSHIFT,	SDLK_z,			SDLK_x,		SDLK_c,		SDLK_v	};
-	m_keyboardMapping[bit(1)] = { SDLK_a,		SDLK_s,			SDLK_d,		SDLK_f,		SDLK_g	};
-	m_keyboardMapping[bit(2)] = { SDLK_q,		SDLK_w,			SDLK_e,		SDLK_r,		SDLK_t	};
-	m_keyboardMapping[bit(3)] = { SDLK_1,		SDLK_2,			SDLK_3,     SDLK_4,		SDLK_5	};
+	keyboardMapping()[bit(0)] = { SDLK_LSHIFT,  SDLK_z,         SDLK_x,     SDLK_c,     SDLK_v  };
+	keyboardMapping()[bit(1)] = { SDLK_a,       SDLK_s,         SDLK_d,     SDLK_f,     SDLK_g  };
+	keyboardMapping()[bit(2)] = { SDLK_q,       SDLK_w,         SDLK_e,     SDLK_r,     SDLK_t  };
+	keyboardMapping()[bit(3)] = { SDLK_1,       SDLK_2,         SDLK_3,     SDLK_4,     SDLK_5  };
 
 	// Right side
-	m_keyboardMapping[bit(4)] = { SDLK_0,		SDLK_9,			SDLK_8,		SDLK_7,		SDLK_6	};
-	m_keyboardMapping[bit(5)] = { SDLK_p,		SDLK_o,			SDLK_i,		SDLK_u,		SDLK_y	};
-	m_keyboardMapping[bit(6)] = { SDLK_RETURN,	SDLK_l,			SDLK_k,		SDLK_j,		SDLK_h	};
-	m_keyboardMapping[bit(7)] = { SDLK_SPACE,	SDLK_RSHIFT,	SDLK_m,		SDLK_n,		SDLK_b	};
+	keyboardMapping()[bit(4)] = { SDLK_0,       SDLK_9,         SDLK_8,     SDLK_7,     SDLK_6  };
+	keyboardMapping()[bit(5)] = { SDLK_p,       SDLK_o,         SDLK_i,     SDLK_u,     SDLK_y  };
+	keyboardMapping()[bit(6)] = { SDLK_RETURN,  SDLK_l,         SDLK_k,     SDLK_j,     SDLK_h  };
+	keyboardMapping()[bit(7)] = { SDLK_SPACE,   SDLK_RSHIFT,    SDLK_m,     SDLK_n,     SDLK_b  };
 }
 
 uint8_t Ula::findSelectedKeys(uint8_t rows) const {
 	uint8_t returned = Mask5;
-	for (int row = 0; row < 8; ++row) {
+	assert(keyboardMapping().size() == 8);
+	for (int row = 0; row < keyboardMapping().size(); ++row) {
 		const uint8_t current = bit(row);
 		if ((rows & current) == 0)
 			continue;
-		auto pKeys = m_keyboardMapping.find(current);
-		if (pKeys != m_keyboardMapping.cend()) {
+		auto pKeys = keyboardMapping().find(current);
+		if (pKeys != keyboardMapping().cend()) {
 			const auto& keys = pKeys->second;
-			for (int column = 0; column < 5; ++column) {
-				if (m_keyboardRaw.find(keys[column]) != m_keyboardRaw.cend())
+			assert(keys.size() == 5);
+			for (int column = 0; column < keys.size(); ++column) {
+				if (keyboardRaw().find(keys[column]) == keyboardRaw().end())
 					returned &= ~bit(column);
 			}
 		}
@@ -328,17 +331,12 @@ void Ula::maybeWrittenPort(const uint8_t port) {
 		writtenPort(port);
 }
 
-// 0 - 2	Border Color(0..7) (always with Bright = off)
-// 3		MIC Output(CAS SAVE) (0 = On, 1 = Off)
-// 4		Beep Output(ULA Sound)    (0 = Off, 1 = On)
-// 5 - 7	Not used
-
 // 128 64 32 16  8  4  2  U
 //   7  6  5  4  3  2  1  0
-//                  <----->	Border colour
-//               -			Mic output
-//            -				Beep output
-//   <----->				Not used
+//                  <-----> Border colour (0..7) (always with Bright = off)
+//               -          MIC Output (CAS SAVE) (0 = On, 1 = Off)
+//            -             Beep Output (ULA Sound)    (0 = Off, 1 = On)
+//   <----->                Not used
 
 void Ula::writtenPort(const uint8_t port) {
 
@@ -360,18 +358,14 @@ void Ula::maybeReadingPort(const uint8_t port) {
 		readingPort(port);
 }
 
-// 0 - 4	Keyboard Inputs(0 = Pressed, 1 = Released)
-// 5		Not used
-// 6		EAR Input(CAS LOAD)
-// 7		Not used
-// A8..A15	Keyboard Address Output(0 = Select)
-
 // 128 64 32 16  8  4  2  U
 //   7  6  5  4  3  2  1  0
-//            <----------->	Keyboard
-//         -				Not used
-//      -					Ear input
-//   -						Not used
+//            <-----------> Keyboard inputs (0 = Pressed, 1 = Released)
+//         -                Not used
+//      -                   EAR input (CAS LOAD)
+//   -                      Not used
+
+// A8..A15 Keyboard Address Output (0 = Select)
 
 void Ula::readingPort(const uint8_t port) {
 	const auto portHigh = BUS().ADDRESS().high;
