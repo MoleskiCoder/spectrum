@@ -2,6 +2,7 @@
 #pragma once
 #endif
 
+#define USE_COROUTINES
 #define NOMINMAX
 
 #include <algorithm>

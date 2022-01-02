@@ -67,6 +67,8 @@ void TZXFile::load(std::string path) {
 		blocks().push_back(readBlock());
 }
 
+#ifdef USE_COROUTINES
+
 #if __cplusplus >= 202002L
 
 TZXFile::amplitude_generator_t TZXFile::generate() const {
@@ -91,6 +93,23 @@ void TZXFile::generate(amplitude_push_t& sink) const {
 				sink(level);
 		}
 	}
+}
+
+#endif
+
+#else
+
+std::vector<ToneSequence::amplitude_t> TZXFile::generate() const {
+	std::vector<ToneSequence::amplitude_t> returned;
+	for (const auto& block : blocks()) {
+		const auto pulses = block.generate();
+		for (const auto& pulse : pulses) {
+			const auto& [level, length] = pulse;
+			for (int i = 0; i < length; ++i)
+				returned.push_back(level);
+		}
+	}
+	return returned;
 }
 
 #endif

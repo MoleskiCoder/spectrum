@@ -45,6 +45,7 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 			// Tape handling
 			if (tape().playing()) {
 				BUS().beep().maybeStartRecording();
+#ifdef USE_COROUTINES
 #if __cplusplus >= 202002L
 				if (tones()) {
 					m_ear = tones()();
@@ -56,6 +57,12 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 					m_ear = tones().get();
 					BUS().beep().buzz(m_ear, frameCpuCycles());
 					tones()();
+				}
+#endif
+#else
+				if (m_current_tone != tones().end()) {
+					m_ear = *m_current_tone++;
+					BUS().beep().buzz(m_ear, frameCpuCycles());
 				}
 #endif
 			} else {
@@ -389,8 +396,13 @@ void Ula::readingPort(const uint8_t port) {
 
 void Ula::attachTZX(const std::string path) {
 	tape().load(path);
+#ifdef USE_COROUTINES
 #if __cplusplus < 202002L
 	auto puller{ [this](TZXFile::amplitude_push_t& sink) { m_tape.generate(sink); } };
 	m_tones = std::make_unique<TZXFile::amplitude_pull_t>(puller);
+#endif
+#else
+	m_tones = tape().generate();
+	m_current_tone = tones().cbegin();
 #endif
 }

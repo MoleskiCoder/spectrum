@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <memory>
+#include <chrono>
 
 #include "Configuration.h"
 #include "Computer.h"
@@ -22,16 +23,22 @@ void loadROM(const Configuration& configuration, Computer& computer) {
 	//computer.plug(romDirectory + "\\Release-v0.37\\testrom.bin");
 	//computer.plug(romDirectory + "\\smart\\ROMs\\DiagROM.v41");
 	//computer.plug(romDirectory + "\\DiagROM.v56");
+	//computer.plug(romDirectory + "\\VMM-TEST.ROM");
 }
 
 void loadProgram(const Configuration& configuration, Computer& computer) {
 
 	auto programDirectory = configuration.getProgramDirectory();
 
-	//computer.loadZ80(programDirectory + "\\Knight Lore (1984)(Ultimate).z80");	// Works
 	//computer.loadZ80(programDirectory + "\\Alien 8 (1985)(Ultimate).z80");	// Works
+	//computer.loadSna(programDirectory + "\\ant_attack.sna");	// 3D ant attack, works
 
-	//computer.loadZ80(programDirectory + "\\R-Type (1988)(Activision).z80");		// v3, not for 48K spectrum
+	//computer.loadZ80(programDirectory + "\\Ballblazer (1985)(Activision).z80");	// Not 48k spectrum
+
+	//computer.loadZ80(programDirectory + "\\Boulder Dash (1984)(First Star Software).z80");	// Works
+
+	//computer.loadZ80(programDirectory + "\\Cobra (1986)(Ocean Software).z80");	// Shows title screen, then crashes
+	//computer.loadZ80(programDirectory + "\\Cobra (1986)(Ocean Software)[a2].z80");	// Shows menu screen, then crashes
 
 	//computer.loadSna(programDirectory + "\\ELITE.SNA");	// freeze
 	//computer.loadZ80(programDirectory + "\\Elite (1986)(Firebird).z80");	// spins for a second, then freezes
@@ -41,20 +48,35 @@ void loadProgram(const Configuration& configuration, Computer& computer) {
 
 	//computer.loadZ80(programDirectory + "\\Head Over Heels (1987)(Ocean Software).z80");	// v2, freeze
 
-	//computer.loadSna(programDirectory + "\\ant_attack.sna");	// 3D ant attack, works
-	//computer.loadSna(programDirectory + "\\zexall.sna");
+	//computer.loadZ80(programDirectory + "\\HELCHOP.Z80");
+	//computer.loadZ80(programDirectory + "\\Helichopper_1985_Firebird_Software.z80");
+	//computer.loadZ80(programDirectory + "\\Helichopper_1985_Firebird_Software_a.z80");
+	//computer.loadZ80(programDirectory + "\\HALLSTHI.z80");
 
-	//computer.loadZ80(programDirectory + "\\Jetpac_1983_Ultimate_Play_The_Game_16K.z80");
+	//computer.loadZ80(programDirectory + "\\Jetpac_1983_Ultimate_Play_The_Game_16K.z80");	// Doesn't exist
 	//computer.loadZ80(programDirectory + "\\Jetpac (1983)(Ultimate Play The Game)[a][16K].z80");
 	//computer.loadTZX(programDirectory + "\\jetpac.tzx");
 	//computer.loadZ80(programDirectory + "\\JetPac.z80");
 	//computer.loadSna(programDirectory + "\\JetPac.sna");
 
+	//computer.loadZ80(programDirectory + "\\Knight Lore (1984)(Ultimate).z80");	// Works
+
 	//computer.loadTZX(programDirectory + "\\Manic Miner.tzx");
 
-	//computer.loadZ80(programDirectory + "\\HELCHOP.Z80");
-	//computer.loadZ80(programDirectory + "\\Helichopper_1985_Firebird_Software.z80");
-	//computer.loadZ80(programDirectory + "\\Helichopper_1985_Firebird_Software_a.z80");
+	//computer.loadZ80(programDirectory + "\\R-Type (1988)(Activision).z80");		// v3, not for 48K spectrum
+	//computer.loadZ80(programDirectory + "\\Rommels_Revenge_1983_Crystal_Computing.z80");	// Goes through menus, crashes in game
+
+	//computer.loadSna(programDirectory + "\\zexall.sna");
+
+
+	// Utilities
+	//computer.loadZ80(programDirectory + "\\Spectrum Musicmaker (1983)(Robert Newman).z80");	// Works
+	//computer.loadZ80(programDirectory + "\\Spectrum Sound FX (1983)(Marolli Soft).z80");	// v3
+	//computer.loadZ80(programDirectory + "\\Sounds 2 (19xx)(The Champ).z80");	// Not for 48k Spectrums
+	//computer.loadZ80(programDirectory + "\\Sound Demo 01 (1992)(Theo Devil).z80");	// Not for 48k Spectrums
+	//computer.loadZ80(programDirectory + "\\iotbs2.z80");	// Not for 48k Spectrums
+
+	// Demos
 
 	//computer.loadZ80(programDirectory + "\\TFF4.Z80");
 	//computer.loadZ80(programDirectory + "\\BABY.Z80");	// Plays sampled "I don't care"
@@ -66,27 +88,48 @@ void testTapeLoading(const Configuration& configuration) {
 
 	auto programDirectory = configuration.getProgramDirectory();
 
-	//{
-	//	TZXFile tape;
-	//	tape.load(programDirectory + "\\Manic Miner.tzx");
+	const auto start_time = std::chrono::steady_clock::now();
+	auto count = 0ULL;
 
-	//	ToneSequence::amplitude_t highest = ToneSequence::amplitude_t::Low;
-	//	auto generator = tape.generate();
-	//	while (generator) {
-	//		auto level = generator();
-	//		highest = std::max(highest, level);
-	//	}
-	//}
+	TZXFile tape;
+	tape.load(programDirectory + "\\Manic Miner.tzx");
 
-	//{
-	//	TZXFile tape;
-	//	tape.load(programDirectory + "\\Manic Miner.tzx");
+	ToneSequence::amplitude_t highest = ToneSequence::amplitude_t::Low;
 
-	//	ToneSequence::amplitude_t highest = ToneSequence::amplitude_t::Low;
-	//	auto levels = tape.generate_vector();
-	//	for (const auto& level : levels)
-	//		highest = std::max(highest, level);
-	//}
+#ifdef USE_COROUTINES
+#if __cplusplus >= 202002L
+	auto generator = tape.generate();
+	while (generator) {
+		auto level = generator();
+		highest = std::max(highest, level);
+		++count;
+	}
+#else
+	auto puller{ [tape](TZXFile::amplitude_push_t& sink) { tape.generate(sink); } };
+	auto amplitudes = TZXFile::amplitude_pull_t(puller);
+	for (auto level : amplitudes) {
+		highest = std::max(highest, level);
+		++count;
+	}
+#endif
+#else
+	const auto amplitudes = tape.generate();
+	for (auto level : amplitudes) {
+		highest = std::max(highest, level);
+		++count;
+	}
+#endif
+
+	const auto finish_time = std::chrono::steady_clock::now();
+	const auto elapsed_time = finish_time - start_time;
+	const auto seconds = std::chrono::duration_cast<std::chrono::duration<double>>(elapsed_time).count();
+
+	std::cout.imbue(std::locale(""));
+	std::cout
+		<< "Retrieved " << count << " amplitudes. "
+		<< "Elapsed time: " << seconds << " seconds. "
+		<< int(count / seconds) << " amplitudes per second."
+		<< std::endl;
 }
 
 int main(int, char*[])
@@ -120,12 +163,12 @@ int main(int, char*[])
 		return 2;
 	}
 
-	try {
-		testTapeLoading(configuration);
-	} catch (const std::exception& error) {
-		::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "Problem testing tape loading: %s", error.what());
-		return 2;
-	}
+	//try {
+	//	testTapeLoading(configuration);
+	//} catch (const std::exception& error) {
+	//	::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "Problem testing tape loading: %s", error.what());
+	//	return 2;
+	//}
 
 	try {
 		computer->runLoop();
