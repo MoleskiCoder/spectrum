@@ -389,7 +389,7 @@ void Ula::readingPort(const uint8_t port) {
 void Ula::attachTZX(const std::string path) {
 	tape().load(path);
 #if __cplusplus < 202002L
-	tone_generator() = std::make_unique<boost::coroutines2::coroutine<ToneSequence::amplitude_t>::pull_type>(boost::bind(&TZXFile::generate, &m_tape, _1));
+	tone_generator() = std::make_unique<TZXFile::amplitude_pull_t>(boost::bind(&TZXFile::generate, &m_tape, _1));
 	tones() = m_tone_generator->begin();
 #endif
 }

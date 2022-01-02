@@ -110,10 +110,10 @@ private:
 
     TZXFile m_tape;
 #if __cplusplus >= 202002L
-    EightBit::co_generator_t<ToneSequence::amplitude_t> m_tones = m_tape.generate();
+    TZXFile::amplitude_generator_t m_tones = m_tape.generate();
 #else
-    std::unique_ptr<boost::coroutines2::coroutine<ToneSequence::amplitude_t>::pull_type> m_tone_generator;
-    boost::coroutines2::coroutine<ToneSequence::amplitude_t>::pull_type::iterator m_tones;
+    std::unique_ptr<TZXFile::amplitude_pull_t> m_tone_generator;
+    TZXFile::amplitude_pull_t::iterator m_tones;
 #endif
 
 public:

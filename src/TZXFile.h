@@ -19,6 +19,13 @@ class TZXFile final {
 public:
 	typedef std::vector<TAPBlock> blocks_t;
 
+#if __cplusplus >= 202002L
+	typedef EightBit::co_generator_t<ToneSequence::amplitude_t> amplitude_generator_t;
+#else
+	typedef boost::coroutines2::coroutine<ToneSequence::amplitude_t>::push_type amplitude_push_t;
+	typedef boost::coroutines2::coroutine<ToneSequence::amplitude_t>::pull_type amplitude_pull_t;
+#endif
+
 private:
 	static const uint16_t ScreenAddress = 0x4000;
 	static const int ScreenLength = 0x1b00;
@@ -55,9 +62,9 @@ public:
 #endif
 
 #if __cplusplus >= 202002L
-	[[nodiscard]] EightBit::co_generator_t<ToneSequence::amplitude_t> generate() const;
+	[[nodiscard]] amplitude_generator_t generate() const;
 #else
-	void generate(boost::coroutines2::coroutine<ToneSequence::amplitude_t>::push_type& sink) const;
+	void generate(amplitude_push_t& sink) const;
 #endif
 
 	[[nodiscard]] constexpr auto playing() const noexcept { return m_playing; }

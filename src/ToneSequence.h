@@ -20,6 +20,13 @@ public:
 	typedef EightBit::Device::PinLevel amplitude_t;
 	typedef std::pair<amplitude_t, int> pulse_t;
 
+#if __cplusplus >= 202002L
+	typedef EightBit::co_generator_t<pulse_t> pulse_generator_t;
+#else
+	typedef boost::coroutines2::coroutine<pulse_t>::push_type pulse_push_t;
+	typedef boost::coroutines2::coroutine<pulse_t>::pull_type pulse_pull_t;
+#endif
+
 protected:
 	[[nodiscard]] constexpr auto pauseTime() const noexcept { return m_pauseTime; }
 	[[nodiscard]] constexpr auto& pauseTime() noexcept { return m_pauseTime; }
@@ -88,8 +95,8 @@ private:
 
 public:
 #if __cplusplus >= 202002L
-	[[nodiscard]] EightBit::co_generator_t<pulse_t> generate(const TAPBlock& block) const;
+	[[nodiscard]] pulse_generator_t generate(const TAPBlock& block) const;
 #else
-	void generate(const TAPBlock& block, boost::coroutines2::coroutine<pulse_t>::push_type& sink);
+	void generate(const TAPBlock& block, pulse_push_t& sink);
 #endif
 };

@@ -31,7 +31,7 @@ std::vector<ToneSequence::pulse_t> ToneSequence::generatePilotTone(int pulses) c
 
 #if __cplusplus >= 202002L
 
-EightBit::co_generator_t<ToneSequence::pulse_t> ToneSequence::generate(const TAPBlock& block) const {
+ToneSequence::pulse_generator_t ToneSequence::generate(const TAPBlock& block) const {
 
 	{
 		const auto pulses = generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());
@@ -53,7 +53,7 @@ EightBit::co_generator_t<ToneSequence::pulse_t> ToneSequence::generate(const TAP
 
 #else
 
-void ToneSequence::generate(const TAPBlock& block, boost::coroutines2::coroutine<pulse_t>::push_type& sink) {
+void ToneSequence::generate(const TAPBlock& block, pulse_push_t& sink) {
 
 	{
 		const auto pulses = generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());

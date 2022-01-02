@@ -75,7 +75,7 @@ void TZXFile::load(std::string path) {
 
 #if __cplusplus >= 202002L
 
-EightBit::co_generator_t<ToneSequence::amplitude_t> TZXFile::generate() const {
+TZXFile::amplitude_generator_t TZXFile::generate() const {
 	for (const auto& block : blocks()) {
 		auto generator = block.generate();
 		while (generator) {
@@ -88,9 +88,9 @@ EightBit::co_generator_t<ToneSequence::amplitude_t> TZXFile::generate() const {
 
 #else
 
-void TZXFile::generate(boost::coroutines2::coroutine<ToneSequence::amplitude_t>::push_type& sink) const {
+void TZXFile::generate(amplitude_push_t& sink) const {
 	for (const auto& block : blocks()) {
-		boost::coroutines2::coroutine<ToneSequence::pulse_t>::pull_type pulses(boost::bind(&TAPBlock::generate, &block, _1));
+		ToneSequence::pulse_pull_t pulses(boost::bind(&TAPBlock::generate, &block, _1));
 		for (const auto& pulse : pulses) {
 			const auto& [level, length] = pulse;
 			for (int i = 0; i < length; ++i)
