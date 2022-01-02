@@ -111,8 +111,7 @@ private:
 #if __cplusplus >= 202002L
     TZXFile::amplitude_generator_t m_tones = m_tape.generate();
 #else
-    std::unique_ptr<TZXFile::amplitude_pull_t> m_tone_generator;
-    TZXFile::amplitude_pull_t::iterator m_tones;
+    std::unique_ptr<TZXFile::amplitude_pull_t> m_tones;
 #endif
 
 public:
@@ -253,12 +252,11 @@ private:
 
     [[nodiscard]] constexpr const auto& tape() const noexcept { return m_tape; }
     [[nodiscard]] constexpr auto& tape() noexcept { return m_tape; }
-    [[nodiscard]] constexpr const auto& tones() const noexcept { return m_tones; }
-    [[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
 
-#if __cplusplus < 202002L
-    [[nodiscard]] constexpr const auto& tone_generator() const noexcept { return m_tone_generator; }
-    [[nodiscard]] constexpr auto& tone_generator() noexcept { return m_tone_generator; }
+#if __cplusplus >=202002L
+    [[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
+#else
+    [[nodiscard]] auto& tones() noexcept { return *m_tones; }
 #endif
 
 public:

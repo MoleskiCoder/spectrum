@@ -51,10 +51,11 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 					BUS().beep().buzz(m_ear, frameCpuCycles());
 				}
 #else
-				if (tone_generator() && (tones() != tone_generator()->end())) {
-					m_ear = *tones();
+				assert(m_tones);
+				if (tones()) {
+					m_ear = tones().get();
 					BUS().beep().buzz(m_ear, frameCpuCycles());
-					m_tones++;
+					tones()();
 				}
 #endif
 			} else {
@@ -390,7 +391,6 @@ void Ula::attachTZX(const std::string path) {
 	tape().load(path);
 #if __cplusplus < 202002L
 	auto puller{ [this](TZXFile::amplitude_push_t& sink) { m_tape.generate(sink); } };
-	tone_generator() = std::make_unique<TZXFile::amplitude_pull_t>(puller);
-	tones() = tone_generator()->begin();
+	m_tones = std::make_unique<TZXFile::amplitude_pull_t>(puller);
 #endif
 }
