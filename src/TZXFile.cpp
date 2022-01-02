@@ -1,14 +1,8 @@
 #include "stdafx.h"
 
-//#include <iostream>
-
 #include "TAPBlock.h"
 #include "TZXFile.h"
 #include "Board.h"
-
-#if __cplusplus < 202002L
-#   include <boost/bind.hpp>
-#endif
 
 TZXFile::TZXFile() {}
 
@@ -90,7 +84,7 @@ TZXFile::amplitude_generator_t TZXFile::generate() const {
 
 void TZXFile::generate(amplitude_push_t& sink) const {
 	for (const auto& block : blocks()) {
-		ToneSequence::pulse_pull_t pulses(boost::bind(&TAPBlock::generate, &block, _1));
+		ToneSequence::pulse_pull_t pulses{ [block](ToneSequence::pulse_push_t& sink) { block.generate(sink); } };
 		for (const auto& pulse : pulses) {
 			const auto& [level, length] = pulse;
 			for (int i = 0; i < length; ++i)

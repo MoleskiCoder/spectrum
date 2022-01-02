@@ -7,7 +7,6 @@
 
 #if __cplusplus < 202002L
 #   include <memory>
-#   include <boost/bind.hpp>
 #endif
 
 #include <SDL.h>
