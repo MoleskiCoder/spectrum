@@ -2,6 +2,8 @@
 #pragma once
 #endif
 
+#define NOMINMAX
+
 #include <algorithm>
 #include <array>
 #include <bitset>

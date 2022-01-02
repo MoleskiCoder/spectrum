@@ -35,6 +35,8 @@ uint8_t Content::readByte(int position) {
 	return bytes[0];
 }
 
+#if __cplusplus >= 202002L
+
 std::span<uint8_t> Content::readBytes(int position, int amount) {
 	assert(position >= 0);
 	assert(amount > 0);
@@ -46,6 +48,22 @@ std::span<uint8_t> Content::fetchBytes(int amount) {
 	move(amount);
 	return bytes;
 }
+
+#else
+
+boost::span<uint8_t> Content::readBytes(int position, int amount) {
+	assert(position >= 0);
+	assert(amount > 0);
+	return boost::span<uint8_t>(BYTES().data() + position, amount);
+}
+
+boost::span<uint8_t> Content::fetchBytes(int amount) {
+	const auto bytes = readBytes(position(), amount);
+	move(amount);
+	return bytes;
+}
+
+#endif
 
 uint8_t Content::fetchByte() {
 	const auto bytes = fetchBytes(1);

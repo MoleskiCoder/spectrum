@@ -45,10 +45,18 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 			// Tape handling
 			if (tape().playing()) {
 				BUS().beep().maybeStartRecording();
+#if __cplusplus >= 202002L
 				if (tones()) {
 					m_ear = tones()();
 					BUS().beep().buzz(m_ear, frameCpuCycles());
 				}
+#else
+				if (tone_generator() && (tones() != tone_generator()->end())) {
+					m_ear = *tones();
+					BUS().beep().buzz(m_ear, frameCpuCycles());
+					m_tones++;
+				}
+#endif
 			} else {
 				BUS().beep().maybeStopRecording();
 			}
@@ -318,8 +326,12 @@ uint8_t Ula::findSelectedKeys(uint8_t rows) const {
 			const auto& keys = pKeys->second;
 			assert(keys.size() == 5);
 			for (int column = 0; column < keys.size(); ++column) {
+#if __cplusplus >= 202002L
+				if (keyboardRaw().contains(keys[column]))
+#else
 				if (keyboardRaw().find(keys[column]) == keyboardRaw().end())
-					returned &= ~bit(column);
+#endif
+				returned &= ~bit(column);
 			}
 		}
 	}
@@ -375,5 +387,9 @@ void Ula::readingPort(const uint8_t port) {
 }
 
 void Ula::attachTZX(const std::string path) {
-	m_tape.load(path);
+	tape().load(path);
+#if __cplusplus < 202002L
+	tone_generator() = std::make_unique<boost::coroutines2::coroutine<ToneSequence::amplitude_t>::pull_type>(boost::bind(&TZXFile::generate, &m_tape, _1));
+	tones() = m_tone_generator->begin();
+#endif
 }

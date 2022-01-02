@@ -55,6 +55,7 @@ private:
 		return compressed_window(m_window);
 	}
 
+#if __cplusplus >= 202002L
 	[[nodiscard]] constexpr static bool finished_window(const std::array<int, 4>& window) noexcept {
 		const std::array<int, 4> compare = { 0x00, 0xed, 0xed, 0x00 };
 		return window == compare;
@@ -63,6 +64,16 @@ private:
 	[[nodiscard]] constexpr bool finished_window() const noexcept {
 		return finished_window(m_window);
 	}
+#else
+	[[nodiscard]] static bool finished_window(const std::array<int, 4>& window) noexcept {
+		const std::array<int, 4> compare = { 0x00, 0xed, 0xed, 0x00 };
+		return window == compare;
+	}
+
+	[[nodiscard]] bool finished_window() const noexcept {
+		return finished_window(m_window);
+	}
+#endif
 
 	constexpr static void adjust(std::array<int, 4>& window, int current) noexcept {
 		for (int i = 2; i >= 0; --i)

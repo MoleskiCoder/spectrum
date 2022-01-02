@@ -2,10 +2,15 @@
 
 #include <cstdint>
 #include <vector>
-#include <span>
 
 #include <Rom.h>
 #include <Register.h>
+
+#if __cplusplus >= 202002L
+#	include <span>
+#else
+#	include <boost/core/span.hpp>
+#endif
 
 class Content : public EightBit::Rom {
 private:
@@ -34,9 +39,21 @@ public:
 	void move(int amount = 1);
 
 	[[nodiscard]] uint8_t readByte(int position);
+
+#if __cplusplus >= 202002L
+
 	[[nodiscard]] std::span<uint8_t> readBytes(int position, int amount);
 
 	[[nodiscard]] std::span<uint8_t> fetchBytes(int amount);
+
+#else
+
+	[[nodiscard]] boost::span<uint8_t> readBytes(int position, int amount);
+
+	[[nodiscard]] boost::span<uint8_t> fetchBytes(int amount);
+
+#endif
+
 	[[nodiscard]] uint8_t fetchByte();
 
 	[[nodiscard]] virtual EightBit::register16_t readWord(int position) = 0;

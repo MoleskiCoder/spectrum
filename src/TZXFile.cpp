@@ -6,6 +6,10 @@
 #include "TZXFile.h"
 #include "Board.h"
 
+#if __cplusplus < 202002L
+#   include <boost/bind.hpp>
+#endif
+
 TZXFile::TZXFile() {}
 
 void TZXFile::readHeader() {
@@ -69,6 +73,8 @@ void TZXFile::load(std::string path) {
 		blocks().push_back(readBlock());
 }
 
+#if __cplusplus >= 202002L
+
 EightBit::co_generator_t<ToneSequence::amplitude_t> TZXFile::generate() const {
 	for (const auto& block : blocks()) {
 		auto generator = block.generate();
@@ -79,3 +85,18 @@ EightBit::co_generator_t<ToneSequence::amplitude_t> TZXFile::generate() const {
 		}
 	}
 }
+
+#else
+
+void TZXFile::generate(boost::coroutines2::coroutine<ToneSequence::amplitude_t>::push_type& sink) const {
+	for (const auto& block : blocks()) {
+		boost::coroutines2::coroutine<ToneSequence::pulse_t>::pull_type pulses(boost::bind(&TAPBlock::generate, &block, _1));
+		for (const auto& pulse : pulses) {
+			const auto& [level, length] = pulse;
+			for (int i = 0; i < length; ++i)
+				sink(level);
+		}
+	}
+}
+
+#endif

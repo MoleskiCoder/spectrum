@@ -9,7 +9,11 @@
 #include "LittleEndianContent.h"
 #include "TAPBlock.h"
 
-#include <co_generator_t.h>
+#if __cplusplus >= 202002L
+#   include <co_generator_t.h>
+#else
+#	include <boost/coroutine2/all.hpp>
+#endif
 
 class TZXFile final {
 public:
@@ -41,10 +45,20 @@ public:
 	void load(std::string path);
 
 	[[nodiscard]] constexpr const auto& blocks() const noexcept { return m_blocks; }
+
+#if __cplusplus >= 202002L
 	[[nodiscard]] constexpr auto unloaded() const noexcept { return blocks().empty(); }
 	[[nodiscard]] constexpr auto loaded() const noexcept { return !unloaded(); }
+#else
+	[[nodiscard]] auto unloaded() const noexcept { return blocks().empty(); }
+	[[nodiscard]] auto loaded() const noexcept { return !unloaded(); }
+#endif
 
+#if __cplusplus >= 202002L
 	[[nodiscard]] EightBit::co_generator_t<ToneSequence::amplitude_t> generate() const;
+#else
+	void generate(boost::coroutines2::coroutine<ToneSequence::amplitude_t>::push_type& sink) const;
+#endif
 
 	[[nodiscard]] constexpr auto playing() const noexcept { return m_playing; }
 	[[nodiscard]] constexpr auto stopped() const noexcept { return !playing(); }

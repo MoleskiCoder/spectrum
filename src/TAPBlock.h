@@ -9,6 +9,10 @@
 #include "LittleEndianContent.h"
 #include "StandardToneSequence.h"
 
+#if __cplusplus < 202002L
+#	include <boost/coroutine2/all.hpp>
+#endif
+
 class TAPBlock final {
 public:
 	enum BlockFlag { Header = 0, Data = 0xff };
@@ -86,5 +90,9 @@ public:
 
 	void process();
 
+#if __cplusplus >= 202002L
 	[[nodiscard]] auto generate() const { return StandardToneSequence().generate(*this); }
+#else
+	void generate(boost::coroutines2::coroutine<ToneSequence::pulse_t>::push_type& sink) const { StandardToneSequence().generate(*this, sink); }
+#endif
 };

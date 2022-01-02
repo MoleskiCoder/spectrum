@@ -5,6 +5,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#if __cplusplus < 202002L
+#   include <memory>
+#   include <boost/bind.hpp>
+#endif
+
 #include <SDL.h>
 
 #include <ClockedChip.h>
@@ -104,7 +109,12 @@ private:
     static const int AttributeAddress = 0x1800;
 
     TZXFile m_tape;
+#if __cplusplus >= 202002L
     EightBit::co_generator_t<ToneSequence::amplitude_t> m_tones = m_tape.generate();
+#else
+    std::unique_ptr<boost::coroutines2::coroutine<ToneSequence::amplitude_t>::pull_type> m_tone_generator;
+    boost::coroutines2::coroutine<ToneSequence::amplitude_t>::pull_type::iterator m_tones;
+#endif
 
 public:
     static constexpr float FramesPerSecond = 50.08f;
@@ -244,8 +254,13 @@ private:
 
     [[nodiscard]] constexpr const auto& tape() const noexcept { return m_tape; }
     [[nodiscard]] constexpr auto& tape() noexcept { return m_tape; }
-    //[[nodiscard]] constexpr const auto& tones() const noexcept { return m_tones; }
-    //[[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
+    [[nodiscard]] constexpr const auto& tones() const noexcept { return m_tones; }
+    [[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
+
+#if __cplusplus < 202002L
+    [[nodiscard]] constexpr const auto& tone_generator() const noexcept { return m_tone_generator; }
+    [[nodiscard]] constexpr auto& tone_generator() noexcept { return m_tone_generator; }
+#endif
 
 public:
     constexpr void playTape() noexcept { tape().play(); }
