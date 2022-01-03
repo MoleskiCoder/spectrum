@@ -9,16 +9,34 @@
 #include <array>
 #include <bitset>
 #include <cassert>
+#include <chrono>
 #include <cstdint>
-#include <stdexcept>
+#include <cstring>
+#include <fstream>
 #include <iostream>
+#include <iterator>
+#include <limits>
 #include <memory>
+#include <stdexcept>
 #include <string>
-#include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
+#include <vector>
 
-#include <boost/dynamic_bitset.hpp>
+#ifdef USE_COROUTINES
+#if __cplusplus >= 202002L
+#	include <co_generator_t.h>
+#else
+#	include <boost/coroutine2/all.hpp>
+#endif
+#endif
+
+#if __cplusplus >= 202002L
+#	include <span>
+#else
+#	include <boost/core/span.hpp>
+#endif
 
 #include <SDL.h>
 
@@ -35,9 +53,9 @@
 #include <Rom.h>
 #include <Signal.h>
 
-#include <Z80.h>
-#include <Profiler.h>
 #include <Disassembler.h>
+#include <Profiler.h>
+#include <Z80.h>
 
 #ifdef _MSC_VER
 #pragma comment(lib, "SDL2.lib")

@@ -4,9 +4,14 @@
 #include <array>
 #include <unordered_map>
 #include <unordered_set>
+#include <string>
 
+#ifdef USE_COROUTINES
 #if __cplusplus < 202002L
 #   include <memory>
+#endif
+#else
+#   include <vector>
 #endif
 
 #include <SDL.h>

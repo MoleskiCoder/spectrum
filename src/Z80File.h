@@ -4,7 +4,14 @@
 #include <string>
 #include <cstdint>
 
+#include <Chip.h>
+#include <Register.h>
+
 #include "LittleEndianContent.h"
+
+namespace EightBit {
+	class Z80;
+}
 
 class Board;
 

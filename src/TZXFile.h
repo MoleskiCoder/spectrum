@@ -1,21 +1,19 @@
 #pragma once
 
-#include <memory>
+#include <cstdint>
 #include <string>
 #include <vector>
 
-#include <Register.h>
-
-#include "LittleEndianContent.h"
-#include "TAPBlock.h"
-
 #ifdef USE_COROUTINES
 #if __cplusplus >= 202002L
-#   include <co_generator_t.h>
+#	include <co_generator_t.h>
 #else
 #	include <boost/coroutine2/all.hpp>
 #endif
 #endif
+
+#include "LittleEndianContent.h"
+#include "TAPBlock.h"
 
 class TZXFile final {
 public:

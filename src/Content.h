@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cassert>
 #include <cstdint>
 #include <vector>
 
+#include <Chip.h>
 #include <Rom.h>
 #include <Register.h>
 

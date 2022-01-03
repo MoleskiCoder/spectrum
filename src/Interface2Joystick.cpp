@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Interface2Joystick.h"
+#include "Board.h"
 
 Interface2Joystick::Interface2Joystick(Board& motherboard)
 : Joystick(motherboard) {}

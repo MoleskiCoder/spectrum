@@ -9,10 +9,11 @@
 
 #include "Board.h"
 #include "ColourPalette.h"
-#include "Joystick.h"
+#include "Ula.h"
 
 class Configuration;
 class Expansion;
+class Joystick;
 
 class Computer final : public Gaming::Game {
 public:

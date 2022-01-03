@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <string>
 
-#include <Rom.h>
 #include <Register.h>
 
 #include "LittleEndianContent.h"

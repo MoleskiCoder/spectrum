@@ -2,7 +2,7 @@
 
 #include <Device.h>
 
-#include "Board.h"
+class Board;
 
 class Expansion : public EightBit::Device {
 public:

@@ -4,6 +4,8 @@
 
 #include "Joystick.h"
 
+class Board;
+
 class KempstonJoystick final : public Joystick {
 public:
 	KempstonJoystick(Board& motherboard);

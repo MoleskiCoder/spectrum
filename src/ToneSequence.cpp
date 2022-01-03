@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <bitset>
 #include "ToneSequence.h"
 #include "TAPBlock.h"
 

@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "Ula.h"
 
-#include <Chip.h>
 #include <cassert>
+
+#include <Chip.h>
 
 #include "Board.h"
 #include "TZXFile.h"
