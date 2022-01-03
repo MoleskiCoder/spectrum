@@ -13,11 +13,12 @@ std::vector<ToneSequence::pulse_t> ToneSequence::generate(uint8_t byte) const {
 
 std::vector<ToneSequence::pulse_t> ToneSequence::generate(const Content& content) const {
 	std::vector<pulse_t> returned;
-	returned.reserve(content.size() * 8 ); // bytes * bits-per-byte
-	for (int i = 0; i < content.size(); ++i) {
-		auto tones = generate(content.peek(i));
-		for (const auto& tone : tones)
-			returned.push_back(tone);
+	returned.reserve(content.size() * 8); // bytes * bits-per-byte
+	const auto bytes = const_cast<Content&>(content).readBytes();
+	for (auto byte : bytes) {
+		const auto pulses = generate(byte);
+		assert(pulses.size() == 8);
+		returned.insert(returned.end(), pulses.begin(), pulses.end());
 	}
 	return returned;
 }

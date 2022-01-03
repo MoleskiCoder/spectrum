@@ -14,7 +14,7 @@
 
 class Content : public EightBit::Rom {
 private:
-	int m_position = -1;
+	uint16_t m_position = EightBit::Chip::Mask16;
 	bool m_locked = false;
 
 public:
@@ -36,29 +36,58 @@ public:
 	[[nodiscard]] constexpr void lock(bool locking = true) noexcept { locked() = locking; }
 	[[nodiscard]] constexpr void unlock() noexcept { lock(true); }
 
-	void move(int amount = 1);
-
-	[[nodiscard]] uint8_t readByte(int position);
+	constexpr void move(int amount = 1) noexcept {
+		assert(!locked());
+		position() += amount;
+	}
 
 #if __cplusplus >= 202002L
 
-	[[nodiscard]] std::span<uint8_t> readBytes(int position, int amount);
+	[[nodiscard]] constexpr auto readBytes(uint16_t position, uint16_t amount) noexcept {
+		return std::span<uint8_t>(BYTES().data() + position, amount);
+	}
 
-	[[nodiscard]] std::span<uint8_t> fetchBytes(int amount);
+	[[nodiscard]] constexpr auto fetchBytes(uint16_t amount) noexcept {
+		const auto bytes = readBytes(position(), amount);
+		move(amount);
+		return bytes;
+	}
+
+	[[nodiscard]] constexpr auto readBytes() noexcept {
+		return readBytes(0, size());
+	}
 
 #else
 
-	[[nodiscard]] boost::span<uint8_t> readBytes(int position, int amount);
+	[[nodiscard]] constexpr boost::span<uint8_t> readBytes(uint16_t position, uint16_t amount) noexcept {
+		return boost::span<uint8_t>(BYTES().data() + position, amount);
+	}
 
-	[[nodiscard]] boost::span<uint8_t> fetchBytes(int amount);
+	[[nodiscard]] constexpr boost::span<uint8_t> fetchBytes(uint16_t amount) noexcept {
+		const auto bytes = readBytes(position(), amount);
+		move(amount);
+		return bytes;
+	}
+
+	[[nodiscard]] constexpr boost::span<uint8_t> readBytes() noexcept {
+		return readBytes(0, size());
+	}
 
 #endif
 
-	[[nodiscard]] uint8_t fetchByte();
+	[[nodiscard]] constexpr auto readByte(uint16_t position) noexcept {
+		const auto bytes = readBytes(position, 1);
+		return bytes[0];
+	}
 
-	[[nodiscard]] virtual EightBit::register16_t readWord(int position) = 0;
-	[[nodiscard]] std::vector<EightBit::register16_t> readWords(int position, int amount);
+	[[nodiscard]] constexpr auto fetchByte() noexcept {
+		const auto bytes = fetchBytes(1);
+		return bytes[0];
+	}
 
-	[[nodiscard]] std::vector<EightBit::register16_t> fetchWords(int amount);
+	[[nodiscard]] virtual EightBit::register16_t readWord(uint16_t position) = 0;
+	[[nodiscard]] std::vector<EightBit::register16_t> readWords(uint16_t position, uint16_t amount);
+
+	[[nodiscard]] std::vector<EightBit::register16_t> fetchWords(uint16_t amount);
 	[[nodiscard]] EightBit::register16_t fetchWord();
 };
