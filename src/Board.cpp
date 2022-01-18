@@ -81,7 +81,7 @@ void Board::toggleProfileMode() {
 	m_configuration.setProfileMode(!current);
 }
 
-void Board::raisePOWER() {
+void Board::raisePOWER() noexcept {
 	EightBit::Bus::raisePOWER();
 	for (auto& expansion : m_expansions)
 		expansion->raisePOWER();
@@ -94,7 +94,7 @@ void Board::raisePOWER() {
 	mic().start();
 }
 
-void Board::lowerPOWER() {
+void Board::lowerPOWER() noexcept {
 	mic().stop();
 	beep().stop();
 	CPU().lowerPOWER();

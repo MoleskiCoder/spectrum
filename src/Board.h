@@ -52,8 +52,8 @@ public:
 	void toggleProfileMode();
 
 	void initialise() final;
-	void raisePOWER() final;
-	void lowerPOWER() final;
+	void raisePOWER() noexcept final;
+	void lowerPOWER() noexcept final;
 
 	[[nodiscard]] uint8_t peek(uint16_t address) noexcept override;
 	void poke(uint16_t address, uint8_t value) noexcept override;

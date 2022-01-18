@@ -19,8 +19,8 @@ class Computer final : public Gaming::Game {
 public:
 	Computer(Configuration& configuration);
 
-	void raisePOWER() override;
-	void lowerPOWER() override;
+	void raisePOWER() noexcept override;
+	void lowerPOWER() noexcept override;
 
 	void plug(std::shared_ptr<Expansion> expansion);
 	void plug(std::string path);

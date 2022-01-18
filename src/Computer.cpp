@@ -12,14 +12,14 @@ const uint32_t* Computer::pixels() const {
 	return BUS().ULA().pixels().data();
 }
 
-void Computer::raisePOWER() {
+void Computer::raisePOWER() noexcept {
 	Game::raisePOWER();
 	m_colours.load(pixelFormat().get());
 	BUS().initialise();
 	BUS().raisePOWER();
 }
 
-void Computer::lowerPOWER() {
+void Computer::lowerPOWER() noexcept {
 	BUS().lowerPOWER();
 	Game::lowerPOWER();
 }
