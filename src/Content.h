@@ -87,7 +87,7 @@ public:
 		return bytes[0];
 	}
 
-	[[nodiscard]] virtual EightBit::register16_t readWord(uint16_t position) = 0;
+	[[nodiscard]] virtual EightBit::register16_t readWord(uint16_t position) noexcept = 0;
 	[[nodiscard]] std::vector<EightBit::register16_t> readWords(uint16_t position, uint16_t amount);
 
 	[[nodiscard]] std::vector<EightBit::register16_t> fetchWords(uint16_t amount);
