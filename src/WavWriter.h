@@ -73,6 +73,7 @@ public:
 	}
 
 	void recordSample(int channel, OutputT sample) {
+		assert(channel < channels());
 		m_audio.samples[channel].push_back(sample);
 	}
 
