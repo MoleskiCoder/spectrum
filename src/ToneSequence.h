@@ -88,7 +88,7 @@ private:
 		return generatePause(pauseTime());
 	}
 
-	[[nodiscard]] pulse_t generate(bool bit) const noexcept {
+	[[nodiscard]] constexpr pulse_t generate(bool bit) const noexcept {
 		return generatePulse(bit ? oneBitTonePulseLength() : zeroBitTonePulseLength());
 	}
 
