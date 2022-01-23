@@ -132,6 +132,11 @@ public:
     static const int RasterWidth = LeftRasterBorder + ActiveRasterWidth + RightRasterBorder;
     static const int RasterHeight = TopRasterBorder + ActiveRasterHeight + BottomRasterBorder;
 
+    static const int TotalHeight = VerticalRetraceLines + RasterHeight;
+    static const int TotalHorizontalClocks = HorizontalRetraceClocks + RasterWidth;
+    static const int TotalFrameClocks = TotalHeight * TotalHorizontalClocks;
+    static constexpr float CalculatedClockFrequency = TotalFrameClocks * FramesPerSecond;
+
 public:
     Ula(const ColourPalette& palette, Board& bus);
 
@@ -151,11 +156,6 @@ public:
     [[nodiscard]] constexpr const auto& pixels() const noexcept { return m_pixels; }
 
 private:
-    static const int TotalHeight = VerticalRetraceLines + RasterHeight;
-    static const int TotalHorizontalClocks = HorizontalRetraceClocks + RasterWidth;
-    static const int TotalFrameClocks = TotalHeight * TotalHorizontalClocks;
-    static constexpr float CalculatedClockFrequency = TotalFrameClocks * FramesPerSecond;
-
     std::array<uint16_t, 256> m_scanLineAddresses;
     std::array<uint16_t, 256> m_attributeAddresses;
     std::array<uint32_t, RasterWidth * RasterHeight> m_pixels;
