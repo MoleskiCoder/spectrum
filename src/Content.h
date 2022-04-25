@@ -36,7 +36,7 @@ public:
 	[[nodiscard]] constexpr auto locked() const noexcept { return m_locked; }
 	[[nodiscard]] constexpr auto unlocked() const noexcept { return !locked(); }
 	[[nodiscard]] constexpr void lock(bool locking = true) noexcept { locked() = locking; }
-	[[nodiscard]] constexpr void unlock() noexcept { lock(true); }
+	[[nodiscard]] constexpr void unlock() noexcept { lock(false); }
 
 	constexpr void move(int amount = 1) noexcept {
 		assert(!locked());
