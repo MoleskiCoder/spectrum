@@ -2,17 +2,13 @@
 
 #include <cassert>
 #include <cstdint>
+#include <span>
 #include <vector>
 
 #include <Chip.h>
 #include <Rom.h>
 #include <Register.h>
 
-#if __cplusplus >= 202002L
-#	include <span>
-#else
-#	include <boost/core/span.hpp>
-#endif
 
 class Content : public EightBit::Rom {
 private:
@@ -43,8 +39,6 @@ public:
 		position() += amount;
 	}
 
-#if __cplusplus >= 202002L
-
 	[[nodiscard]] constexpr auto readBytes(uint16_t position, uint16_t amount) noexcept {
 		return std::span<uint8_t>(BYTES().data() + position, amount);
 	}
@@ -58,24 +52,6 @@ public:
 	[[nodiscard]] constexpr auto readBytes() noexcept {
 		return readBytes(0, size());
 	}
-
-#else
-
-	[[nodiscard]] constexpr boost::span<uint8_t> readBytes(uint16_t position, uint16_t amount) noexcept {
-		return boost::span<uint8_t>(BYTES().data() + position, amount);
-	}
-
-	[[nodiscard]] constexpr boost::span<uint8_t> fetchBytes(uint16_t amount) noexcept {
-		const auto bytes = readBytes(position(), amount);
-		move(amount);
-		return bytes;
-	}
-
-	[[nodiscard]] constexpr boost::span<uint8_t> readBytes() noexcept {
-		return readBytes(0, size());
-	}
-
-#endif
 
 	[[nodiscard]] constexpr auto readByte(uint16_t position) noexcept {
 		const auto bytes = readBytes(position, 1);

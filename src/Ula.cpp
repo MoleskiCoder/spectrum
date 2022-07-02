@@ -319,12 +319,8 @@ uint8_t Ula::findSelectedKeys(uint8_t rows) const {
 			const auto& keys = pKeys->second;
 			assert(keys.size() == 5);
 			for (int column = 0; column < keys.size(); ++column) {
-#if __cplusplus >= 202002L
 				if (keyboardRaw().contains(keys[column]))
-#else
-				if (keyboardRaw().find(keys[column]) == keyboardRaw().end())
-#endif
-				returned &= ~bit(column);
+					returned &= ~bit(column);
 			}
 		}
 	}
