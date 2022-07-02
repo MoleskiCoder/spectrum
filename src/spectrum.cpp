@@ -96,29 +96,26 @@ void testTapeLoading(const Configuration& configuration) {
 
 	ToneSequence::amplitude_t highest = ToneSequence::amplitude_t::Low;
 
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
 	auto generator = tape.generate();
 	while (generator) {
-		auto level = generator();
-		highest = std::max(highest, level);
+		const auto level = generator();
 		++count;
 	}
-#else
-	auto puller{ [tape](TZXFile::amplitude_push_t& sink) { tape.generate(sink); } };
-	auto amplitudes = TZXFile::amplitude_pull_t(puller);
-	for (auto level : amplitudes) {
-		highest = std::max(highest, level);
-		++count;
-	}
-#endif
-#else
-	const auto amplitudes = tape.generate();
-	for (auto level : amplitudes) {
-		highest = std::max(highest, level);
-		++count;
-	}
-#endif
+
+	//Buzzer<Uint8> beep = { Ula::FramesPerSecond, Ula::CpuClockRate, AUDIO_U8 };
+	//auto generator = tape.generate();
+	//auto frameCycles = 0;
+	//while (generator) {
+	//	const auto level = generator();
+	//	beep.buzz(level, frameCycles);
+	//	if (++frameCycles == (Ula::TotalFrameClocks / 2)) {
+	//		frameCycles = 0;
+	//		beep.endFrame();
+	//		//std::cout << ".";
+	//	}
+	//	++count;
+	//}
+
 
 	const auto finish_time = std::chrono::steady_clock::now();
 	const auto elapsed_time = finish_time - start_time;

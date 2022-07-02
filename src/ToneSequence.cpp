@@ -31,10 +31,6 @@ std::vector<ToneSequence::pulse_t> ToneSequence::generatePilotTone(int pulses) c
 	return returned;
 }
 
-#ifdef USE_COROUTINES
-
-#if __cplusplus >= 202002L
-
 ToneSequence::pulse_generator_t ToneSequence::generate(const TAPBlock& block) const {
 
 	{
@@ -54,53 +50,3 @@ ToneSequence::pulse_generator_t ToneSequence::generate(const TAPBlock& block) co
 
 	co_yield generatePause();
 }
-
-#else
-
-void ToneSequence::generate(const TAPBlock& block, pulse_push_t& sink) {
-
-	{
-		const auto pulses = generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());
-		for (const auto& pulse : pulses)
-			sink(pulse);
-	}
-
-	sink(generatePulse(firstSyncTonePulseLength()));
-	sink(generatePulse(secondSyncTonePulseLength()));
-
-	{
-		const auto pulses = generate(block.content());
-		for (const auto& pulse : pulses)
-			sink(pulse);
-	}
-
-	sink(generatePause());
-}
-
-#endif
-
-#else
-
-std::vector<ToneSequence::pulse_t> ToneSequence::generate(const TAPBlock& block) const {
-
-	std::vector<pulse_t> returned;
-
-	{
-		const auto pulses = generatePilotTone(block.isHeaderBlock() ? headerPilotTonePulses() : dataPilotTonePulses());
-		returned.insert(returned.end(), pulses.begin(), pulses.end());
-	}
-
-	returned.push_back(generatePulse(firstSyncTonePulseLength()));
-	returned.push_back(generatePulse(secondSyncTonePulseLength()));
-
-	{
-		const auto pulses = generate(block.content());
-		returned.insert(returned.end(), pulses.begin(), pulses.end());
-	}
-
-	returned.push_back(generatePause());
-
-	return returned;
-}
-
-#endif

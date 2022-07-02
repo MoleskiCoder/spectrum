@@ -6,14 +6,6 @@
 #include <unordered_set>
 #include <string>
 
-#ifdef USE_COROUTINES
-#if __cplusplus < 202002L
-#   include <memory>
-#endif
-#else
-#   include <vector>
-#endif
-
 #include <SDL.h>
 
 #include <ClockedChip.h>
@@ -113,16 +105,7 @@ private:
     static const int AttributeAddress = 0x1800;
 
     TZXFile m_tape;
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
     TZXFile::amplitude_generator_t m_tones = m_tape.generate();
-#else
-    std::unique_ptr<TZXFile::amplitude_pull_t> m_tones;
-#endif
-#else
-    std::vector<ToneSequence::amplitude_t> m_tones;
-    std::vector<ToneSequence::amplitude_t>::const_iterator m_current_tone;
-#endif
 
 public:
     static constexpr float FramesPerSecond = 50.08f;
@@ -262,16 +245,7 @@ private:
 
     [[nodiscard]] constexpr const auto& tape() const noexcept { return m_tape; }
     [[nodiscard]] constexpr auto& tape() noexcept { return m_tape; }
-
-#ifdef USE_COROUTINES
-#if __cplusplus >=202002L
     [[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
-#else
-    [[nodiscard]] auto& tones() noexcept { return *m_tones; }
-#endif
-#else
-    [[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
-#endif
 
 public:
     constexpr void playTape() noexcept { tape().play(); }

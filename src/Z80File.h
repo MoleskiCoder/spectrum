@@ -92,7 +92,7 @@ private:
 		adjust(m_window, current);
 	}
 
-	[[nodiscard]] auto fetchByteWindowed() noexcept {
+	[[nodiscard]] constexpr auto fetchByteWindowed() noexcept {
 		const auto current = fetchByte();
 		adjust_window(current);
 		return current;

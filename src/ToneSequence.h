@@ -6,13 +6,7 @@
 
 #include <Device.h>
 
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
-#   include <co_generator_t.h>
-#else
-#	include <boost/coroutine2/all.hpp>
-#endif
-#endif
+#include <co_generator_t.h>
 
 class TAPBlock;
 class Content;
@@ -21,15 +15,7 @@ class ToneSequence {
 public:
 	typedef EightBit::Device::PinLevel amplitude_t;
 	typedef std::pair<amplitude_t, int> pulse_t;
-
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
 	typedef EightBit::co_generator_t<pulse_t> pulse_generator_t;
-#else
-	typedef boost::coroutines2::coroutine<pulse_t>::push_type pulse_push_t;
-	typedef boost::coroutines2::coroutine<pulse_t>::pull_type pulse_pull_t;
-#endif
-#endif
 
 protected:
 	[[nodiscard]] constexpr auto pauseTime() const noexcept { return m_pauseTime; }
@@ -98,13 +84,5 @@ private:
 	[[nodiscard]] std::vector<pulse_t> generatePilotTone(int pulses) const;
 
 public:
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
 	[[nodiscard]] pulse_generator_t generate(const TAPBlock& block) const;
-#else
-	void generate(const TAPBlock& block, pulse_push_t& sink);
-#endif
-#else
-	[[nodiscard]] std::vector<pulse_t> generate(const TAPBlock& block) const;
-#endif
 };

@@ -85,13 +85,5 @@ public:
 
 	void process();
 
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
 	[[nodiscard]] auto generate() const { return StandardToneSequence().generate(*this); }
-#else
-	void generate(ToneSequence::pulse_push_t& sink) const { StandardToneSequence().generate(*this, sink); }
-#endif
-#else
-	auto generate() const { return StandardToneSequence().generate(*this); }
-#endif
 };

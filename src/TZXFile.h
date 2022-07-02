@@ -4,13 +4,7 @@
 #include <string>
 #include <vector>
 
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
-#	include <co_generator_t.h>
-#else
-#	include <boost/coroutine2/all.hpp>
-#endif
-#endif
+#include <co_generator_t.h>
 
 #include "LittleEndianContent.h"
 #include "TAPBlock.h"
@@ -18,15 +12,7 @@
 class TZXFile final {
 public:
 	typedef std::vector<TAPBlock> blocks_t;
-
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
 	typedef EightBit::co_generator_t<ToneSequence::amplitude_t> amplitude_generator_t;
-#else
-	typedef boost::coroutines2::coroutine<ToneSequence::amplitude_t>::push_type amplitude_push_t;
-	typedef boost::coroutines2::coroutine<ToneSequence::amplitude_t>::pull_type amplitude_pull_t;
-#endif
-#endif
 
 private:
 	static const uint16_t ScreenAddress = 0x4000;
@@ -54,24 +40,10 @@ public:
 	void load(std::string path);
 
 	[[nodiscard]] constexpr const auto& blocks() const noexcept { return m_blocks; }
-
-#if __cplusplus >= 202002L
 	[[nodiscard]] constexpr auto unloaded() const noexcept { return blocks().empty(); }
 	[[nodiscard]] constexpr auto loaded() const noexcept { return !unloaded(); }
-#else
-	[[nodiscard]] auto unloaded() const noexcept { return blocks().empty(); }
-	[[nodiscard]] auto loaded() const noexcept { return !unloaded(); }
-#endif
 
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
 	[[nodiscard]] amplitude_generator_t generate() const;
-#else
-	void generate(amplitude_push_t& sink) const;
-#endif
-#else
-	[[nodiscard]] std::vector<ToneSequence::amplitude_t> generate() const;
-#endif
 
 	[[nodiscard]] constexpr auto playing() const noexcept { return m_playing; }
 	[[nodiscard]] constexpr auto stopped() const noexcept { return !playing(); }

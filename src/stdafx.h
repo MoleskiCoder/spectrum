@@ -17,6 +17,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -24,19 +25,7 @@
 #include <utility>
 #include <vector>
 
-#ifdef USE_COROUTINES
-#if __cplusplus >= 202002L
-#	include <co_generator_t.h>
-#else
-#	include <boost/coroutine2/all.hpp>
-#endif
-#endif
-
-#if __cplusplus >= 202002L
-#	include <span>
-#else
-#	include <boost/core/span.hpp>
-#endif
+#include <co_generator_t.h>
 
 #include <SDL.h>
 
