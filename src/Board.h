@@ -67,20 +67,20 @@ private:
 	Configuration& m_configuration;
 	const ColourPalette& m_palette;
 	EightBit::InputOutput m_ports;
-	EightBit::Z80 m_cpu = *this;
+	EightBit::Z80 m_cpu { *this, m_ports };
 	Ula m_ula = { m_palette, *this };
 	Buzzer<Uint8> m_beep = { Ula::FramesPerSecond, Ula::CpuClockRate, AUDIO_U8 };
 	Buzzer<Uint8> m_mic = { Ula::FramesPerSecond, Ula::CpuClockRate, AUDIO_U8 };
 	std::vector<std::shared_ptr<Expansion>> m_expansions;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)
-	EightBit::Ram m_contendedRam = 0x4000;	//4000h - 7FFFh  RAM(Work RAM and VRAM) (with waitstates)
+	EightBit::Ram m_contendedRam = 0x4000;	//4000h - 7FFFh  RAM(Work RAM and VRAM) (with wait-states)
 	EightBit::Ram m_uncontendedRam = 0x8000;//8000h - FFFFh  Additional RAM
 
 	EightBit::Disassembler m_disassembler = *this;
 	EightBit::Profiler m_profiler = { m_cpu, m_disassembler };
 
-	int m_allowed = 0;	// To track "overdrawn" cycle expendature
+	int m_allowed = 0;	// To track "overdrawn" cycle expenditure
 
 	void runCycle();
 };
