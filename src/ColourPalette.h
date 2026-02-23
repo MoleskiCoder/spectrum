@@ -35,7 +35,7 @@ public:
 	void load(SDL_PixelFormat* hardware);
 
 private:
-	std::array<uint32_t, 16> m_colours;
+	std::array<uint32_t, 16> m_colours = {};
 
 	void loadColour(SDL_PixelFormat* hardware, size_t idx, Uint8 red, Uint8 green, Uint8 blue);
 };

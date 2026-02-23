@@ -42,18 +42,6 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 	Ticked.connect([this](EightBit::EventArgs) {
 		incrementC();
 		if ((cycles() % 2) == 0) {
-
-			// Tape handling
-			if (tape().playing()) {
-				BUS().beep().maybeStartRecording();
-				if (tones()) {
-					m_ear = tones()();
-					BUS().beep().buzz(m_ear, frameCpuCycles());
-				}
-			} else {
-				BUS().beep().maybeStopRecording();
-			}
-
 			// Is the CPU able to proceed?
 			if (!maybeApplyContention())
 				Proceed.fire();
@@ -253,8 +241,7 @@ void Ula::renderLines() {
 		renderLine();
 	assert(V() == TotalHeight);
 	resetV();
-	BUS().beep().endFrame();
-	BUS().mic().endFrame();
+	BUS().sound().endFrame();
 }
 
 void Ula::resetF() noexcept {
@@ -347,11 +334,10 @@ void Ula::writtenPort(const uint8_t port) {
 
 	PinLevel mic = PinLevel::Low;
 	match(mic, value & Bit3);
-	BUS().mic().buzz(mic, frameCpuCycles());
 
 	PinLevel speaker = PinLevel::Low;
 	match(speaker, value & Bit4);
-	BUS().beep().buzz(speaker, frameCpuCycles());
+	BUS().sound().buzz(speaker, frameCpuCycles());
 }
 
 void Ula::maybeReadingPort(const uint8_t port) {

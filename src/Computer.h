@@ -26,7 +26,6 @@ public:
 	void plug(std::string path);
 	void loadSna(std::string path);
 	void loadZ80(std::string path);
-	void loadTZX(std::string path);
 
 	[[nodiscard]] Board& BUS() { return m_board; }
 	[[nodiscard]] const Board& BUS() const { return m_board; }
@@ -63,10 +62,4 @@ private:
 	void handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event);
 	void handleControllerButtonDown(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
 	void handleControllerButtonUp(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
-
-	void playTape();
-	void stopTape();
-
-	void toggleDebugMode();
-	void toggleProfileMode();
 };

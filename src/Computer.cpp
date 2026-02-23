@@ -40,30 +40,6 @@ void Computer::loadZ80(const std::string path) {
 	BUS().loadZ80(path);
 }
 
-void Computer::loadTZX(const std::string path) {
-	BUS().attachTZX(path);
-}
-
-void Computer::playTape() {
-	std::cout << "Playing tape." << std::endl;
-	BUS().playTape();
-}
-
-void Computer::stopTape() {
-	std::cout << "Stopping tape." << std::endl;
-	BUS().stopTape();
-}
-
-void Computer::toggleDebugMode() {
-	std::cout << "Toggling debug mode." << std::endl;
-	BUS().toggleDebugMode();
-}
-
-void Computer::toggleProfileMode() {
-	std::cout << "Toggling profile mode." << std::endl;
-	BUS().toggleProfileMode();
-}
-
 void Computer::runRasterLines() {
 	BUS().renderLines();
 }
@@ -87,24 +63,6 @@ bool Computer::handleKeyDown(SDL_Keycode key) {
 bool Computer::handleKeyUp(SDL_Keycode key) {
 	auto handled = Game::handleKeyUp(key);
 	if (!handled) {
-		switch (key) {
-		case SDLK_F7:
-			toggleProfileMode();
-			handled = true;
-			break;
-		case SDLK_F8:
-			toggleDebugMode();
-			handled = true;
-			break;
-		case SDLK_F10:
-			playTape();
-			handled = true;
-			break;
-		case SDLK_F11:
-			stopTape();
-			handled = true;
-			break;
-		}
 		BUS().ULA().pullKey(key);
 	}
 	return handled;

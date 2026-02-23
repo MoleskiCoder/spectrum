@@ -11,7 +11,6 @@
 #include <Rom.h>
 
 #include <Z80.h>
-#include <Profiler.h>
 #include <Disassembler.h>
 
 #include "Ula.h"
@@ -29,8 +28,7 @@ public:
 	[[nodiscard]] constexpr auto& CPU() noexcept { return m_cpu; }
 	[[nodiscard]] constexpr auto& ULA() noexcept { return m_ula; }
 	[[nodiscard]] constexpr const auto& ULA() const noexcept { return m_ula; }
-	[[nodiscard]] constexpr auto& beep() noexcept { return m_beep; }
-	[[nodiscard]] constexpr auto& mic() noexcept { return m_mic; }
+	[[nodiscard]] constexpr auto& sound() noexcept { return m_sound; }
 	[[nodiscard]] constexpr auto& ports() noexcept { return m_ports; }
 	[[nodiscard]] constexpr auto& ROM() noexcept { return m_basicRom; }
 	[[nodiscard]] constexpr auto& VRAM() noexcept { return m_contendedRam; }
@@ -44,19 +42,9 @@ public:
 	void loadSna(std::string path);
 	void loadZ80(std::string path);
 
-	void attachTZX(std::string path);
-	void playTape();
-	void stopTape();
-
-	void toggleDebugMode();
-	void toggleProfileMode();
-
 	void initialise() final;
 	void raisePOWER() noexcept final;
 	void lowerPOWER() noexcept final;
-
-	[[nodiscard]] uint8_t peek(uint16_t address) noexcept override;
-	void poke(uint16_t address, uint8_t value) noexcept override;
 
 	void renderLines();
 
@@ -69,8 +57,7 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu { *this, m_ports };
 	Ula m_ula = { m_palette, *this };
-	Buzzer<Uint8> m_beep = { Ula::FramesPerSecond, Ula::CpuClockRate, AUDIO_U8 };
-	Buzzer<Uint8> m_mic = { Ula::FramesPerSecond, Ula::CpuClockRate, AUDIO_U8 };
+	Buzzer<Uint8> m_sound = { Ula::FramesPerSecond, Ula::CpuClockRate, AUDIO_U8 };
 	std::vector<std::shared_ptr<Expansion>> m_expansions;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)
@@ -78,7 +65,6 @@ private:
 	EightBit::Ram m_uncontendedRam = 0x8000;//8000h - FFFFh  Additional RAM
 
 	EightBit::Disassembler m_disassembler = *this;
-	EightBit::Profiler m_profiler = { m_cpu, m_disassembler };
 
 	int m_allowed = 0;	// To track "overdrawn" cycle expenditure
 
