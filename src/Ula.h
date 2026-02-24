@@ -10,6 +10,7 @@
 
 #include <ClockedChip.h>
 #include <Signal.h>
+#include <Register.h>
 
 #include "ColourPalette.h"
 #include "TZXFile.h"
@@ -104,9 +105,6 @@ private:
     static const int BytesPerLine = ActiveRasterWidth / 8;
     static const int AttributeAddress = 0x1800;
 
-    TZXFile m_tape;
-    TZXFile::amplitude_generator_t m_tones = m_tape.generate();
-
 public:
     static constexpr float FramesPerSecond = 50.08f;
     static const int UlaClockRate = 7'000'000; // 7Mhz
@@ -129,8 +127,6 @@ public:
 
     void pokeKey(SDL_Keycode raw);
     void pullKey(SDL_Keycode raw) noexcept;
-
-    void attachTZX(const std::string path);
 
     constexpr void setBorder(int border) noexcept {
         m_borderColour = m_palette.colour(border, false);
@@ -200,11 +196,11 @@ private:
 
     [[nodiscard]] uint8_t findSelectedKeys(uint8_t rows) const;
 
-    [[nodiscard]] auto constexpr usedPort(uint8_t port) const noexcept { return (port & Bit0) == 0; }
-    void maybeReadingPort(uint8_t port);
-    void readingPort(uint8_t port);
-    void maybeWrittenPort(uint8_t port);
-    void writtenPort(uint8_t port);
+    [[nodiscard]] auto constexpr usedPort(uint8_t low) const noexcept { return (low & Bit0) == 0; }
+    void maybeReadingPort(EightBit::register16_t port);
+    void readingPort(EightBit::register16_t port);
+    void maybeWrittenPort(EightBit::register16_t port);
+    void writtenPort(EightBit::register16_t port);
 
     void maybeFlash() noexcept;
     void flash() noexcept;
@@ -242,12 +238,4 @@ private:
     void addContention(int cycles) noexcept;
     [[nodiscard]] constexpr auto contention() const noexcept { return m_contention; }
     bool maybeApplyContention() noexcept;
-
-    [[nodiscard]] constexpr const auto& tape() const noexcept { return m_tape; }
-    [[nodiscard]] constexpr auto& tape() noexcept { return m_tape; }
-    [[nodiscard]] constexpr auto& tones() noexcept { return m_tones; }
-
-public:
-    constexpr void playTape() noexcept { tape().play(); }
-    constexpr void stopTape() noexcept { tape().stop(); }
 };

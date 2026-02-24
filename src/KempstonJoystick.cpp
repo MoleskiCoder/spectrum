@@ -4,9 +4,9 @@
 
 KempstonJoystick::KempstonJoystick(Board& motherboard)
 : Joystick(motherboard) {
-	BUS().CPU().ReadingIO.connect([this](EightBit::EventArgs) {
-		const auto port = BUS().ADDRESS().low;
-		if (port == 0x1f)
+	BUS().ports().ReadingPort.connect([this](EightBit::register16_t port) {
+		const auto low = port.low;
+		if (low == 0x1f)
 			BUS().ports().writeInputPort(port, m_contents);
 	});
 }

@@ -22,12 +22,12 @@ void Board::initialise() {
 		runCycle();
 	});
 
-	CPU().ExecutedInstruction.connect([this](const EightBit::Z80&) {
+	CPU().ExecutedInstruction.connect([this](const EightBit::EventArgs&) {
 		CPU().raiseRESET();
 	});
 
 	if (m_configuration.isDebugMode()) {
-		CPU().ExecutingInstruction.connect([this](const EightBit::Z80&) {
+		CPU().ExecutingInstruction.connect([this](const EightBit::EventArgs&) {
 			std::cerr
 				<< EightBit::Disassembler::state(CPU())
 				<< " "

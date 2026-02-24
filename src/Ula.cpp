@@ -23,12 +23,12 @@ Ula::Ula(const ColourPalette& palette, Board& bus)
 		maybeContend();
 	});
 
-	BUS().CPU().ReadingIO.connect([this](EightBit::EventArgs) {
-		maybeReadingPort(BUS().ADDRESS().low);
+	BUS().ports().ReadingPort.connect([this](EightBit::register16_t port) {
+		maybeReadingPort(port);
 	});
 
-	BUS().CPU().WrittenIO.connect([this](EightBit::EventArgs) {
-		maybeWrittenPort(BUS().ADDRESS().low);
+	BUS().ports().WrittenPort.connect([this](EightBit::register16_t port) {
+		maybeWrittenPort(port);
 	});
 
 	RaisedPOWER.connect([this](EightBit::EventArgs) {
@@ -314,8 +314,8 @@ uint8_t Ula::findSelectedKeys(uint8_t rows) const {
 	return returned;
 }
 
-void Ula::maybeWrittenPort(const uint8_t port) {
-	if (usedPort(port))
+void Ula::maybeWrittenPort(EightBit::register16_t port) {
+	if (usedPort(port.low))
 		writtenPort(port);
 }
 
@@ -326,7 +326,7 @@ void Ula::maybeWrittenPort(const uint8_t port) {
 //            -             Beep Output (ULA Sound)    (0 = Off, 1 = On)
 //   <----->                Not used
 
-void Ula::writtenPort(const uint8_t port) {
+void Ula::writtenPort(EightBit::register16_t port) {
 
 	const auto value = BUS().ports().readOutputPort(port);
 
@@ -340,8 +340,8 @@ void Ula::writtenPort(const uint8_t port) {
 	BUS().sound().buzz(speaker, frameCpuCycles());
 }
 
-void Ula::maybeReadingPort(const uint8_t port) {
-	if (usedPort(port))
+void Ula::maybeReadingPort(EightBit::register16_t port) {
+	if (usedPort(port.low))
 		readingPort(port);
 }
 
@@ -354,13 +354,8 @@ void Ula::maybeReadingPort(const uint8_t port) {
 
 // A8..A15 Keyboard Address Output (0 = Select)
 
-void Ula::readingPort(const uint8_t port) {
-	const auto portHigh = BUS().ADDRESS().high;
-	const auto  selected = findSelectedKeys(~portHigh);
+void Ula::readingPort(EightBit::register16_t port) {
+	const auto selected = findSelectedKeys(~port.high);
 	const uint8_t value = selected | (raised(m_ear) ? bit(6) : 0);
-	BUS().ports().writeInputPort(port, value);
-}
-
-void Ula::attachTZX(const std::string path) {
-	tape().load(path);
+	BUS().ports().writeInputPort(BUS().ADDRESS().word, value);
 }
