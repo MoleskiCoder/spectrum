@@ -39,10 +39,10 @@ TAPBlock TZXFile::readBlock() {
 TAPBlock TZXFile::readStandardSpeedDataBlock() {
 
 	const auto pause = content().fetchWord();
-	std::cout << "TZX: Pause (ms): " << std::dec << pause.word << std::endl;
+	std::cout << "TZX: Pause (ms): " << std::dec << pause.joined << std::endl;
 	const auto length = content().fetchWord();
-	std::cout << "TZX: Length (bytes): " << std::dec << length.word << std::endl;
-	auto bytes = content().fetchBytes(length.word);
+	std::cout << "TZX: Length (bytes): " << std::dec << length.joined << std::endl;
+	auto bytes = content().fetchBytes(length.joined);
 	std::cout << "TZX: (Remaining (bytes): " << std::dec << (int)content().remaining() << ")" << std::endl;
 
 	LittleEndianContent block;

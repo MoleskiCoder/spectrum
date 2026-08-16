@@ -42,14 +42,14 @@ public:
 	void loadSna(std::string path);
 	void loadZ80(std::string path);
 
-	void initialise() final;
+	void initialise() noexcept final;
 	void raisePOWER() noexcept final;
 	void lowerPOWER() noexcept final;
 
 	void renderLines();
 
 protected:
-	EightBit::MemoryMapping mapping(uint16_t address) noexcept final;
+	const EightBit::MemoryMapping& mapping(uint16_t address) noexcept final;
 
 private:
 	Configuration& m_configuration;
@@ -63,6 +63,10 @@ private:
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)
 	EightBit::Ram m_contendedRam = 0x4000;	//4000h - 7FFFh  RAM(Work RAM and VRAM) (with wait-states)
 	EightBit::Ram m_uncontendedRam = 0x8000;//8000h - FFFFh  Additional RAM
+
+	EightBit::MemoryMapping m_romMapping{ m_basicRom, 0x0000, 0xffff, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+	EightBit::MemoryMapping m_vramMapping{ m_contendedRam, 0x4000, 0xffff, EightBit::MemoryMapping::AccessLevel::ReadWrite };
+	EightBit::MemoryMapping m_wramMapping{ m_uncontendedRam, 0x8000, 0xffff,  EightBit::MemoryMapping::AccessLevel::ReadWrite };
 
 	EightBit::Disassembler m_disassembler = *this;
 

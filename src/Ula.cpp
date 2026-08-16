@@ -162,7 +162,7 @@ bool Ula::maybeContend(const uint16_t address) noexcept {
 }
 
 bool Ula::maybeContend() noexcept {
-	return maybeContend(BUS().ADDRESS().word);
+	return maybeContend(BUS().ADDRESS().joined);
 }
 
 void Ula::addContention(int cycles) noexcept {
@@ -357,5 +357,5 @@ void Ula::maybeReadingPort(EightBit::register16_t port) {
 void Ula::readingPort(EightBit::register16_t port) {
 	const auto selected = findSelectedKeys(~port.high);
 	const uint8_t value = selected | (raised(m_ear) ? bit(6) : 0);
-	BUS().ports().writeInputPort(BUS().ADDRESS().word, value);
+	BUS().ports().writeInputPort(BUS().ADDRESS().joined, value);
 }

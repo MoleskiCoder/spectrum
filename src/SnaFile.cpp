@@ -63,10 +63,10 @@ void SnaFile::load(Board& board) {
 	board.ULA().setBorder(border());
 
 	// XXXX HACK, HACK, HACK!!
-	const auto original = board.CPU().peekWord(0xfffe);
+	const auto original = board.CPU().peekShort(0xfffe);
 	board.poke(0xfffe, 0xed);
 	board.poke(0xffff, 0x45);	// ED45 is RETN
-	board.CPU().PC().word = 0xfffe;
+	board.CPU().PC().joined = 0xfffe;
 	board.CPU().step();
-	board.CPU().pokeWord(0xfffe, original);
+	board.CPU().pokeShort(0xfffe, original);
 }

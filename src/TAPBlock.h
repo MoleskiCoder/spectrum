@@ -62,12 +62,12 @@ public:
 
 	[[nodiscard]] auto& headerFilename() { return m_headerFilename; }
 	[[nodiscard]] auto headerFilename() const { return m_headerFilename; }
-	[[nodiscard]] constexpr auto& dataBlockLength() noexcept { return m_dataBlockLength.word; }
-	[[nodiscard]] constexpr auto dataBlockLength() const noexcept { return m_dataBlockLength.word; }
-	[[nodiscard]] constexpr auto& headerParameter1() noexcept { return m_headerParameter1.word; }
-	[[nodiscard]] constexpr auto headerParameter1() const noexcept { return m_headerParameter1.word; }
-	[[nodiscard]] constexpr auto& headerParameter2() noexcept { return m_headerParameter2.word; }
-	[[nodiscard]] constexpr auto headerParameter2() const noexcept { return m_headerParameter2.word; }
+	[[nodiscard]] constexpr auto& dataBlockLength() noexcept { return m_dataBlockLength.joined; }
+	[[nodiscard]] constexpr auto dataBlockLength() const noexcept { return m_dataBlockLength.joined; }
+	[[nodiscard]] constexpr auto& headerParameter1() noexcept { return m_headerParameter1.joined; }
+	[[nodiscard]] constexpr auto headerParameter1() const noexcept { return m_headerParameter1.joined; }
+	[[nodiscard]] constexpr auto& headerParameter2() noexcept { return m_headerParameter2.joined; }
+	[[nodiscard]] constexpr auto headerParameter2() const noexcept { return m_headerParameter2.joined; }
 
 	// Program block
 	[[nodiscard]] constexpr auto lineNumber() const noexcept { return headerParameter1(); }

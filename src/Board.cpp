@@ -13,7 +13,7 @@ Board::Board(const ColourPalette& palette, Configuration& configuration)
   m_palette(palette) {
 }
 
-void Board::initialise() {
+void Board::initialise() noexcept {
 
 	auto romDirectory = m_configuration.getRomDirectory();
 	plug(romDirectory + "\\48.rom");	// ZX Spectrum Basic
@@ -84,12 +84,12 @@ void Board::lowerPOWER() noexcept {
 	EightBit::Bus::lowerPOWER();
 }
 
-EightBit::MemoryMapping Board::mapping(const uint16_t address) noexcept {
+const EightBit::MemoryMapping& Board::mapping(const uint16_t address) noexcept {
 	if (address < 0x4000)
-		return { ROM(), 0x0000, 0xffff, EightBit::MemoryMapping::AccessLevel::ReadOnly };
+		return m_romMapping;
 	if (address < 0x8000)
-		return { VRAM(), 0x4000, 0xffff, EightBit::MemoryMapping::AccessLevel::ReadWrite };
-	return { WRAM(), 0x8000, 0xffff,  EightBit::MemoryMapping::AccessLevel::ReadWrite };
+		return m_vramMapping;
+	return m_wramMapping;
 }
 
 void Board::renderLines() {
