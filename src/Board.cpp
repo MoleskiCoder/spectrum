@@ -69,6 +69,8 @@ void Board::raisePOWER() noexcept {
 	CPU().raiseNMI();
 	
 	sound().start();
+
+	CPU().raiseRESET();
 }
 
 void Board::lowerPOWER() noexcept {

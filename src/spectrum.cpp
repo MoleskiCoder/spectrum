@@ -23,6 +23,8 @@ void loadROM(const Configuration& configuration, Computer& computer) {
 	//computer.plug(romDirectory + "\\Release-v0.37\\testrom.bin");
 	//computer.plug(romDirectory + "\\smart\\ROMs\\DiagROM.v41");
 	//computer.plug(romDirectory + "\\DiagROM.v56");
+    computer.plug(romDirectory + "\\diagrom\\DiagROMv.171");
+
 	//computer.plug(romDirectory + "\\VMM-TEST.ROM");
 }
 
@@ -132,6 +134,8 @@ void testTapeLoading(const Configuration& configuration) {
 int main(int, char*[])
 {
 	Configuration configuration;
+
+	configuration.setVerboseMode(true);
 
 #ifdef _DEBUG
 	//configuration.setDebugMode(true);

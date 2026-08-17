@@ -102,6 +102,8 @@ private:
     static const int HorizontalRetraceClocks = 96;
     static const int VerticalRetraceLines = 8;
 
+    static const int InterruptDuration = 64;   // 32 CPU cycles
+
     static const int BytesPerLine = ActiveRasterWidth / 8;
     static const int AttributeAddress = 0x1800;
 
@@ -147,6 +149,7 @@ private:
     uint32_t m_borderColour = 0;
     int m_contention = 0;
     bool m_accessingVRAM = false;
+    bool m_interruptFired = false;
 
     // Input port information
     PinLevel m_ear = PinLevel::Low;            // Bit 6

@@ -9,6 +9,9 @@ public:
 	[[nodiscard]] bool isDebugMode() const { return m_debugMode; }
 	void setDebugMode(bool value) { m_debugMode = value; }
 
+	[[nodiscard]] bool isVerboseMode() const { return m_verboseMode; }
+	void setVerboseMode(bool value) { m_verboseMode = value; }
+
 	[[nodiscard]] bool isProfileMode() const { return m_profileMode; }
 	void setProfileMode(bool value) { m_profileMode = value; }
 
@@ -20,6 +23,7 @@ public:
 
 private:
 	bool m_debugMode = false;
+	bool m_verboseMode = false;
 	bool m_profileMode = false;
 	bool m_drawGraphics = true;
 	std::string m_romDirectory = "roms";

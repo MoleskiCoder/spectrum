@@ -196,9 +196,15 @@ void Ula::processVerticalSync() {
 }
 
 void Ula::processVerticalSync(const int y) {
-	if (y == (ActiveRasterHeight + BottomRasterBorder))
-		lower(BUS().CPU().INT());
-	tick(ActiveRasterWidth);
+	if (y == (ActiveRasterHeight + BottomRasterBorder)) {
+		assert(raised(BUS().CPU().INT()));
+		assert(!m_interruptFired);
+		BUS().CPU().lowerINT();
+		m_interruptFired = true;
+	}
+	tick(InterruptDuration);
+	BUS().CPU().raiseINT();
+	tick(ActiveRasterWidth - InterruptDuration);
 	tick(RightRasterBorder);
 	tick(HorizontalRetraceClocks);
 	tick(LeftRasterBorder);
@@ -236,11 +242,16 @@ void Ula::renderLine() {
 }
 
 void Ula::renderLines() {
+	assert(!m_interruptFired);
 	assert(V() == 0);
+	resetCycles();
 	for (int i = 0; i < TotalHeight; ++i)
 		renderLine();
 	assert(V() == TotalHeight);
+	assert(m_interruptFired);
+	assert(cycles() == frameUlaCycles());
 	resetV();
+	m_interruptFired = false;
 	BUS().sound().endFrame();
 }
 
