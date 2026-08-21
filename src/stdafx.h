@@ -27,10 +27,10 @@
 
 #include <co_generator_t.h>
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <Game.h>
-#include <SDLWrapper.h>
+#include <Wrapper.h>
 
 #include <Bus.h>
 #include <Chip.h>
@@ -47,6 +47,5 @@
 #include <Z80.h>
 
 #ifdef _MSC_VER
-#pragma comment(lib, "SDL2.lib")
-#pragma comment(lib, "SDL2main.lib")
+#pragma comment(lib, "SDL3.lib")
 #endif

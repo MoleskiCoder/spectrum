@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <string>
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <ClockedChip.h>
 #include <Signal.h>

@@ -48,8 +48,8 @@ protected:
 	bool handleJoyButtonDown(SDL_JoyButtonEvent event) final;
 	bool handleJoyButtonUp(SDL_JoyButtonEvent event) final;
 
-	bool handleControllerButtonDown(SDL_ControllerButtonEvent event) final;
-	bool handleControllerButtonUp(SDL_ControllerButtonEvent event) final;
+	bool handleGamepadButtonDown(SDL_GamepadButtonEvent event) final;
+	bool handleGamepadButtonUp(SDL_GamepadButtonEvent event) final;
 
 private:
 	Configuration& m_configuration;
@@ -60,6 +60,6 @@ private:
 
 	void handleJoyButtonDown(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event);
 	void handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event);
-	void handleControllerButtonDown(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
-	void handleControllerButtonUp(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event);
+	void handleGamepadButtonDown(std::vector<Joystick*> joysticks, SDL_GamepadButtonEvent event);
+	void handleGamepadButtonUp(std::vector<Joystick*> joysticks, SDL_GamepadButtonEvent event);
 };

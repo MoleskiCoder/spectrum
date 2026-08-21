@@ -57,7 +57,7 @@ private:
 	EightBit::InputOutput m_ports;
 	EightBit::Z80 m_cpu { *this, m_ports };
 	Ula m_ula = { m_palette, *this };
-	Buzzer<Uint8> m_sound = { Ula::FramesPerSecond, Ula::CpuClockRate, AUDIO_U8 };
+	Buzzer<Uint8> m_sound = { Ula::FramesPerSecond, Ula::CpuClockRate, SDL_AUDIO_U8 };
 	std::vector<std::shared_ptr<Expansion>> m_expansions;
 
 	EightBit::Rom m_basicRom;				//0000h - 3FFFh  ROM(BASIC)

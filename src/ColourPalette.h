@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstdint>
 
-struct SDL_PixelFormat;
+struct SDL_PixelFormatDetails;
 
 class ColourPalette final {
 public:
@@ -32,10 +32,10 @@ public:
 		return colour(bright ? index + 8 : index);
 	}
 
-	void load(SDL_PixelFormat* hardware);
+	void load(const SDL_PixelFormatDetails* hardware);
 
 private:
 	std::array<uint32_t, 16> m_colours = {};
 
-	void loadColour(SDL_PixelFormat* hardware, size_t idx, Uint8 red, Uint8 green, Uint8 blue);
+	void loadColour(const SDL_PixelFormatDetails* hardware, size_t idx, Uint8 red, Uint8 green, Uint8 blue);
 };

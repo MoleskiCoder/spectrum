@@ -5,10 +5,10 @@
 #include <limits>
 #include <vector>
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <Device.h>
-#include <SDLWrapper.h>
+#include <Wrapper.h>
 
 #include "WavWriter.h"
 
@@ -22,8 +22,7 @@ private:
 
 	WavWriter<T, float> m_wav = { "spectrum.wav", 1, AudioFrequency, LowLevel, HighLevel, -.1f, .1f };
 
-	SDL_AudioSpec m_have;
-	SDL_AudioDeviceID m_device = 0;
+	std::shared_ptr<SDL_AudioStream> m_stream;
 
 	const float m_sampleLength;
 
@@ -53,26 +52,14 @@ public:
 		const auto samplesPerFrame = static_cast<float>(AudioFrequency) / frameRate + 1.0f;
 
 		SDL_AudioSpec want;
-		SDL_zero(want);
 		want.freq = AudioFrequency;
 		want.format = format;
 		want.channels = 1;
-		want.samples = static_cast<Uint16>(samplesPerFrame / want.channels);
 	
-		SDL_zero(m_have);
-		m_device = ::SDL_OpenAudioDevice(nullptr, SDL_FALSE, &want, &m_have, 0);
-		if (m_device == 0)
-			Gaming::SDLWrapper::throwSDLException("Unable to open audio device");
-		assert(m_device >= 2);
+		m_stream.reset(::SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &want, nullptr, nullptr), ::SDL_DestroyAudioStream);
+		Gaming::Wrapper::maybeThrowException(m_stream.get(), "Unable to open audio device stream");
 
-		// Given that there are no allowed changes, problems should have led to an
-		// exception being thrown.  So the following must all be correct.
-		assert(m_have.freq == want.freq);
-		assert(m_have.format == want.format);
-		assert(m_have.channels == want.channels);
-		assert(m_have.samples == want.samples);
-	
-		m_buffer.resize(m_have.samples);
+		m_buffer.resize((uint64_t)samplesPerFrame);
 		m_bufferLength = static_cast<Uint32>(m_buffer.size() * sizeof(T));
 	
 		stop();
@@ -82,11 +69,18 @@ public:
 		try {
 			maybeStopRecording();
 		} catch (...) {}
-		::SDL_CloseAudioDevice(m_device);
+		m_stream.reset();
 	}
 
-	void stop() noexcept { ::SDL_PauseAudioDevice(m_device, SDL_TRUE); }
-	void start() noexcept {	::SDL_PauseAudioDevice(m_device, SDL_FALSE); }
+	void stop() noexcept {
+		const auto success = ::SDL_PauseAudioStreamDevice(m_stream.get());
+		Gaming::Wrapper::maybeThrowException(success, "Unable to pause audio device stream");
+	}
+	
+	void start() noexcept {
+		const auto success = ::SDL_ResumeAudioStreamDevice(m_stream.get());
+		Gaming::Wrapper::maybeThrowException(success, "Unable to resume audio device stream");
+	}
 
 	auto maybeStartRecording() {
 		return m_wav.maybeStartRecording();
@@ -103,8 +97,8 @@ public:
 
 	void endFrame() {
 		std::fill(m_buffer.begin() + m_lastSample, m_buffer.end(), m_lastLevel);
-		const int returned = ::SDL_QueueAudio(m_device, m_buffer.data(), m_bufferLength);
-		Gaming::SDLWrapper::verifySDLCall(returned, "Unable to queue buzzer audio: ");
+		const auto success = SDL_PutAudioStreamData(m_stream.get(), m_buffer.data(), m_bufferLength);
+		Gaming::Wrapper::maybeThrowException(success, "Unable to put buzzer audio");
 		m_wav.maybeRecordSamples(m_buffer.begin(), m_buffer.end());
 		m_lastSample = 0;
 	}

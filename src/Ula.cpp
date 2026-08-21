@@ -293,16 +293,16 @@ void Ula::pullKey(SDL_Keycode raw) noexcept {
 void Ula::initialiseKeyboardMapping() {
 
 	// Left side
-	keyboardMapping()[bit(0)] = { SDLK_LSHIFT,  SDLK_z,         SDLK_x,     SDLK_c,     SDLK_v  };
-	keyboardMapping()[bit(1)] = { SDLK_a,       SDLK_s,         SDLK_d,     SDLK_f,     SDLK_g  };
-	keyboardMapping()[bit(2)] = { SDLK_q,       SDLK_w,         SDLK_e,     SDLK_r,     SDLK_t  };
+	keyboardMapping()[bit(0)] = { SDLK_LSHIFT,  SDLK_Z,         SDLK_X,     SDLK_C,     SDLK_V  };
+	keyboardMapping()[bit(1)] = { SDLK_A,       SDLK_S,         SDLK_D,     SDLK_F,     SDLK_G  };
+	keyboardMapping()[bit(2)] = { SDLK_G,       SDLK_W,         SDLK_E,     SDLK_R,     SDLK_T  };
 	keyboardMapping()[bit(3)] = { SDLK_1,       SDLK_2,         SDLK_3,     SDLK_4,     SDLK_5  };
 
 	// Right side
 	keyboardMapping()[bit(4)] = { SDLK_0,       SDLK_9,         SDLK_8,     SDLK_7,     SDLK_6  };
-	keyboardMapping()[bit(5)] = { SDLK_p,       SDLK_o,         SDLK_i,     SDLK_u,     SDLK_y  };
-	keyboardMapping()[bit(6)] = { SDLK_RETURN,  SDLK_l,         SDLK_k,     SDLK_j,     SDLK_h  };
-	keyboardMapping()[bit(7)] = { SDLK_SPACE,   SDLK_RSHIFT,    SDLK_m,     SDLK_n,     SDLK_b  };
+	keyboardMapping()[bit(5)] = { SDLK_P,       SDLK_O,         SDLK_I,     SDLK_U,     SDLK_Y  };
+	keyboardMapping()[bit(6)] = { SDLK_RETURN,  SDLK_L,         SDLK_K,     SDLK_J,     SDLK_H  };
+	keyboardMapping()[bit(7)] = { SDLK_SPACE,   SDLK_RSHIFT,    SDLK_M,     SDLK_N,     SDLK_B  };
 }
 
 uint8_t Ula::findSelectedKeys(uint8_t rows) const {

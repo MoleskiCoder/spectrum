@@ -15,7 +15,7 @@ const uint32_t* Computer::pixels() const {
 
 void Computer::raisePOWER() noexcept {
 	Game::raisePOWER();
-	m_colours.load(pixelFormat().get());
+	m_colours.load(pixelFormat());
 	BUS().initialise();
 	BUS().raisePOWER();
 }
@@ -79,19 +79,19 @@ bool Computer::handleJoyButtonUp(const SDL_JoyButtonEvent event) {
 	return true;
 }
 
-bool Computer::handleControllerButtonDown(SDL_ControllerButtonEvent event) {
-	handleControllerButtonDown(joysticks(), event);
+bool Computer::handleGamepadButtonDown(SDL_GamepadButtonEvent event) {
+	handleGamepadButtonDown(joysticks(), event);
 	return true;
 }
 
-bool Computer::handleControllerButtonUp(SDL_ControllerButtonEvent event) {
-	handleControllerButtonUp(joysticks(), event);
+bool Computer::handleGamepadButtonUp(SDL_GamepadButtonEvent event) {
+	handleGamepadButtonUp(joysticks(), event);
 	return true;
 }
 
 void Computer::handleJoyButtonDown(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event) {
 	switch (event.button) {
-	case SDL_CONTROLLER_BUTTON_A:
+	case SDL_GAMEPAD_BUTTON_SOUTH:
 		for (auto joystick : joysticks)
 			joystick->pushFire();
 		break;
@@ -100,49 +100,49 @@ void Computer::handleJoyButtonDown(std::vector<Joystick*> joysticks, SDL_JoyButt
 
 void Computer::handleJoyButtonUp(std::vector<Joystick*> joysticks, SDL_JoyButtonEvent event) {
 	switch (event.button) {
-	case SDL_CONTROLLER_BUTTON_A:
+	case SDL_GAMEPAD_BUTTON_SOUTH:
 		for (auto joystick : joysticks)
 			joystick->releaseFire();
 		break;
 	}
 }
 
-void Computer::handleControllerButtonDown(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event) {
+void Computer::handleGamepadButtonDown(std::vector<Joystick*> joysticks, SDL_GamepadButtonEvent event) {
 	switch (event.button) {
-	case SDL_CONTROLLER_BUTTON_DPAD_UP:
+	case SDL_GAMEPAD_BUTTON_DPAD_UP:
 		for (auto joystick : joysticks)
 			joystick->pushUp();
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+	case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
 		for (auto joystick : joysticks)
 			joystick->pushDown();
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+	case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
 		for (auto joystick : joysticks)
 			joystick->pushLeft();
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+	case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 		for (auto joystick : joysticks)
 			joystick->pushRight();
 		break;
 	}
 }
 
-void Computer::handleControllerButtonUp(std::vector<Joystick*> joysticks, SDL_ControllerButtonEvent event) {
+void Computer::handleGamepadButtonUp(std::vector<Joystick*> joysticks, SDL_GamepadButtonEvent event) {
 	switch (event.button) {
-	case SDL_CONTROLLER_BUTTON_DPAD_UP:
+	case SDL_GAMEPAD_BUTTON_DPAD_UP:
 		for (auto joystick : joysticks)
 			joystick->releaseUp();
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+	case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
 		for (auto joystick : joysticks)
 			joystick->releaseDown();
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+	case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
 		for (auto joystick : joysticks)
 			joystick->releaseLeft();
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+	case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 		for (auto joystick : joysticks)
 			joystick->releaseRight();
 		break;
