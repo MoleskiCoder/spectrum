@@ -167,6 +167,7 @@
   <ItemGroup>
     <ClInclude Include="AbstractBuzzer.h" />
     <ClInclude Include="AbstractColourPalette.h" />
+    <ClInclude Include="Application.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="Buzzer.h" />
     <ClInclude Include="ColourPalette.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="Z80File.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="ColourPalette.cpp" />
     <ClCompile Include="Computer.cpp" />

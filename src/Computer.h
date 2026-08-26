@@ -30,6 +30,8 @@ public:
 	[[nodiscard]] Board& BUS() { return m_board; }
 	[[nodiscard]] const Board& BUS() const { return m_board; }
 
+	[[nodiscard]] const Configuration& configuration() const { return m_configuration; }
+
 protected:
 	[[nodiscard]] float fps() const noexcept final { return Ula::FramesPerSecond; }
 	[[nodiscard]] bool useVsync() const noexcept final { return true; }

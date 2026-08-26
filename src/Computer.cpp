@@ -6,8 +6,7 @@
 Computer::Computer(Configuration& configuration)
 : Gaming::Game(configuration.loggingLevel()),
   m_configuration(configuration),
-  m_board(m_colours, configuration) {
-}
+  m_board(m_colours, configuration) {}
 
 const uint32_t* Computer::pixels() const {
 	return BUS().ULA().pixels().data();
