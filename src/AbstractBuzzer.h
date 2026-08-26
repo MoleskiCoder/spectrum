@@ -31,12 +31,12 @@ protected:
 	: m_audioFrequency(audioFrequency),
 	  m_frameRate(frameRate),
 	  m_clockRate(clockRate) {
-		m_buffer.resize((int64_t)samplesPerFrame());
+		m_buffer.resize(static_cast<uint64_t>(samplesPerFrame()));
 	}
 
-	[[nodiscard]] constexpr float sampleLength() const noexcept { return static_cast<float>m_audioFrequency / static_cast<float>m_clockRate; }
-	[[nodiscard]] constexpr float cyclesPerSample() const noexcept { return static_cast<float>m_clockRate / static_cast<float>m_audioFrequency; }
-	[[nodiscard]] constexpr float samplesPerFrame() const noexcept { return static_cast<float>m_audioFrequency / m_frameRate + 1.0f; }
+	[[nodiscard]] constexpr float sampleLength() const noexcept { return static_cast<float>(m_audioFrequency) / static_cast<float>(m_clockRate); }
+	[[nodiscard]] constexpr float cyclesPerSample() const noexcept { return static_cast<float>(m_clockRate) / static_cast<float>(m_audioFrequency); }
+	[[nodiscard]] constexpr float samplesPerFrame() const noexcept { return static_cast<float>(m_audioFrequency) / m_frameRate + 1.0f; }
 
 	[[nodiscard]] constexpr auto sample(int cycle) const noexcept {
 		const auto sample = static_cast<float>(cycle) * sampleLength();

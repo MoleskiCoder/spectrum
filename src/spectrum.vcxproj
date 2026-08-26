@@ -166,6 +166,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AbstractBuzzer.h" />
+    <ClInclude Include="AbstractColourPalette.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="Buzzer.h" />
     <ClInclude Include="ColourPalette.h" />
