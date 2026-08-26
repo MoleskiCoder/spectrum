@@ -165,7 +165,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AudioFile.h" />
+    <ClInclude Include="AbstractBuzzer.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="Buzzer.h" />
     <ClInclude Include="ColourPalette.h" />
@@ -185,7 +185,6 @@
     <ClInclude Include="ToneSequence.h" />
     <ClInclude Include="TZXFile.h" />
     <ClInclude Include="Ula.h" />
-    <ClInclude Include="WavWriter.h" />
     <ClInclude Include="Z80File.h" />
   </ItemGroup>
   <ItemGroup>

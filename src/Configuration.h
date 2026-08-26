@@ -9,8 +9,9 @@ public:
 	[[nodiscard]] bool isDebugMode() const { return m_debugMode; }
 	void setDebugMode(bool value) { m_debugMode = value; }
 
-	[[nodiscard]] bool isVerboseMode() const { return m_verboseMode; }
-	void setVerboseMode(bool value) { m_verboseMode = value; }
+	[[nodiscard]] SDL_LogPriority loggingLevel() const { return SDL_LOG_PRIORITY_DEBUG; }
+	//[[nodiscard]] SDL_LogPriority loggingLevel() const { return SDL_LOG_PRIORITY_INFO; }
+	//[[nodiscard]] SDL_LogPriority loggingLevel() const { return SDL_LOG_PRIORITY_WARN; }
 
 	[[nodiscard]] bool isProfileMode() const { return m_profileMode; }
 	void setProfileMode(bool value) { m_profileMode = value; }

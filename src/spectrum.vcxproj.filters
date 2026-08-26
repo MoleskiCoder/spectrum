@@ -68,13 +68,10 @@
     <ClInclude Include="StandardToneSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AudioFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WavWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LittleEndianContent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractBuzzer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

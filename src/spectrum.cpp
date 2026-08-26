@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
-#include <memory>
-#include <chrono>
+#define SDL_MAIN_USE_CALLBACKS 1
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 
 #include "Configuration.h"
 #include "Computer.h"
@@ -23,7 +24,8 @@ void loadROM(const Configuration& configuration, Computer& computer) {
 	//computer.plug(romDirectory + "\\Release-v0.37\\testrom.bin");
 	//computer.plug(romDirectory + "\\smart\\ROMs\\DiagROM.v41");
 	//computer.plug(romDirectory + "\\DiagROM.v56");
-    computer.plug(romDirectory + "\\diagrom\\DiagROMv.171");
+	//computer.plug(romDirectory + "\\diagrom\\DiagROMv.171");
+	computer.plug(romDirectory + "\\diagrom\\DiagROMv.173");
 
 	//computer.plug(romDirectory + "\\VMM-TEST.ROM");
 }
@@ -86,97 +88,37 @@ void loadProgram(const Configuration& configuration, Computer& computer) {
 	//computer.loadZ80(programDirectory + "\\HEDGEHOG.Z80");	// Not for 48K spectrum
 }
 
-void testTapeLoading(const Configuration& configuration) {
+SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
-	auto programDirectory = configuration.getProgramDirectory();
+	Configuration configuration;
+	auto* computer = new Computer(configuration);
 
-	const auto start_time = std::chrono::steady_clock::now();
-	auto count = 0ULL;
+    computer->raisePOWER();
 
-	TZXFile tape;
-	tape.load(programDirectory + "\\Manic Miner.tzx");
+    computer->plug(std::make_shared<KempstonJoystick>(computer->BUS()));
+    //computer->plug(std::make_shared<Interface2Joystick>(computer->BUS()));
 
-	ToneSequence::amplitude_t highest = ToneSequence::amplitude_t::Low;
+	loadROM(configuration, *computer);
+    loadProgram(configuration, *computer);
 
-	auto generator = tape.generate();
-	while (generator) {
-		const auto level = generator();
-		++count;
-	}
+    ::SDL_LogInfo(::SDL_LOG_CATEGORY_APPLICATION, "Completed application initialisation");
 
-	//Buzzer<Uint8> beep = { Ula::FramesPerSecond, Ula::CpuClockRate, AUDIO_U8 };
-	//auto generator = tape.generate();
-	//auto frameCycles = 0;
-	//while (generator) {
-	//	const auto level = generator();
-	//	beep.buzz(level, frameCycles);
-	//	if (++frameCycles == (Ula::TotalFrameClocks / 2)) {
-	//		frameCycles = 0;
-	//		beep.endFrame();
-	//		//std::cout << ".";
-	//	}
-	//	++count;
-	//}
+    *appstate = computer;
 
-
-	const auto finish_time = std::chrono::steady_clock::now();
-	const auto elapsed_time = finish_time - start_time;
-	const auto seconds = std::chrono::duration_cast<std::chrono::duration<double>>(elapsed_time).count();
-
-	std::cout.imbue(std::locale(""));
-	std::cout
-		<< "Retrieved " << count << " amplitudes. "
-		<< "Elapsed time: " << seconds << " seconds. "
-		<< int(count / seconds) << " amplitudes per second."
-		<< std::endl;
+	return SDL_APP_CONTINUE;
 }
 
-int main(int, char*[])
-{
-	Configuration configuration;
+void SDL_AppQuit(void* appstate, SDL_AppResult result) {
+	::SDL_LogInfo(::SDL_LOG_CATEGORY_APPLICATION, "Terminating application");
+	((Computer*)appstate)->lowerPOWER();
+}
 
-	configuration.setVerboseMode(true);
+SDL_AppResult SDL_AppIterate(void* appstate) {
+	::SDL_LogDebug(::SDL_LOG_CATEGORY_APPLICATION, "Executing application frame");
+	return ((Computer*)appstate)->runFrame();
+}
 
-#ifdef _DEBUG
-	//configuration.setDebugMode(true);
-	//configuration.setProfileMode(true);
-	//configuration.setDrawGraphics(true);
-#endif
-
-	auto computer = std::make_unique<Computer>(configuration);
-
-	computer->plug(std::make_shared<KempstonJoystick>(computer->BUS()));
-	computer->plug(std::make_shared<Interface2Joystick>(computer->BUS()));
-
-	computer->raisePOWER();
-
-	try {
-		loadROM(configuration, *computer);
-	} catch (const std::exception& error) {
-		::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "Problem loading ZX Spectrum ROM: %s", error.what());
-		return 2;
-	}
-
-	try {
-		loadProgram(configuration, *computer);
-	} catch (const std::exception& error) {
-		::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "Problem loading ZX Spectrum program: %s", error.what());
-		return 2;
-	}
-
-	//try {
-	//	testTapeLoading(configuration);
-	//} catch (const std::exception& error) {
-	//	::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "Problem testing tape loading: %s", error.what());
-	//	return 2;
-	//}
-
-	try {
-		computer->runLoop();
-	} catch (const std::exception& error) {
-		::SDL_LogError(::SDL_LOG_CATEGORY_APPLICATION, "Problem running ZX Spectrum: %s", error.what());
-		return 2;
-	}
-
-	return 0;
+SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
+	::SDL_LogDebug(::SDL_LOG_CATEGORY_APPLICATION, "Handling application event");
+	return ((Computer*)appstate)->handleEvent(*event);
 }

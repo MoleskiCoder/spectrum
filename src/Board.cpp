@@ -62,23 +62,21 @@ void Board::raisePOWER() noexcept {
 	for (auto& expansion : m_expansions)
 		expansion->raisePOWER();
 	
+	sound().raisePOWER();
 	ULA().raisePOWER();
 	CPU().raisePOWER();
 	CPU().lowerRESET();
 	CPU().raiseINT();
 	CPU().raiseNMI();
-	
-	sound().start();
 
 	CPU().raiseRESET();
 }
 
 void Board::lowerPOWER() noexcept {
 
-	sound().stop();
-
 	CPU().lowerPOWER();
 	ULA().lowerPOWER();
+	sound().lowerPOWER();
 
 	for (auto& expansion : m_expansions)
 		expansion->lowerPOWER();

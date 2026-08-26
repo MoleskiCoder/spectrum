@@ -4,7 +4,7 @@
 #include "Joystick.h"
 
 Computer::Computer(Configuration& configuration)
-: Gaming::Game(configuration.isVerboseMode()),
+: Gaming::Game(configuration.loggingLevel()),
   m_configuration(configuration),
   m_board(m_colours, configuration) {
 }
